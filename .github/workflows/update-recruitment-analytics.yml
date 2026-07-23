@@ -1,0 +1,62 @@
+name: Update Recruitment Analytics Report from Jira
+
+on:
+  schedule:
+    # Twice a day (UTC). Kyiv is UTC+3 (summer) / UTC+2 (winter):
+    #   05:10 UTC → morning refresh (offset 10 min from REC job to avoid API contention)
+    #   12:10 UTC → midday refresh
+    - cron: '10 5 * * *'
+    - cron: '10 12 * * *'
+  workflow_dispatch: {}   # allow manual trigger from Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-recruitment-analytics
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run updater (REC + WRP → Recruitment Analytics Report)
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          python3 scripts/update_recruitment_analytics.py
+
+      - name: Commit & push if data changed
+        run: |
+          git config user.name  "rec-dashboard-bot[github-actions]"
+          git config user.email "rec-dashboard-bot@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain reports/Recruitment_Analytics_Report.html)" ]]; then
+            git add reports/Recruitment_Analytics_Report.html
+            git commit -m "chore(analytics): auto-refresh Recruitment Analytics Report from Jira [skip ci]"
+            for i in 1 2 3; do
+              if git push; then
+                echo "✓ Recruitment Analytics Report updated and pushed (attempt $i)."
+                exit 0
+              fi
+              echo "Push attempt $i rejected, rebasing on remote main..."
+              git pull --rebase origin main
+              sleep 2
+            done
+            echo "✗ Failed to push after 3 attempts."
+            exit 1
+          else
+            echo "ℹ No data changes — skipping commit."
+          fi
