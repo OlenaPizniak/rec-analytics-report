@@ -507,17 +507,46 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .bc-seg:hover { opacity:.82; }
 .bc-xlabel { margin-top:14px; font-size:15px; color:var(--text); cursor:pointer; }
 .bc-xlabel:hover { color:var(--blue); }
+/* Horizontal bar chart (narrow Active block) */
+.hbc { display:flex; flex-direction:column; }
+.hbc-legend { display:flex; justify-content:center; gap:22px; flex-wrap:wrap; margin:6px 0 14px; }
+.hbc-rows { display:flex; flex-direction:column; margin-top:6px; }
+.hbc-row { display:flex; align-items:center; gap:16px; padding:14px 4px; border-bottom:1px solid #efe6d8; }
+.hbc-row:last-child { border-bottom:none; }
+.hbc-seg { cursor:default; }
+.hbc-seg:hover { filter:brightness(1.06); }
+#tip { position:fixed; z-index:100000; max-width:290px; background:#2e231a; color:#f7efe0; font-size:12px; line-height:1.45; padding:8px 11px; border-radius:9px; box-shadow:0 6px 22px rgba(0,0,0,.3); pointer-events:none; opacity:0; transition:opacity .1s; }
+.hbc-label { width:96px; flex:none; font-size:15px; color:var(--text); }
+.hbc-track { flex:1; min-width:0; }
+.hbc-bar { display:flex; height:32px; border-radius:6px; overflow:hidden; min-width:3px; }
+.hbc-seg { display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; min-width:0; overflow:hidden; }
 
 .pr-grid { display:grid; grid-template-columns:minmax(260px,.9fr) 1.3fr; gap:44px; align-items:center; }
 @media (max-width:900px){ .pr-grid { grid-template-columns:1fr; gap:28px; } }
 
-.dc { position:relative; padding:8px 6px 12px; }
+.dc { position:relative; padding:6px 4px 10px; display:flex; flex-direction:column; }
 .dc-title { text-align:center; font-size:19px; font-weight:700; color:var(--text); letter-spacing:-.3px; margin-bottom:14px; }
-.dc-row { display:flex; align-items:center; justify-content:center; gap:60px; flex-wrap:wrap; }
-.dc-row svg { flex-shrink:0; }
-.dc-legend { display:flex; flex-direction:column; gap:15px; }
-.dc-leg { display:flex; align-items:center; gap:11px; font-size:15px; color:var(--text); cursor:pointer; }
-.dc-leg .dot { width:15px; height:15px; border-radius:50%; margin:0; }
+.dc-legend { display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; gap:10px 24px; margin-bottom:8px; }
+.dc-leg { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--text); }
+.dc-leg .dot { width:13px; height:13px; border-radius:50%; margin:0; flex:none; }
+.dc-leg-pct { font-weight:700; color:var(--text2); font-variant-numeric:tabular-nums; }
+.dc-donut { display:flex; align-items:center; justify-content:center; margin-top:4px; }
+.dc-svg { width:225px; height:225px; max-width:100%; }
+/* Active Roles Priority — donut (left) + table (right), equal-height sub-cards */
+.prio-grid { display:grid; grid-template-columns:minmax(340px,0.9fr) minmax(420px,1.1fr); gap:24px; align-items:start; margin-bottom:20px; }
+.prio-cell { background:#fffdf9; border:1px solid var(--border); border-radius:14px; padding:20px; }
+.prio-cell--chart { align-self:start; }
+.prio-cell--table { padding:0; display:flex; flex-direction:column; overflow:hidden; }
+.pc-body { flex:1; min-height:0; overflow:hidden; padding:8px 16px; }
+.prio-cell--table.expanded { height:auto !important; max-height:none !important; }
+.prio-cell--table.expanded .pc-body { overflow:auto; }
+.closed-grid { grid-template-columns:minmax(340px,0.9fr) minmax(420px,1.1fr); }
+/* Closed vertical bar chart: fit the narrow cell + fill height (bars pinned low) */
+.prio-cell .bc { display:flex; flex-direction:column; height:100%; }
+.prio-cell .bc-plot { flex:1; min-height:0; gap:10px; }
+.prio-cell .bc-col { flex:1 1 0; min-width:0; }
+.prio-cell .bc-bar { width:100%; max-width:90px; }
+@media (max-width:1024px){ .prio-grid { grid-template-columns:1fr; } .prio-cell--table { max-height:none !important; } .pc-body { overflow:visible; } }
 .dc-leg:hover { color:var(--blue); }
 
 /* pivot tables */
@@ -540,6 +569,9 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .dtbl tbody tr:hover { background:#f4ebdd; }
 .dtbl .num { text-align:right; font-variant-numeric:tabular-nums; }
 .srcbar { height:8px; border-radius:4px; background:linear-gradient(90deg,#8a7860,#c9bfac); min-width:2px; display:inline-block; vertical-align:middle; }
+.dept-badge { display:inline-block; margin-left:8px; font-size:11px; font-weight:600; padding:2px 9px; border-radius:7px; vertical-align:middle; letter-spacing:.1px; }
+.dept-badge.mobile { background:#efe8dc; color:#8a7a62; }
+.dept-badge.web { background:#e6eef6; color:#5f7fa3; }
 .tag-src { font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; }
 .tag-src.mobile { background:#ece3d5; color:#4a3829; }
 .tag-src.web { background:#e6ddc7; color:#5c4a2e; }
@@ -569,7 +601,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .hsbh-row { display:flex; align-items:center; gap:14px; }
 .hsbh-name { width:190px; flex-shrink:0; text-align:right; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .hsbh-track { flex:1; display:flex; align-items:center; gap:10px; }
-.hsbh-bar { height:24px; border-radius:5px; cursor:pointer; transition:opacity .12s; min-width:3px; }
+.hsbh-bar { height:24px; border-radius:5px; cursor:default; transition:opacity .12s; min-width:3px; }
 .hsbh-bar:hover { opacity:.82; }
 .hsbh-val { font-size:13px; font-weight:700; color:var(--text); }
 
@@ -588,14 +620,19 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .modal-body { overflow:auto; padding:8px 26px 26px; }
 .modal-body .dtbl thead th { position:sticky; top:0; z-index:2; }
 .gc-sel { font-family:inherit; font-size:12.5px; padding:5px 9px; border:1px solid var(--border); border-radius:7px; background:var(--white); color:var(--text); cursor:pointer; }
-/* View-only report — all click affordances & modals removed (2026-07) */
+/* Interactivity: ONLY table rows open modals; charts / KPIs / overview panels are display-only */
 .clickable{cursor:default!important;transition:none!important;}
 .kpi-hint{display:none!important;}
 .kpi-card.clickable:hover{transform:none!important;box-shadow:none!important;}
 .ov-big.clickable:hover{color:inherit!important;}
 .ov-stat.clickable:hover{background:inherit!important;}
 .bc-big.clickable:hover{color:inherit!important;}
-.ptbl tbody tr.clickable td:first-child{color:inherit!important;font-weight:inherit!important;}
+.bc-xlabel,.bc-seg,.bc-big{cursor:default!important;}
+.ptbl tbody tr.clickable, .dtbl tbody tr.clickable{cursor:pointer!important;}
+.ptbl tbody tr.clickable:hover, .dtbl tbody tr.clickable:hover{background:#f4ebdd!important;}
+/* Collapse toggle for table cards whose height is capped to the left chart */
+.ov-toggle{display:none;width:100%;border:none;border-top:1px solid var(--border);background:#faf4e8;color:var(--text2);font-family:inherit;font-size:12.5px;font-weight:600;padding:10px;cursor:pointer;letter-spacing:.2px;}
+.ov-toggle:hover{background:#f1e9db;}
 </style>
 </head>
 <body>
@@ -609,7 +646,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 27 липня 2026, оновлено 09:18 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
+    <!--<<<AUTO_DATE_START>>>-->Дані: 27 липня 2026, оновлено 17:22 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
   </div>
 </div>
 
@@ -650,20 +687,20 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     </div>
 
     <div class="section">
-      <div class="sec-body" id="ov-barchart"></div>
-    </div>
-
-    <div class="section">
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#8a7860,#a3927a)">📋</div>
         <h2>Деталі — Active Roles Data</h2>
         <span class="section-note" id="ov-deptnote"></span>
       </div>
-      <div class="sec-body" id="ov-depttable"></div>
-    </div>
-
-    <div class="section">
-      <div class="sec-body"><div id="ov-prio-donut"></div></div>
+      <div class="sec-body">
+        <div class="prio-grid">
+          <div class="prio-cell prio-cell--chart" id="ov-barchart"></div>
+          <div class="prio-cell prio-cell--table">
+            <div class="pc-body" id="ov-depttable"></div>
+            <button class="ov-toggle" onclick="toggleBlock(this)"><span class="tg-ic">▾</span> <span class="tg-tx">Показати всі</span></button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="section">
@@ -672,11 +709,15 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
         <h2>Active Roles Priority — by department</h2>
         <span class="section-note" id="ov-prionote"></span>
       </div>
-      <div class="sec-body" id="ov-prio-table"></div>
-    </div>
-
-    <div class="section">
-      <div class="sec-body" id="ov-closedbar"></div>
+      <div class="sec-body">
+        <div class="prio-grid">
+          <div class="prio-cell prio-cell--chart" id="ov-prio-donut"></div>
+          <div class="prio-cell prio-cell--table">
+            <div class="pc-body" id="ov-prio-table"></div>
+            <button class="ov-toggle" onclick="toggleBlock(this)"><span class="tg-ic">▾</span> <span class="tg-tx">Показати всі</span></button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="section">
@@ -685,7 +726,15 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
         <h2>Деталі — Closed Roles Data</h2>
         <span class="section-note" id="ov-closednote"></span>
       </div>
-      <div class="sec-body" id="ov-closedtable"></div>
+      <div class="sec-body">
+        <div class="prio-grid closed-grid">
+          <div class="prio-cell prio-cell--chart" id="ov-closedbar"></div>
+          <div class="prio-cell prio-cell--table">
+            <div class="pc-body" id="ov-closedtable"></div>
+            <button class="ov-toggle" onclick="toggleBlock(this)"><span class="tg-ic">▾</span> <span class="tg-tx">Показати всі</span></button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -752,116 +801,85 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 
 </div>
 
-<!-- Vacancy list modal removed — report is view-only -->
+<!-- ── Vacancy list modal (tables only) ── -->
+<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-title">—</div>
+        <div class="modal-sub" id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
 
 <script>
 // <<<AUTO_DATA_START>>> — managed by scripts/update_recruitment_analytics.py
 // Combined mobile(REC)+web(WRP) active roles. Each item: source, kind, r(reason),
 // sn(seniority), es(employee status), t/sb(dept), h(hires). See update_recruitment_analytics.py
 const OP=[
+  {key:"REC-602",s:"AI Creative Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Oleksandr Honcharuk",sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-27",pk:"REC-593"},
   {key:"REC-598",s:"Motion Designer/Video Editor",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Kate Tsykalo",sd:"2026-07-21",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"Creative",cr:"2026-07-21",pk:"REC-586"},
   {key:"REC-594",s:"Employee Experience Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Low",sn:"Junior",r:"Replacement",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Anna Malaniuk",sd:"2026-07-10",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Employee Experience",sb:"People Engagement",cr:"2026-07-10"},
   {key:"REC-593",s:"AI Creative Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Oleksandr Honcharuk",sd:"2026-07-09",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"Creative",cr:"2026-07-09"},
-  {key:"REC-591",s:"Graphic Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Low",sn:null,r:null,es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:null,sb:null,cr:"2026-07-09",pk:"REC-568"},
-  {key:"REC-590",s:"Graphic Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Low",sn:null,r:null,es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:null,sb:null,cr:"2026-07-09",pk:"REC-568"},
-  {key:"REC-586",s:"Motion Designer/Video Editor",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:null,rec:"Mariia Salabai",src:null,so:"Kate Tsykalo",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"Creative",cr:"2026-07-02"},
+  {key:"REC-590",s:"Graphic Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Low",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Masha Kolomiets",sd:"2026-07-03",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"Creative",cr:"2026-07-09",pk:"REC-568"},
+  {key:"REC-586",s:"Motion Designer/Video Editor",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Kate Tsykalo",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"Creative",cr:"2026-07-02"},
   {key:"REC-580",s:"Digital Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Staff",rec:"Polina Serdiuk",src:null,so:"Kateryna Hrabynska",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-07-02"},
   {key:"REC-578",s:"Google Ads Demand Gen Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Senior",r:"Extention",es:"Staff",rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:"Yaroslav Omelianenko",sd:"2026-06-30",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"PPC",cr:"2026-07-01"},
   {key:"REC-569",s:"AI Creative Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Max Kovalenko",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-06-29"},
-  {key:"REC-568",s:"Graphic Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Low",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Masha Kolomiiets",sd:"2026-07-03",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:3,t:"Marketing",sb:"Creative",cr:"2026-06-29"},
+  {key:"REC-568",s:"Graphic Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Low",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Masha Kolomiiets",sd:"2026-07-03",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"Creative",cr:"2026-06-29"},
   {key:"REC-567",s:" Copywriter",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Alina Muravchyk",src:null,so:"Viktoriia Dumych (Monastyrska)",sd:"2026-06-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Workout Content",cr:"2026-06-24"},
   {key:"REC-566",s:"Content Project Manager",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Alina Muravchyk",src:null,so:"Viktoriia Dumych (Monastyrska)",sd:"2026-06-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Workout Content",cr:"2026-06-24"},
   {key:"REC-544",s:"IT Support Engineer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Replacement",es:"Staff",rec:"Mariia Salabai",src:null,so:"Serhii Pidlypaiev",sd:"2026-05-27",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:"IT support",cr:"2026-05-27"},
   {key:"REC-543",s:"Full Stack Engineer (PHP+JavaScript+AI)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Senior",r:"Extention",es:"Staff",rec:"Nadiia Brusova",src:"Kateryna Yaremenko",so:"Constantine Chernenko",sd:"2026-05-26",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:"Workouts iOS",cr:"2026-05-26"},
   {key:"REC-539",s:"Legal Counsel",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Junior",r:"Replacement",es:"Staff",rec:"Nadiia Brusova",src:null,so:"Iryna Savchuk",sd:"2026-07-01",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Legal",sb:null,cr:"2026-05-25"},
   {key:"REC-499",s:"Content Manager",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Senior",r:"Replacement",es:"Non-staff",rec:"Polina Serdiuk",src:"Anastasiia Melnyk",so:"Volodymyr Chayka",sd:"2026-05-21",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:null,cr:"2026-05-21"},
-  {key:"REC-341",s:"Creative Writer",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Junior",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-13"},
-  {key:"REC-340",s:"Content Researcher",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Junior",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-13"},
-  {key:"REC-339",s:"SEO Writer",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Junior",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-13"},
-  {key:"REC-338",s:"Fashion Constructor",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Middle",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-05-13"},
-  {key:"REC-337",s:"Designer (freelance)",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Middle",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-05-13"},
-  {key:"REC-335",s:"Backend Engineer",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Middle",r:"Replacement",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:"Backend Core",cr:"2026-05-13"},
-  {key:"REC-333",s:"Product Manager",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Senior",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:null,cr:"2026-05-13"},
-  {key:"REC-332",s:"Fashion Content Manager ",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Middle",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-13"},
-  {key:"REC-316",s:"E-com Writer ",source:"mobile",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Junior",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-06"},
   {key:"REC-315",s:"Product Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Senior",r:"Replacement",es:"Staff",rec:"Anastasiia Shapovalenko",src:"Mariia Salabai",so:"Anna Yasinkovska",sd:"2026-05-05",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:"Design",cr:"2026-05-05"},
   {key:"REC-237",s:"Junior Digital Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Polina Serdiuk",src:null,so:"Kateryna Hrabynska",sd:"2026-07-07",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-04-07"},
   {key:"REC-195",s:"Backend Engineer Core Team (GoLang + PHP)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Senior",r:"Extention",es:"Staff",rec:"Anastasiia Shapovalenko",src:"Anastasiia Melnyk",so:"Daryna Varycheva",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:"Backend Core",cr:"2026-04-02"},
-  {key:"REC-191",s:"Data Analyst (Marketing)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Extention",es:"Staff",rec:"Veronika Khovrina",src:"Anastasiia Melnyk",so:"Pavlo Boiko",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Analytics",sb:"Analytics",cr:"2026-04-02"},
+  {key:"REC-191",s:"Data Analyst (Marketing)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Extention",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Pavlo Boiko",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Analytics",sb:"Analytics",cr:"2026-04-02"},
   {key:"WRP-84",s:"Video Editor (freelance) ",source:"web",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:null,rec:"Daria Kozlova",src:null,so:null,sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Mobile",sb:"Mobile Team",cr:"2026-07-22"},
   {key:"WRP-82",s:"Partnership Manager",source:"web",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Replacement",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Payment",sb:"Payment",cr:"2026-07-06"},
-  {key:"WRP-79",s:"Project Manager",source:"web",type:"position",kind:"op",st:"Plan",pr:"Medium",sn:"Middle",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:null,cr:"2026-03-12"},
   {key:"WRP-76",s:"Growth Product Manager (Creators Quiz)",source:"web",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Extention",es:null,rec:null,src:null,so:null,sd:"2026-02-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:null,sb:null,cr:"2026-02-26"},
 ];
 // Consultant track (REC Recruitment Assignment + WRP Consultant), active
 const RA=[
   {key:"REC-601",s:"Marketing Expert",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:null,src:"Kateryna Yaremenko",so:"Vika Repa",sd:"2026-07-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"E-commerce",sb:null,cr:"2026-07-23"},
-  {key:"REC-595",s:"First Sale Consultant",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Prygoniuk",sd:"2026-07-15",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-07-15"},
   {key:"REC-589",s:"Google Ads Demand Gen Expert",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"PPC",cr:"2026-07-08"},
   {key:"REC-588",s:"Google Ads Demand Gen Consultant",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:null,sb:null,cr:"2026-07-08"},
-  {key:"REC-570",s:"Product Designer",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olha Pyrozhenko",sd:"2026-06-30",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-06-30"},
   {key:"REC-564",s:"Beauty consultation",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22"},
-  {key:"REC-559",s:"WhatsApp Expert",source:"mobile",type:"position",kind:"ra",st:"On hold",pr:"High",sn:null,r:"Consultation",es:null,rec:"Anastasiia Hodyna",src:"Kateryna Yaremenko",so:"Nataly Lytvyn",sd:"2026-06-04",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Brand Communications",sb:"Brand Communications",cr:"2026-06-05"},
   {key:"REC-484",s:"2D Motion Designer",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-05-12",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-05-19"},
-  {key:"REC-357",s:"Walk & Run for mental health",source:"mobile",type:"subtask",kind:"ra_sub",st:"On hold",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:"Viktoriia Dumuch",sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-272"},
-  {key:"REC-356",s:"Тренера/-ку з бігу для формування програм підготовки до забігів на 5 / 10 / 21 км",source:"mobile",type:"subtask",kind:"ra_sub",st:"On hold",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:"Viktoriia Dumuch",sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-274"},
-  {key:"REC-355",s:"E-com Consultants",source:"mobile",type:"subtask",kind:"ra_sub",st:"Plan",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"E-commerce",sb:"Non-tech",cr:"2026-05-15",pk:"REC-342"},
-  {key:"REC-351",s:"Influence Marketing Consultant ",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:"Expert",r:"Consultation",es:null,rec:"Alina Muravchyk",src:null,so:null,sd:"2026-04-07",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Brand Communications",sb:null,cr:"2026-05-14"},
   {key:"REC-350",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:"Alina Muravchyk",src:null,so:null,sd:"2026-03-16",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-14"},
-  {key:"REC-347",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"Plan",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:null,src:null,so:"Tetiana Shneider",sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-13"},
-  {key:"REC-342",s:"E-com Consultants",source:"mobile",type:"position",kind:"ra",st:"Plan",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"E-commerce",sb:"Non-tech",cr:"2026-05-13"},
-  {key:"REC-334",s:"Mental Practices Specialist",source:"mobile",type:"position",kind:"ra",st:"Plan",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-13"},
-  {key:"REC-274",s:"Тренера/-ку з бігу для формування програм підготовки до забігів на 5 / 10 / 21 км",source:"mobile",type:"position",kind:"ra",st:"On hold",pr:"Low",sn:"Expert",r:"Consultation",es:"Expert",rec:"Yaroslava Bondarchuk",src:null,so:"Viktoriia Dumuch",sd:"2026-04-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Content",sb:null,cr:"2026-04-22"},
-  {key:"REC-272",s:"Walk & Run for mental health",source:"mobile",type:"position",kind:"ra",st:"On hold",pr:"Low",sn:"Expert",r:"Consultation",es:"Expert",rec:"Yaroslava Bondarchuk",src:null,so:"Viktoriia Dumuch",sd:"2026-04-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Content",sb:null,cr:"2026-04-22"},
   {key:"REC-245",s:"TaiChi Instructor ",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Polina Serdiuk",src:null,so:"Viktoriia Dumuch / Anabel Chupruna",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-04-16"},
   {key:"WRP-83",s:"RD + PhD expert",source:"web",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:null,cr:"2026-07-17"},
 ];
 // Start dates lookup
 const SD={
+  "REC-602":"2026-07-22",
   "REC-601":"2026-07-23",
   "REC-598":"2026-07-21",
-  "REC-595":"2026-07-15",
   "REC-594":"2026-07-10",
   "REC-593":"2026-07-09",
-  "REC-591":null,
-  "REC-590":null,
+  "REC-590":"2026-07-03",
   "REC-589":"2026-07-01",
   "REC-588":null,
   "REC-586":"2026-07-02",
   "REC-580":"2026-07-02",
   "REC-578":"2026-06-30",
-  "REC-570":"2026-06-30",
   "REC-569":"2026-07-02",
   "REC-568":"2026-07-03",
   "REC-567":"2026-06-29",
   "REC-566":"2026-06-29",
   "REC-564":"2026-06-23",
-  "REC-559":"2026-06-04",
   "REC-544":"2026-05-27",
   "REC-543":"2026-05-26",
   "REC-539":"2026-07-01",
   "REC-499":"2026-05-21",
   "REC-484":"2026-05-12",
-  "REC-357":null,
-  "REC-356":null,
-  "REC-355":null,
-  "REC-351":"2026-04-07",
   "REC-350":"2026-03-16",
-  "REC-347":null,
-  "REC-342":null,
-  "REC-341":null,
-  "REC-340":null,
-  "REC-339":null,
-  "REC-338":null,
-  "REC-337":null,
-  "REC-335":null,
-  "REC-334":null,
-  "REC-333":null,
-  "REC-332":null,
-  "REC-316":null,
   "REC-315":"2026-05-05",
-  "REC-274":"2026-04-23",
-  "REC-272":"2026-04-23",
   "REC-245":"2026-07-02",
   "REC-237":"2026-07-07",
   "REC-195":"2026-04-02",
@@ -869,14 +887,15 @@ const SD={
   "WRP-84":"2026-07-22",
   "WRP-83":null,
   "WRP-82":null,
-  "WRP-79":null,
   "WRP-76":"2026-02-23"
 };
 // Seniority lookup
 const SN={
+  "REC-602":"Middle",
   "REC-598":"Middle",
   "REC-594":"Junior",
   "REC-593":"Middle",
+  "REC-590":"Junior",
   "REC-586":"Middle",
   "REC-580":"Middle",
   "REC-578":"Senior",
@@ -888,63 +907,43 @@ const SN={
   "REC-543":"Senior",
   "REC-539":"Junior",
   "REC-499":"Senior",
-  "REC-351":"Expert",
   "REC-350":"Expert",
-  "REC-347":"Expert",
-  "REC-342":"Expert",
-  "REC-341":"Junior",
-  "REC-340":"Junior",
-  "REC-339":"Junior",
-  "REC-338":"Middle",
-  "REC-337":"Middle",
-  "REC-335":"Middle",
-  "REC-334":"Expert",
-  "REC-333":"Senior",
-  "REC-332":"Middle",
-  "REC-316":"Junior",
   "REC-315":"Senior",
-  "REC-274":"Expert",
-  "REC-272":"Expert",
   "REC-245":"Expert",
   "REC-237":"Junior",
   "REC-195":"Senior",
   "REC-191":"Middle",
   "WRP-84":"Middle",
   "WRP-82":"Middle",
-  "WRP-79":"Middle",
   "WRP-76":"Middle"
 };
 // Recruiter lookup
 const RECR={
+  "REC-602":"Anastasiia Shapovalenko",
   "REC-598":"Mariia Salabai",
-  "REC-595":"Yaroslava Bondarchuk",
   "REC-594":"Yaroslava Bondarchuk",
   "REC-593":"Anastasiia Shapovalenko",
+  "REC-590":"Anastasiia Shapovalenko",
   "REC-589":"Darina Lavrenko",
   "REC-586":"Mariia Salabai",
   "REC-580":"Polina Serdiuk",
   "REC-578":"Darina Lavrenko",
-  "REC-570":"Mariia Salabai",
   "REC-569":"Anastasiia Shapovalenko",
   "REC-568":"Anastasiia Shapovalenko",
   "REC-567":"Alina Muravchyk",
   "REC-566":"Alina Muravchyk",
   "REC-564":"Kateryna Yaremenko",
-  "REC-559":"Anastasiia Hodyna",
   "REC-544":"Mariia Salabai",
   "REC-543":"Nadiia Brusova",
   "REC-539":"Nadiia Brusova",
   "REC-499":"Polina Serdiuk",
   "REC-484":"Mariia Salabai",
-  "REC-351":"Alina Muravchyk",
   "REC-350":"Alina Muravchyk",
   "REC-315":"Anastasiia Shapovalenko",
-  "REC-274":"Yaroslava Bondarchuk",
-  "REC-272":"Yaroslava Bondarchuk",
   "REC-245":"Polina Serdiuk",
   "REC-237":"Polina Serdiuk",
   "REC-195":"Anastasiia Shapovalenko",
-  "REC-191":"Veronika Khovrina",
+  "REC-191":"Yaroslava Bondarchuk",
   "WRP-84":"Daria Kozlova"
 };
 // Sourcer lookup
@@ -952,12 +951,10 @@ const SRCR={
   "REC-601":"Kateryna Yaremenko",
   "REC-589":"Kateryna Yaremenko",
   "REC-578":"Kateryna Yaremenko",
-  "REC-559":"Kateryna Yaremenko",
   "REC-543":"Kateryna Yaremenko",
   "REC-499":"Anastasiia Melnyk",
   "REC-315":"Mariia Salabai",
-  "REC-195":"Anastasiia Melnyk",
-  "REC-191":"Anastasiia Melnyk"
+  "REC-195":"Anastasiia Melnyk"
 };
 // <<<AUTO_DATA_END>>>
 // <<<AUTO_CV_START>>> — managed by scripts/update_recruitment_analytics.py
@@ -965,10 +962,12 @@ const SRCR={
 // close date) preferred, else hd (transition into Hired/Closed via changelog), else rd.
 const CV=[
   {key:"REC-599",s:"Junior Creative Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Alina Muravchyk",src:null,so:"Олександра Мозгова",sd:"2026-06-30",ed:null,fcd:"2026-07-22",fcd_c:"2026-06-30",rd:null,cs:"Happy Monday",cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-22",hd:"2026-07-22"},
+  {key:"REC-595",s:"First Sale Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Prygoniuk",sd:"2026-07-15",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-16",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-07-15",hd:null},
   {key:"REC-592",s:"Junior Digital Marketing Specialist",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Non-staff",rec:"Polina Serdiuk",src:"Polina Serdiuk",so:"Грабинська, Бучака",sd:"2026-05-12",ed:null,fcd:"2026-07-16",fcd_c:"2026-07-01",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-07-09",pk:"REC-237",hd:"2026-07-16"},
   {key:"REC-579",s:"Legal Counsel",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Anastasiia Yefimenko",sd:"2026-06-09",ed:null,fcd:"2026-07-10",fcd_c:"2026-06-17",rd:null,cs:"Dou",cs_other:null,h:1,t:"Legal",sb:"Legal",cr:"2026-07-01",pk:"REC-539",hd:"2026-07-10"},
-  {key:"REC-574",s:"Video Editor",source:"mobile",type:"position",kind:"ra",st:"Hired",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:"2026-07-21",fcd_c:"2026-07-10",rd:null,cs:"Robota.ua",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",hd:"2026-07-22"},
+  {key:"REC-574",s:"Video Editor",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:"2026-07-21",fcd_c:"2026-07-10",rd:null,cs:"Robota.ua",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",hd:null},
   {key:"REC-571",s:"Supplements Industry Consultant",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-30",pk:"REC-565",hd:null},
+  {key:"REC-570",s:"Product Designer",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olha Pyrozhenko",sd:"2026-06-30",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-03",rd:null,cs:"Dou",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-06-30",hd:null},
   {key:"REC-565",s:"Supplements Industry Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-07-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
   {key:"REC-563",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-06-18",fcd_c:"2026-06-08",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-06-19",pk:"REC-495",hd:null},
   {key:"REC-560",s:"Gym Trainer - female",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Victoriia Dumuch",sd:"2026-04-02",ed:null,fcd:"2026-06-08",fcd_c:"2026-04-29",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Workout Content",cr:"2026-06-08",pk:"REC-184",hd:null},
@@ -984,7 +983,7 @@ const CV=[
   {key:"REC-498",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-05-27",fcd_c:"2026-05-20",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-05-21",pk:"REC-495",hd:null},
   {key:"REC-497",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:"2026-05-13",fcd:"2026-05-13",fcd_c:"2026-04-27",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-05-21",pk:"REC-495",hd:null},
   {key:"REC-496",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:"2026-05-13",fcd:"2026-05-13",fcd_c:"2026-04-27",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-05-21",pk:"REC-495",hd:null},
-  {key:"REC-495",s:"Line Producer (China)",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-07-06",fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-05-21",hd:null},
+  {key:"REC-495",s:"Line Producer (China)",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-07-06",fcd_c:null,rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-05-21",hd:null},
   {key:"REC-395",s:"UX Writer",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"High",sn:"Middle",r:"Replacement",es:"Non-staff",rec:"Yaroslava Bondarchuk",src:null,so:"Kateryna Mykytchenko",sd:"2026-05-21",ed:null,fcd:"2026-07-16",fcd_c:"2026-05-21",rd:null,cs:"Djinni",cs_other:null,h:1,t:"Product",sb:"UX Research",cr:"2026-05-18",hd:"2026-07-16"},
   {key:"REC-361",s:"Gym Trainer - male",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:null,sd:"2026-04-01",ed:null,fcd:"2026-05-25",fcd_c:"2026-05-04",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-184",hd:null},
   {key:"REC-360",s:"REC-185  Gym Trainer - male",source:"mobile",type:"subtask",kind:"ra_sub",st:"Hired",pr:"High",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Viktoriia Dumuch",sd:"2026-04-01",ed:null,fcd:"2026-05-21",fcd_c:"2026-05-07",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-184",hd:"2026-05-25"},
@@ -1108,6 +1107,7 @@ const CV=[
 // Canceled roles (REC Canceled + WRP Canceled) — excluded from active & closed,
 // surfaced only in the Canceled KPI.
 const CX=[
+  {key:"REC-591",s:"Graphic Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"Canceled",pr:"Low",sn:null,r:null,es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:null,sb:null,cr:"2026-07-09",pk:"REC-568"},
   {key:"REC-577",s:"Video Editor",source:"mobile",type:"subtask",kind:"ra_sub",st:"Canceled",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",pk:"REC-574"},
   {key:"REC-576",s:"Video Editor",source:"mobile",type:"subtask",kind:"ra_sub",st:"Canceled",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",pk:"REC-574"},
   {key:"REC-575",s:"Video Editor",source:"mobile",type:"subtask",kind:"ra_sub",st:"Canceled",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:"Mariia Salabai",so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",pk:"REC-574"},
@@ -1181,7 +1181,11 @@ function esBucket(v){
   if(v.es==='Expert') return 'Consulting';
   return 'n/a';
 }
-function deptOf(v){return v.t||'(не вказано)';}
+// Departments are tracked per board: the same name (Product/Engineering/…) on
+// mobile vs web must not merge, so we suffix with the source.
+function deptOf(v){const d=v.t;if(!d)return '(не вказано)';return d+(v.source==='web'?' (Web)':' (Mobile)');}
+// Render a department name with its board as a small pill instead of "(Mobile)/(Web)" text.
+function deptLabel(d){const m=/^(.*) \((Mobile|Web)\)$/.exec(d);return m?`${m[1]}<span class="dept-badge ${m[2].toLowerCase()}">${m[2]}</span>`:d;}
 
 // ── per-report filter state (each tab has its own period + source) ──
 const ST={
@@ -1209,12 +1213,12 @@ function inRange(dateStr,scope){
   if(t&&d>t) return false;
   return true;
 }
-function _rangeLabel(scope){const [f,t]=_range(scope);return (!f&&!t)?'усі дати':`${f||'…'} → ${t||'…'}`;}
+function _rangeLabel(scope){const [f,t]=_range(scope);return (!f&&!t)?'усі дати':`${f?_ua(f):'…'} → ${t?_ua(t):'…'}`;}
 function bySource(arr){return arr;}  // source (Mobile/Web) split removed — C-level view is combined
 // Active = currently-open roles that are actually IN PROGRESS. Period-independent
-// (an open vacancy is open *now* regardless of when it started) and PLANNED roles
-// (status "Plan") are excluded — only work that's actively being recruited counts.
-function activeItems(scope){return bySource(OP.concat(RA)).filter(v=>v.st!=='Plan');}
+// (an open vacancy is open *now* regardless of when it started). PLANNED ("Plan")
+// and ON-HOLD ("On hold") roles are excluded — only work actively being recruited.
+function activeItems(scope){return bySource(OP.concat(RA)).filter(v=>v.st!=='Plan'&&v.st!=='On hold');}
 function closedItems(scope){return bySource(CV).filter(v=>inRange(closeDate(v),scope));}
 function canceledItems(scope){return bySource(typeof CX!=='undefined'?CX:[]);}
 
@@ -1303,12 +1307,13 @@ function modalSort(col){if(_modalSort.col===col)_modalSort.dir*=-1;else{_modalSo
 function _renderModal(){
   const closed=_modalBucket==='closed';
   const cols = closed
-    ? [['key','Key'],['s','Vacancy'],['sn','Seniority'],['r','Reason'],['cs','Source'],['closed','Closed'],['ttf','TTF']]
-    : [['key','Key'],['s','Vacancy'],['pr','Priority'],['sn','Seniority'],['rec','Recruiter'],['src','Sourcer'],['sd','Start date']];
+    ? [['s','Vacancy'],['sn','Seniority'],['r','Reason'],['cs','Source'],['closed','Closed'],['ttf','TTF']]
+    : [['vac','Vacancy'],['pr','Priority'],['sn','Seniority']];
   const val=(v,c)=>{
     if(c==='closed')return closeDate(v)||'';
     if(c==='ttf'){const d=diffDays(closeDate(v),v.sd);return d==null?-1:d;}
     if(c==='key')return v.key||'';
+    if(c==='vac')return v.s||'';
     return (v[c]==null?'':v[c]);
   };
   const arr=_modalItems.slice().sort((a,b)=>{let x=val(a,_modalSort.col),y=val(b,_modalSort.col);if(typeof x==='number'&&typeof y==='number')return (x-y)*_modalSort.dir;return String(x).localeCompare(String(y))*_modalSort.dir;});
@@ -1318,6 +1323,7 @@ function _renderModal(){
     h+='<tr>';
     cols.forEach(([c])=>{
       if(c==='key')h+=`<td>${jl(v.key)} ${srcTag(v.source)}</td>`;
+      else if(c==='vac')h+=`<td>${fv(v.s)}</td>`;
       else if(c==='s')h+=`<td>${fv(v.s)}</td>`;
       else if(c==='pr')h+=`<td>${pb(v.pr)}</td>`;
       else if(c==='sn')h+=`<td>${fv(v.sn)}</td>`;
@@ -1335,11 +1341,17 @@ function _renderModal(){
   if(!arr.length)h='<div class="empty-note">Немає ролей за цим фільтром.</div>';
   document.getElementById('modal-body').innerHTML=h;
 }
-// (click-to-open-modal handler removed — report is view-only)
+// Modals open ONLY from table rows (charts/KPIs/panels carry no clickable table context).
+document.addEventListener('click',e=>{const el=e.target.closest('[data-mf]');if(!el||!el.closest('table'))return;openModal(JSON.parse(el.getAttribute('data-mf')));});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+// Lightweight hover tooltip for any [data-tip] element (appended to body → never clipped)
+const _tip=(function(){const el=document.createElement('div');el.id='tip';document.body.appendChild(el);return el;})();
+let _tipEl=null;
+document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');if(t){if(t!==_tipEl){_tip.textContent=t.getAttribute('data-tip');_tipEl=t;}_tip.style.opacity='1';}else if(_tipEl){_tip.style.opacity='0';_tipEl=null;}});
+document.addEventListener('mousemove',e=>{if(!_tipEl)return;let x=e.clientX+14,y=e.clientY+16;const w=_tip.offsetWidth,h=_tip.offsetHeight;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-16;_tip.style.left=Math.max(8,x)+'px';_tip.style.top=Math.max(8,y)+'px';});
 
 // ── pivots ──
-function deptPivot(items,totalLabel,bucket,scope,totalCol){
+function deptPivot(items,totalLabel,bucket,scope,totalCol,hideTotal){
   totalCol=totalCol||'Total';
   const map={};
   items.forEach(v=>{const d=deptOf(v);(map[d]=map[d]||{Staff:0,'Non-staff':0,Consulting:0,'n/a':0,total:0});map[d][esBucket(v)]++;map[d].total++;});
@@ -1347,10 +1359,11 @@ function deptPivot(items,totalLabel,bucket,scope,totalCol){
   const grand={Staff:0,'Non-staff':0,Consulting:0,'n/a':0,total:0};
   rows.forEach(([,r])=>['Staff','Non-staff','Consulting','n/a','total'].forEach(c=>grand[c]+=r[c]));
   const naCol=grand['n/a']>0;
+  const totCol=!hideTotal;   // Closed table hides the Total column
   const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
-  let h='<table class="ptbl"><thead><tr><th>Department</th><th>'+totalCol+'</th><th>Staff</th><th>Non-staff</th><th>Consulting</th>'+(naCol?'<th>n/a</th>':'')+'</tr></thead><tbody>';
-  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket,scope,dim:'dept',val:d,title:`${totalLabel} · ${d}`})}><td>${d}</td><td>${cell(r.total)}</td><td>${cell(r.Staff)}</td><td>${cell(r['Non-staff'])}</td><td>${cell(r.Consulting)}</td>`+(naCol?`<td>${cell(r['n/a'])}</td>`:'')+'</tr>';});
-  h+=`<tr class="tot-row"><td>${totalLabel}</td><td>${cell(grand.total)}</td><td>${cell(grand.Staff)}</td><td>${cell(grand['Non-staff'])}</td><td>${cell(grand.Consulting)}</td>`+(naCol?`<td>${cell(grand['n/a'])}</td>`:'')+'</tr>';
+  let h='<table class="ptbl"><thead><tr><th>Department</th>'+(totCol?'<th>'+totalCol+'</th>':'')+'<th>Staff</th><th>Non-staff</th><th>Consulting</th>'+(naCol?'<th>n/a</th>':'')+'</tr></thead><tbody>';
+  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket,scope,dim:'dept',val:d,title:`${totalLabel} · ${d}`})}><td>${deptLabel(d)}</td>`+(totCol?`<td>${cell(r.total)}</td>`:'')+`<td>${cell(r.Staff)}</td><td>${cell(r['Non-staff'])}</td><td>${cell(r.Consulting)}</td>`+(naCol?`<td>${cell(r['n/a'])}</td>`:'')+'</tr>';});
+  h+=`<tr class="tot-row"><td>${totalLabel}</td>`+(totCol?`<td>${cell(grand.total)}</td>`:'')+`<td>${cell(grand.Staff)}</td><td>${cell(grand['Non-staff'])}</td><td>${cell(grand.Consulting)}</td>`+(naCol?`<td>${cell(grand['n/a'])}</td>`:'')+'</tr>';
   return h+'</tbody></table>';
 }
 function seniorityPivot(items,bucket,scope){
@@ -1364,7 +1377,7 @@ function seniorityPivot(items,bucket,scope){
   rows.forEach(([,r])=>{grand.total+=r.total;cols.forEach(c=>grand[c]+=(r[c]||0));gno+=(r['—']||0);});
   const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
   let h='<table class="ptbl"><thead><tr><th>Department</th><th>Total</th>'+cols.map(c=>`<th>${c}</th>`).join('')+(anyNo?'<th>—</th>':'')+'</tr></thead><tbody>';
-  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket,scope,dim:'dept',val:d,title:`Seniority · ${d}`})}><td>${d}</td><td>${cell(r.total)}</td>`+cols.map(c=>`<td>${cell(r[c]||0)}</td>`).join('')+(anyNo?`<td>${cell(r['—']||0)}</td>`:'')+'</tr>';});
+  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket,scope,dim:'dept',val:d,title:`Seniority · ${d}`})}><td>${deptLabel(d)}</td><td>${cell(r.total)}</td>`+cols.map(c=>`<td>${cell(r[c]||0)}</td>`).join('')+(anyNo?`<td>${cell(r['—']||0)}</td>`:'')+'</tr>';});
   h+=`<tr class="tot-row"><td>Total</td><td>${cell(grand.total)}</td>`+cols.map(c=>`<td>${cell(grand[c])}</td>`).join('')+(anyNo?`<td>${cell(gno)}</td>`:'')+'</tr>';
   return h+'</tbody></table>';
 }
@@ -1374,26 +1387,31 @@ function _esBreakdown(items){const b={Staff:0,'Non-staff':0,Consulting:0,'n/a':0
 function _reasonBreakdown(items){const b={};items.forEach(v=>{const l=reasonLabel(v.r)||'—';b[l]=(b[l]||0)+1;});return b;}
 function _donut(b,total){
   const order=['Staff','Non-staff','Consulting','n/a'].filter(k=>b[k]>0);
-  if(!total||!order.length) return `<div class="donut donut-hole" style="background:#f1e9db"></div>`;
-  let acc=0,seg=[];
-  order.forEach(k=>{const from=acc/total*360;acc+=b[k];const to=acc/total*360;seg.push(`${ES_COLOR[k]} ${from}deg ${to}deg`);});
-  return `<div class="donut donut-hole" style="background:conic-gradient(${seg.join(',')})"></div>`;
+  const R=39,SW=26,cx=52,cy=52,C=2*Math.PI*R;
+  if(!total||!order.length) return `<svg class="donut" viewBox="0 0 104 104"><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#f1e9db" stroke-width="${SW}"></circle></svg>`;
+  let acc=0,arcs='';
+  order.forEach(k=>{const n=b[k],frac=n/total,dash=frac*C;
+    arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${ES_COLOR[k]}" stroke-width="${SW}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc*C}" transform="rotate(-90 ${cx} ${cy})" data-tip="${k==='n/a'?'N/A':k} — ${n}"></circle>`;
+    acc+=frac;});
+  return `<svg class="donut" viewBox="0 0 104 104">${arcs}</svg>`;
 }
 function ovPanel(title,items,bucket,scope,sub){
   const es=_esBreakdown(items), rs=_reasonBreakdown(items), tot=items.length||1;
+  // Active column → percentages only; Closed column → counts only.
+  const fmtN=n=>bucket==='closed'?`${n}`:`${Math.round(n/tot*100)}%`;
   const esKeys=['Staff','Non-staff','Consulting'].concat(es['n/a']?['n/a']:[]);
-  const legend=esKeys.map(k=>`<div class="ov-stat clickable" ${_attr({bucket,scope,dim:'es',val:k,title:`${title} · ${k}`})}><span class="lbl"><span class="dot" style="background:${ES_COLOR[k]}"></span>${k}</span><span class="val">${es[k]} · ${Math.round(es[k]/tot*100)}%</span></div>`).join('');
-  const reasons=['Extension','Replacement','Consultation'].map(l=>`<div class="ov-stat clickable" ${_attr({bucket,scope,dim:'reason',val:l,title:`${title} · ${l}`})}><span class="lbl">${l}</span><span class="val">${rs[l]||0} · ${Math.round((rs[l]||0)/tot*100)}%</span></div>`).join('');
+  const esLabel=k=>k==='n/a'?'N/A':k;
+  const legend=esKeys.map(k=>`<div class="ov-stat clickable" ${_attr({bucket,scope,dim:'es',val:k,title:`${title} · ${esLabel(k)}`})}><span class="lbl"><span class="dot" style="background:${ES_COLOR[k]}"></span>${esLabel(k)}</span><span class="val">${fmtN(es[k])}</span></div>`).join('');
+  const reasons=['Extension','Replacement','Consultation'].map(l=>`<div class="ov-stat clickable" ${_attr({bucket,scope,dim:'reason',val:l,title:`${title} · ${l}`})}><span class="lbl">${l}</span><span class="val">${fmtN(rs[l]||0)}</span></div>`).join('');
   return `<div class="ov-title">${title}</div>`+
     `<div class="ov-big clickable" ${_attr({bucket,scope,dim:'all',title})}>${items.length}</div>`+
     `<div class="ov-rows">${reasons}</div>`+
-    `<div class="ov-donut-row">${_donut(es,tot)}<div class="ov-legend">${legend}</div></div>`+
-    `<div class="ov-sub">${sub}</div>`;
+    `<div class="ov-donut-row">${_donut(es,tot)}<div class="ov-legend">${legend}</div></div>`;
 }
 function barChart(items,scope,bucket,title,thirdLabel){
   bucket=bucket||'active'; title=title||'Total Active Roles'; thirdLabel=thirdLabel||'Expert';
-  const cols=[['staff','Staff'],['non-staff','Non-staff'],[thirdLabel,'Consulting']];
-  if(items.some(v=>esBucket(v)==='n/a')) cols.push(['n/a','n/a']);
+  const cols=[['Staff','Staff'],['Non-staff','Non-staff'],[thirdLabel,'Consulting']];
+  if(items.some(v=>esBucket(v)==='n/a')) cols.push(['N/A','n/a']);
   const order=['Consultation','Replacement','Extension'];   // top → bottom
   const counts={}; let maxTotal=1, total=0;
   cols.forEach(([lbl,esb])=>{
@@ -1404,24 +1422,52 @@ function barChart(items,scope,bucket,title,thirdLabel){
     total+=sub.length; if(sub.length>maxTotal)maxTotal=sub.length;
   });
   const PLOT=280;
-  const seg=(lbl,esb,r,col,tx)=>{const n=(r==='—')?counts[lbl]._other:counts[lbl][r];if(!n)return '';
+  // Chart is display-only (not clickable).
+  const seg=(lbl,r,col,tx)=>{const n=(r==='—')?counts[lbl]._other:counts[lbl][r];if(!n)return '';
     const hpx=Math.max(3,n/maxTotal*PLOT);
-    const mf=(r==='—')?{bucket,scope,es:esb,title:`${title} · ${lbl}`}:{bucket,scope,es:esb,reason:r,title:`${title} · ${lbl} · ${r}`};
-    return `<div class="bc-seg" style="height:${hpx}px;background:${col};color:${tx}" ${_attr(mf)}>${hpx>16?n:''}</div>`;};
+    return `<div class="bc-seg" style="height:${hpx}px;background:${col};color:${tx}" data-tip="${r==='—'?'Не вказано':r} — ${n}">${hpx>16?n:''}</div>`;};
   let bars='';
   cols.forEach(([lbl,esb])=>{
     bars+=`<div class="bc-col"><div class="bc-bar">`+
-      seg(lbl,esb,'Consultation',BAR_REASON.Consultation,'#5c4a2e')+
-      seg(lbl,esb,'Replacement',BAR_REASON.Replacement,'#fff')+
-      seg(lbl,esb,'Extension',BAR_REASON.Extension,'#fff')+
-      seg(lbl,esb,'—','#e2d6c0','#5c4a2e')+
-      `</div><div class="bc-xlabel clickable" ${_attr({bucket,scope,es:esb,title:`${title} · ${lbl}`})}>${lbl}</div></div>`;
+      seg(lbl,'Consultation',BAR_REASON.Consultation,'#5c4a2e')+
+      seg(lbl,'Replacement',BAR_REASON.Replacement,'#fff')+
+      seg(lbl,'Extension',BAR_REASON.Extension,'#fff')+
+      seg(lbl,'—','#e2d6c0','#5c4a2e')+
+      `</div><div class="bc-xlabel">${lbl}</div></div>`;
   });
   const legend=['Consultation','Replacement','Extension'].map(r=>`<div class="bc-leg-item"><span class="dot" style="background:${BAR_REASON[r]}"></span>${r}</div>`).join('');
   return `<div class="bc"><div class="bc-legend">${legend}</div>`+
     `<div class="bc-title">${title}</div>`+
-    `<div class="bc-big clickable" ${_attr({bucket,scope,dim:'all',title})}>${total}</div>`+
+    `<div class="bc-big">${total}</div>`+
     `<div class="bc-plot">${bars}</div></div>`;
+}
+// Horizontal stacked-bar variant (used for the narrow side-by-side Active chart) —
+// one row per es-bucket, bar length ∝ row total, segments ∝ reason. Display-only.
+function barChartH(items,title,thirdLabel){
+  thirdLabel=thirdLabel||'Expert';
+  const cols=[['Staff','Staff'],['Non-staff','Non-staff'],[thirdLabel,'Consulting']];
+  if(items.some(v=>esBucket(v)==='n/a')) cols.push(['N/A','n/a']);
+  const rorder=['Extension','Replacement','Consultation'];
+  const rows=cols.map(([lbl,esb])=>{
+    const sub=items.filter(v=>esBucket(v)===esb);
+    const c={Extension:0,Replacement:0,Consultation:0,_other:0};
+    sub.forEach(v=>{const r=reasonLabel(v.r);if(rorder.includes(r))c[r]++;else c._other++;});
+    return {lbl,total:sub.length,c};
+  });
+  const maxTotal=Math.max(1,...rows.map(r=>r.total));
+  const total=rows.reduce((s,r)=>s+r.total,0);
+  // per-segment tooltip: reason — count (e.g. "Extension — 5")
+  const seg=(n,rt,col,tx,label)=>n?`<div class="hbc-seg" style="width:${n/rt*100}%;background:${col};color:${tx}" data-tip="${label} — ${n}">${n}</div>`:'';
+  const barsRows=rows.map(r=>`<div class="hbc-row"><div class="hbc-label">${r.lbl}</div><div class="hbc-track"><div class="hbc-bar" style="width:${r.total/maxTotal*100}%">`+
+      seg(r.c.Extension,r.total,BAR_REASON.Extension,'#fff','Extension')+
+      seg(r.c.Replacement,r.total,BAR_REASON.Replacement,'#fff','Replacement')+
+      seg(r.c.Consultation,r.total,BAR_REASON.Consultation,'#5c4a2e','Consultation')+
+      seg(r.c._other,r.total,'#e2d6c0','#5c4a2e','Не вказано')+
+    `</div></div></div>`).join('');
+  const legend=['Consultation','Replacement','Extension'].map(r=>`<div class="bc-leg-item"><span class="dot" style="background:${BAR_REASON[r]}"></span>${r}</div>`).join('');
+  return `<div class="hbc"><div class="bc-title">${title}</div><div class="bc-big">${total}</div>`+
+    `<div class="hbc-legend">${legend}</div>`+
+    `<div class="hbc-rows">${barsRows}</div></div>`;
 }
 function donutSVG(order,counts,colorMap,total){
   if(!total||!order.length) return `<div class="donut donut-hole" style="background:#f1e9db"></div>`;
@@ -1438,9 +1484,9 @@ function prioTable(items,scope){
   rows.forEach(([,r])=>['HIGH','MEDIUM','LIGHT','—','total'].forEach(c=>grand[c]+=r[c]));
   const cols=grand['—']?order.concat('—'):order;
   const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
-  let h='<table class="ptbl"><thead><tr><th>Department</th><th>Total</th>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
-  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket:'active',scope,dept:d,title:`Active Priority · ${d}`})}><td>${d}</td><td>${cell(r.total)}</td>`+cols.map(c=>`<td>${cell(r[c])}</td>`).join('')+'</tr>';});
-  h+=`<tr class="tot-row"><td>Total</td><td>${cell(grand.total)}</td>`+cols.map(c=>`<td>${cell(grand[c])}</td>`).join('')+'</tr>';
+  let h='<table class="ptbl"><thead><tr><th>Department</th>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
+  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket:'active',scope,dept:d,title:`Active Priority · ${d}`})}><td>${deptLabel(d)}</td>`+cols.map(c=>`<td>${cell(r[c])}</td>`).join('')+'</tr>';});
+  h+=`<tr class="tot-row"><td>Total</td>`+cols.map(c=>`<td>${cell(grand[c])}</td>`).join('')+'</tr>';
   return h+'</tbody></table>';
 }
 function donutChart(items,scope){
@@ -1453,33 +1499,57 @@ function donutChart(items,scope){
   let acc=0,arcs='',labels='';
   cols.forEach(k=>{
     const n=counts[k],frac=n/total,dash=frac*C;
-    arcs+=`<circle cx="${cx}" cy="${cy}" r="${rMid}" fill="none" stroke="${PRIO_COLOR[k]}" stroke-width="${sw}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc*C}" transform="rotate(-90 ${cx} ${cy})" style="cursor:pointer" ${_attr({bucket:'active',scope,prio:k,title:`Active · ${k} priority`})}></circle>`;
+    arcs+=`<circle cx="${cx}" cy="${cy}" r="${rMid}" fill="none" stroke="${PRIO_COLOR[k]}" stroke-width="${sw}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc*C}" transform="rotate(-90 ${cx} ${cy})" data-tip="${k==='—'?'Не вказано':k} — ${n}"></circle>`;
     const ang=(acc+frac/2)*2*Math.PI-Math.PI/2;
     const lx=cx+rMid*Math.cos(ang),ly=cy+rMid*Math.sin(ang);
     const tx=(k==='LIGHT'||k==='—')?'#5c4a2e':'#fff';
-    labels+=`<text x="${lx}" y="${ly}" fill="${tx}" font-size="15" font-weight="600" text-anchor="middle" dominant-baseline="central" style="pointer-events:none">${n} (${(frac*100).toFixed(1)}%)</text>`;
+    labels+=`<text x="${lx}" y="${ly}" fill="${tx}" font-size="18" font-weight="700" text-anchor="middle" dominant-baseline="central" style="pointer-events:none">${n}</text>`;
     acc+=frac;
   });
-  const svg=`<svg viewBox="0 0 300 300" width="300" height="300">${arcs}${labels}</svg>`;
-  const legend=cols.map(k=>`<div class="dc-leg clickable" ${_attr({bucket:'active',scope,prio:k,title:`Active · ${k} priority`})}><span class="dot" style="background:${PRIO_COLOR[k]}"></span>${k}</div>`).join('');
-  return `<div class="dc"><div class="dc-title">Active Roles Priority</div><div class="dc-row">${svg}<div class="dc-legend">${legend}</div></div></div>`;
+  // center KPI: big total + "Active Roles"
+  const centerKPI=`<text x="${cx}" y="${cy-9}" text-anchor="middle" dominant-baseline="central" font-size="52" font-weight="800" fill="#4a3829" style="pointer-events:none">${total}</text>`+
+    `<text x="${cx}" y="${cy+28}" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="600" fill="#8a7860" style="pointer-events:none">Active Roles</text>`;
+  const svg=`<svg class="dc-svg" viewBox="0 0 300 300">${arcs}${labels}${centerKPI}</svg>`;
+  const capL=k=>k==='—'?'Не вказано':k.charAt(0)+k.slice(1).toLowerCase();
+  const legend=cols.map(k=>`<div class="dc-leg"><span class="dot" style="background:${PRIO_COLOR[k]}"></span><span class="dc-leg-lbl">${capL(k)}</span><span class="dc-leg-pct">${(counts[k]/total*100).toFixed(1)}%</span></div>`).join('');
+  return `<div class="dc"><div class="dc-title">Active Roles Priority</div><div class="dc-legend">${legend}</div><div class="dc-donut">${svg}</div></div>`;
 }
 function renderOverview(){
   const scope='overview';
   const A=activeItems(scope);
   document.getElementById('ov-active').innerHTML=ovPanel('Active Roles',A,'active',scope,'поточний зріз відкритих ролей');
   document.getElementById('ov-closed').innerHTML=ovPanel('Total Closed Roles',closedItems(scope),'closed',scope,_rangeLabel(scope));
-  document.getElementById('ov-barchart').innerHTML=barChart(A,scope,'active','Total Active Roles','Expert');
+  document.getElementById('ov-barchart').innerHTML=barChartH(A,'Total Active Roles','Expert');
   document.getElementById('ov-depttable').innerHTML=deptPivot(A,'Total Active Roles','active',scope,'Total Active Roles');
   document.getElementById('ov-deptnote').textContent=`${A.length} відкритих ролей · поточний зріз`;
   document.getElementById('ov-prio-donut').innerHTML=donutChart(A,scope);
   document.getElementById('ov-prio-table').innerHTML=prioTable(A,scope);
   const C=closedItems(scope);
-  document.getElementById('ov-closedbar').innerHTML=barChart(C,scope,'closed','Total Closed Roles','Consultant');
-  document.getElementById('ov-closedtable').innerHTML=deptPivot(C,'Total Closed Roles','closed',scope,'Total Closed Roles');
+  document.getElementById('ov-closedbar').innerHTML=barChartH(C,'Total Closed Roles','Consultant');
+  document.getElementById('ov-closedtable').innerHTML=deptPivot(C,'Total Closed Roles','closed',scope,'Total Closed Roles',true);
   document.getElementById('ov-closednote').textContent=`${C.length} закритих · ${_rangeLabel(scope)}`;
   document.getElementById('ov-prionote').textContent=`${A.length} відкритих ролей · поточний зріз`;
+  _fitBlocks();
 }
+// Each block's height is driven by its LEFT chart: the table card is capped at the
+// chart's natural height; rows that don't fit are hidden behind a ▾ arrow. The chart
+// (align-items:start) never moves when the table expands.
+function _setToggleLabel(btn,exp){const ic=btn.querySelector('.tg-ic'),tx=btn.querySelector('.tg-tx');if(ic)ic.textContent=exp?'▴':'▾';if(tx)tx.textContent=exp?'Згорнути':'Показати всі';}
+function toggleBlock(btn){const card=btn.closest('.prio-cell--table');if(!card)return;_setToggleLabel(btn,card.classList.toggle('expanded'));}
+function _fitBlocks(){
+  document.querySelectorAll('.prio-grid').forEach(function(grid){
+    const chart=grid.querySelector('.prio-cell--chart'), tcard=grid.querySelector('.prio-cell--table');
+    if(!chart||!tcard) return;
+    const body=tcard.querySelector('.pc-body'), btn=tcard.querySelector('.ov-toggle');
+    tcard.classList.remove('expanded'); if(btn)_setToggleLabel(btn,false);
+    tcard.style.height='';
+    if(window.innerWidth<1025){ if(btn)btn.style.display='none'; return; }
+    const h=Math.round(chart.getBoundingClientRect().height);
+    tcard.style.height=h+'px';
+    if(btn) btn.style.display=(body.scrollHeight>body.clientHeight+8)?'block':'none';
+  });
+}
+window.addEventListener('resize',_fitBlocks);
 
 // ── ACTIVE ──
 function mtxCell(v){
@@ -1507,7 +1577,7 @@ function activeDetailTable(items,scope){
     const g=groups[dep];
     g.forEach((v,i)=>{
       h+='<tr>';
-      if(i===0) h+=`<td rowspan="${g.length}" class="dep">${dep}</td>`;
+      if(i===0) h+=`<td rowspan="${g.length}" class="dep">${deptLabel(dep)}</td>`;
       h+=`<td>${jl(v.key)}</td><td>${fv(v.s)}</td><td>${srcTag(v.source)}</td><td>${fv(v.sb)}</td><td>${fv(v.sn)}</td>`+
          `<td class="mc">${mc(v,'S_EXT')}</td><td class="mc">${mc(v,'S_REPL')}</td><td class="mc">${mc(v,'N_EXT')}</td><td class="mc">${mc(v,'N_REPL')}</td><td class="mc">${mc(v,'CONS')}</td>`+
          `<td class="mc">${v.h||1}</td></tr>`;
@@ -1531,6 +1601,7 @@ function renderActive(){
 }
 
 // ── CLOSED ──
+function _ua(d){if(!d)return '—';const p=d.slice(0,10).split('-');return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:d;}  // DD.MM.YYYY
 function _monthLabel(d){if(!d)return '—';const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const p=d.slice(0,7).split('-');return `${M[(+p[1])-1]} ${p[0]}`;}
 function _esCell(v){const b=esBucket(v);return b==='n/a'?fv(null):_esBadge(b==='Consulting'?'Expert':b);}
 function closedDetailTable(items,scope){
@@ -1541,8 +1612,8 @@ function closedDetailTable(items,scope){
   order.forEach(dep=>{const g=groups[dep];
     g.forEach((v,i)=>{const cd=closeDate(v),ttf=diffDays(cd,v.sd);
       h+='<tr>';
-      if(i===0)h+=`<td rowspan="${g.length}" class="dep">${dep}</td>`;
-      h+=`<td>${jl(v.key)} ${fv(v.s)}</td><td>${srcTag(v.source)}</td><td>${_reasonBadge(v.r)}</td><td>${fv(v.sn)}</td><td>${fv(v.sd)}</td><td>${fv(cd)}</td><td>${_monthLabel(cd)}</td><td class="num">${ttf!=null?ttf+'d':'—'}</td><td class="num">${cd?cd.slice(0,4):'—'}</td><td>${fv(v.cs)}</td><td>${_esCell(v)}</td></tr>`;
+      if(i===0)h+=`<td rowspan="${g.length}" class="dep">${deptLabel(dep)}</td>`;
+      h+=`<td>${jl(v.key)} ${fv(v.s)}</td><td>${srcTag(v.source)}</td><td>${_reasonBadge(v.r)}</td><td>${fv(v.sn)}</td><td>${_ua(v.sd)}</td><td>${_ua(cd)}</td><td>${_monthLabel(cd)}</td><td class="num">${ttf!=null?ttf+'d':'—'}</td><td class="num">${cd?cd.slice(0,4):'—'}</td><td>${fv(v.cs)}</td><td>${_esCell(v)}</td></tr>`;
     });
   });
   return h+'</tbody></table>';
@@ -1579,7 +1650,7 @@ function hsRender(){
   const max=top?top[1]:1;
   let bars='';
   rows.forEach(([s,n],i)=>{const w=Math.max(2,n/max*100);
-    bars+=`<div class="hsbh-row"><div class="hsbh-name" title="${s}">${s}</div><div class="hsbh-track"><div class="hsbh-bar" style="width:${w}%;background:${HS_EARTH[i%HS_EARTH.length]}" ${_attr({bucket:'closed',scope:'closed',cs:s,dept:HS.dept!=='All'?HS.dept:undefined,sen:HS.sen!=='All'?HS.sen:undefined,title:`Closed · ${s}`})}></div><div class="hsbh-val">${n}</div></div></div>`;});
+    bars+=`<div class="hsbh-row"><div class="hsbh-name" title="${s}">${s}</div><div class="hsbh-track"><div class="hsbh-bar" style="width:${w}%;background:${HS_EARTH[i%HS_EARTH.length]}" data-tip="${s} — ${n}"></div><div class="hsbh-val">${n}</div></div></div>`;});
   document.getElementById('hs-chart').innerHTML=rows.length?`<div class="hsbh">${bars}</div>`:'<div class="empty-note">Немає даних по джерелах за цим фільтром.</div>';
 }
 function renderClosed(){
@@ -1596,8 +1667,7 @@ function renderClosed(){
     kpi('orange','📞',avg(tths)!=null?avg(tths)+'d':'—',`${tths.length} з датою`,'Avg Time-to-Hire')+
     kpi('','🧑‍💼',C.filter(v=>esBucket(v)==='Staff').length,'','Staff',{bucket:'closed',scope,dim:'es',val:'Staff',title:'Closed · Staff'})+
     kpi('','🤝',C.filter(v=>esBucket(v)==='Non-staff').length,'','Non-staff',{bucket:'closed',scope,dim:'es',val:'Non-staff',title:'Closed · Non-staff'})+
-    kpi('','💡',C.filter(v=>esBucket(v)==='Consulting').length,'','Consulting',{bucket:'closed',scope,dim:'es',val:'Consulting',title:'Closed · Consulting'})+
-    kpi('','🚫',canceledItems(scope).length,'не увійшли в закриті','Canceled',{bucket:'canceled',scope,dim:'all',title:'Canceled Roles'});
+    kpi('','💡',C.filter(v=>esBucket(v)==='Consulting').length,'','Consulting',{bucket:'closed',scope,dim:'es',val:'Consulting',title:'Closed · Consulting'});
   document.getElementById('closed-detail-note').textContent=`${roles} закритих · ${_rangeLabel(scope)}`+(noDate?` · ⚠ ${noDate} без дати закриття`:'');
   document.getElementById('closed-detail').innerHTML=roles?closedDetailTable(C,scope):'<div class="empty-note">Немає закритих ролей у цьому періоді. Обери інший місяць/квартал/рік.</div>';
   hsPopulate(false); hsRender();

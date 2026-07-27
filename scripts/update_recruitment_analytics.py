@@ -97,7 +97,7 @@ BOARDS = {
         # active = In progress (not Done, not Plan — planned roles excluded).
         # closed = successfully filled → Hired (or Done for consulting calls).
         # Canceled (category Done, status "Canceled") is neither active nor closed.
-        'active_jql':   'statusCategory != Done AND status != Plan',
+        'active_jql':   'statusCategory != Done AND status not in (Plan, "On hold")',
         'closed_jql':   'status in (Hired, Done)',
         'canceled_jql': 'status = Canceled',
         'terminal':     'Hired',   # success status → close-date fallback via changelog
@@ -110,7 +110,7 @@ BOARDS = {
         },
         # WRP terminal statuses (category Done): "Closed" (filled) + "Canceled".
         # active = In progress (Plan excluded); closed = "Closed" only (Canceled excluded).
-        'active_jql':   'statusCategory != Done AND status != Plan',
+        'active_jql':   'statusCategory != Done AND status not in (Plan, "On hold")',
         'closed_jql':   'status = Closed',
         'canceled_jql': 'status = Canceled',
         'terminal':     'Closed',  # success status → close-date fallback via changelog
