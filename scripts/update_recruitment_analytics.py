@@ -94,10 +94,10 @@ BOARDS = {
             'Recruitment Assignment sub-task': 'ra_sub',
         },
         # Consistent definition across boards (see NOTE below):
-        # active = not in a terminal (Done) category → Plan + In progress.
+        # active = In progress (not Done, not Plan — planned roles excluded).
         # closed = successfully filled → Hired (or Done for consulting calls).
         # Canceled (category Done, status "Canceled") is neither active nor closed.
-        'active_jql':   'statusCategory != Done',
+        'active_jql':   'statusCategory != Done AND status != Plan',
         'closed_jql':   'status in (Hired, Done)',
         'canceled_jql': 'status = Canceled',
         'terminal':     'Hired',   # success status → close-date fallback via changelog
@@ -109,8 +109,8 @@ BOARDS = {
             'Consultant': 'ra',
         },
         # WRP terminal statuses (category Done): "Closed" (filled) + "Canceled".
-        # active = Plan + In progress; closed = "Closed" only (Canceled excluded).
-        'active_jql':   'statusCategory != Done',
+        # active = In progress (Plan excluded); closed = "Closed" only (Canceled excluded).
+        'active_jql':   'statusCategory != Done AND status != Plan',
         'closed_jql':   'status = Closed',
         'canceled_jql': 'status = Canceled',
         'terminal':     'Closed',  # success status → close-date fallback via changelog
@@ -120,8 +120,9 @@ BOARDS = {
 # NOTE on role status semantics (calibrate with Yaroslava if needed):
 #   REC statuses: Hired / Canceled (both Done cat) · Plan (To Do) · In progress.
 #   WRP statuses: Closed / Canceled (both Done cat) · Plan (To Do) · In progress.
-#   "Active" here includes Plan (planned but not started). "Closed" counts only
-#   successful fills; "Canceled" roles are excluded from both buckets.
+#   "Active" = In progress only (planned "Plan" roles are EXCLUDED per Yaroslava,
+#   2026-07). "Closed" counts only successful fills; "Canceled" is excluded from
+#   both buckets.
 
 UA_MONTHS = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
              'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня']

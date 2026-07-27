@@ -587,6 +587,14 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .modal-close:hover { color:var(--text); }
 .modal-body { overflow:auto; padding:8px 26px 26px; }
 .modal-body .dtbl thead th { position:sticky; top:0; z-index:2; }
+/* View-only report — all click affordances & modals removed (2026-07) */
+.clickable{cursor:default!important;transition:none!important;}
+.kpi-hint{display:none!important;}
+.kpi-card.clickable:hover{transform:none!important;box-shadow:none!important;}
+.ov-big.clickable:hover{color:inherit!important;}
+.ov-stat.clickable:hover{background:inherit!important;}
+.bc-big.clickable:hover{color:inherit!important;}
+.ptbl tbody tr.clickable td:first-child{color:inherit!important;font-weight:inherit!important;}
 </style>
 </head>
 <body>
@@ -644,7 +652,6 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#4a3829,#6f5a44)">📊</div>
         <h2>Recruitment Overview</h2>
-        <span class="section-note">Active — поточний зріз · Closed — за обраний період · натисни будь-яку цифру</span>
       </div>
       <div class="sec-body">
         <div class="ov-grid">
@@ -778,19 +785,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 
 </div>
 
-<!-- ── Vacancy list modal ── -->
-<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title" id="modal-title">—</div>
-        <div class="modal-sub" id="modal-sub"></div>
-      </div>
-      <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-  </div>
-</div>
+<!-- Vacancy list modal removed — report is view-only -->
 
 <script>
 // <<<AUTO_DATA_START>>> — managed by scripts/update_recruitment_analytics.py
@@ -1249,10 +1244,10 @@ function inRange(dateStr,scope){
 }
 function _rangeLabel(scope){const [f,t]=_range(scope);return (!f&&!t)?'усі дати':`${f||'…'} → ${t||'…'}`;}
 function bySource(arr){return SRC.v==='all'?arr:arr.filter(v=>v.source===SRC.v);}
-// Active = every currently-open role (statusCategory != Done), period-independent.
-// An open vacancy is open *now* regardless of when it was opened, so we do NOT
-// filter active roles by Start date (that hid ~2/3 of open roles under a period).
-function activeItems(scope){return bySource(OP.concat(RA));}
+// Active = currently-open roles that are actually IN PROGRESS. Period-independent
+// (an open vacancy is open *now* regardless of when it started) and PLANNED roles
+// (status "Plan") are excluded — only work that's actively being recruited counts.
+function activeItems(scope){return bySource(OP.concat(RA)).filter(v=>v.st!=='Plan');}
 function closedItems(scope){return bySource(CV).filter(v=>inRange(closeDate(v),scope));}
 function canceledItems(scope){return bySource(typeof CX!=='undefined'?CX:[]);}
 
@@ -1345,7 +1340,7 @@ function _renderModal(){
   if(!arr.length)h='<div class="empty-note">Немає ролей за цим фільтром.</div>';
   document.getElementById('modal-body').innerHTML=h;
 }
-document.addEventListener('click',e=>{const el=e.target.closest('[data-mf]');if(!el)return;openModal(JSON.parse(el.getAttribute('data-mf')));});
+// (click-to-open-modal handler removed — report is view-only)
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 // ── pivots ──
