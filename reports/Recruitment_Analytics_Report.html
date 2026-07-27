@@ -119,9 +119,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
   height: 3px;
   border-radius: var(--radius) var(--radius) 0 0;
 }
-.kpi-card.blue::before  { background: linear-gradient(90deg,#4a3829,#6f5a44); }
+.kpi-card.blue::before  { background: linear-gradient(90deg,#a3927a,#c2ab93); }
 .kpi-card.green::before { background: linear-gradient(90deg,#7d6a4f,#9c8a6a); }
-.kpi-card.orange::before{ background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+.kpi-card.orange::before{ background: linear-gradient(90deg,#a3927a,#c2ab93); }
 .kpi-card.red::before   { background: linear-gradient(90deg,#ef4444,#f87171); }
 .kpi-icon { font-size: 22px; margin-bottom: 8px; line-height: 1; }
 .kpi-num { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
@@ -580,7 +580,9 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .dtbl.mtx thead th { position:static; text-align:center; }
 .dtbl td.mc, .dtbl th.mc { text-align:center; }
 .dtbl th.grp { border-bottom:1px solid var(--border); }
-.dtbl td.dep { font-weight:700; color:var(--text); text-align:center; vertical-align:middle; background:#faf4e8; border-right:1px solid var(--border); }
+.dtbl td.dep { font-weight:700; color:var(--text); text-align:left; vertical-align:middle; background:transparent; }
+/* thicker divider between department groups */
+.dtbl tbody tr.dep-start td { border-top:2px solid #c7b896; }
 .dtbl.mtx tbody td { border-bottom:1px solid #efe6d8; }
 
 .hs-top { display:flex; align-items:center; gap:12px 16px; flex-wrap:wrap; margin-bottom:20px; }
@@ -633,6 +635,9 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 /* Collapse toggle for table cards whose height is capped to the left chart */
 .ov-toggle{display:none;width:100%;border:none;border-top:1px solid var(--border);background:#faf4e8;color:var(--text2);font-family:inherit;font-size:12.5px;font-weight:600;padding:10px;cursor:pointer;letter-spacing:.2px;}
 .ov-toggle:hover{background:#f1e9db;}
+/* Active/Closed tabs: lighter block surfaces to match the first tab */
+#view-active .kpi-card, #view-closed .kpi-card,
+#view-active .section, #view-closed .section { background:#fffdf9; }
 </style>
 </head>
 <body>
@@ -646,7 +651,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 27 липня 2026, оновлено 17:22 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
+    <!--<<<AUTO_DATE_START>>>-->Дані: 27 липня 2026, оновлено 18:10 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
   </div>
 </div>
 
@@ -781,21 +786,6 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
         <span class="section-note" id="closed-detail-note"></span>
       </div>
       <div class="sec-body sec-body--flush" id="closed-detail"></div>
-    </div>
-
-    <div class="section">
-      <div class="sec-body">
-        <div class="hs-top">
-          <div class="hs-title">🌐 Hiring Sources</div>
-          <span style="margin-left:auto"></span>
-          <label class="hs-sel">Department <select id="hs-dept" onchange="hsRender()"></select></label>
-          <label class="hs-sel">Seniority <select id="hs-sen" onchange="hsRender()"></select></label>
-          <button class="hs-reset" onclick="hsReset()">Reset</button>
-        </div>
-        <div class="hs-label">Insights</div>
-        <div class="kpi-row" id="hs-cards"></div>
-        <div id="hs-chart"></div>
-      </div>
     </div>
   </div>
 
@@ -1266,7 +1256,7 @@ function switchView(view){
 function kpi(cls,icon,num,sub,label,mf){
   const click=mf?` clickable" ${_attr(mf)}`:'"';
   const hint=mf?'<span class="kpi-hint">↗</span>':'';
-  return `<div class="kpi-card ${cls}${click}>${hint}<div class="kpi-icon">${icon}</div>`+
+  return `<div class="kpi-card ${cls}${click}>${hint}`+(icon?`<div class="kpi-icon">${icon}</div>`:'')+
     `<div class="kpi-num">${num}</div><div class="kpi-sub">${sub||''}</div>`+
     `<div class="kpi-label">${label}</div></div>`;
 }
@@ -1569,18 +1559,17 @@ function activeDetailTable(items,scope){
   const order=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);
   const mc=(v,key)=>mtxCell(v)===key?'<span class="num">1</span>':'<span class="num zero">·</span>';
   let h='<table class="dtbl mtx"><thead>'+
-    '<tr><th rowspan="2">Department</th><th rowspan="2">Key</th><th rowspan="2">Vacancy</th><th rowspan="2">Src</th><th rowspan="2">Sub-team</th><th rowspan="2">Seniority</th>'+
-    '<th colspan="2" class="mc grp">Staff</th><th colspan="2" class="mc grp">Non-staff</th><th rowspan="2" class="mc">Consulting</th><th rowspan="2" class="mc">Hires</th></tr>'+
+    '<tr><th rowspan="2">Department</th><th rowspan="2">Vacancy</th><th rowspan="2">Seniority</th>'+
+    '<th colspan="2" class="mc grp">Staff</th><th colspan="2" class="mc grp">Non-staff</th><th rowspan="2" class="mc">Consulting</th></tr>'+
     '<tr><th class="mc">Extension</th><th class="mc">Replacement</th><th class="mc">Extension</th><th class="mc">Replacement</th></tr>'+
     '</thead><tbody>';
-  order.forEach(dep=>{
+  order.forEach((dep,gi)=>{
     const g=groups[dep];
     g.forEach((v,i)=>{
-      h+='<tr>';
+      h+=(i===0&&gi>0)?'<tr class="dep-start">':'<tr>';
       if(i===0) h+=`<td rowspan="${g.length}" class="dep">${deptLabel(dep)}</td>`;
-      h+=`<td>${jl(v.key)}</td><td>${fv(v.s)}</td><td>${srcTag(v.source)}</td><td>${fv(v.sb)}</td><td>${fv(v.sn)}</td>`+
-         `<td class="mc">${mc(v,'S_EXT')}</td><td class="mc">${mc(v,'S_REPL')}</td><td class="mc">${mc(v,'N_EXT')}</td><td class="mc">${mc(v,'N_REPL')}</td><td class="mc">${mc(v,'CONS')}</td>`+
-         `<td class="mc">${v.h||1}</td></tr>`;
+      h+=`<td>${fv(v.s)}</td><td>${fv(v.sn)}</td>`+
+         `<td class="mc">${mc(v,'S_EXT')}</td><td class="mc">${mc(v,'S_REPL')}</td><td class="mc">${mc(v,'N_EXT')}</td><td class="mc">${mc(v,'N_REPL')}</td><td class="mc">${mc(v,'CONS')}</td></tr>`;
     });
   });
   return h+'</tbody></table>';
@@ -1591,11 +1580,8 @@ function renderActive(){
   const roles=A.length, staff=A.filter(v=>esBucket(v)==='Staff').length, nonstaff=A.filter(v=>esBucket(v)==='Non-staff').length, consulting=A.filter(v=>esBucket(v)==='Consulting').length;
   const hires=A.reduce((s,v)=>s+(v.h||1),0);
   document.getElementById('active-kpis').innerHTML=
-    kpi('blue','🎯',roles,'active roles','Total Active Roles',{bucket:'active',scope,dim:'all',title:'Active Roles'})+
-    kpi('green','🧑‍💼',staff,'','Staff',{bucket:'active',scope,dim:'es',val:'Staff',title:'Active · Staff'})+
-    kpi('orange','🤝',nonstaff,'','Non-staff',{bucket:'active',scope,dim:'es',val:'Non-staff',title:'Active · Non-staff'})+
-    kpi('','💡',consulting,'','Consulting',{bucket:'active',scope,dim:'es',val:'Consulting',title:'Active · Consulting'})+
-    kpi('red','📈',hires,'positions to fill','Hires needed',{bucket:'active',scope,dim:'all',title:'Active Roles (hires)'});
+    kpi('blue','',roles,'','Total Active Roles',{bucket:'active',scope,dim:'all',title:'Active Roles'})+
+    kpi('red','',hires,'','Hires needed',{bucket:'active',scope,dim:'all',title:'Active Roles (hires)'});
   document.getElementById('active-detail-note').textContent=`${roles} відкритих ролей · поточний зріз`;
   document.getElementById('active-detail').innerHTML=activeDetailTable(A,scope);
 }
@@ -1608,12 +1594,12 @@ function closedDetailTable(items,scope){
   const list=items.slice().sort((a,b)=>deptOf(a).localeCompare(deptOf(b))||(closeDate(b)||'').localeCompare(closeDate(a)||''));
   const groups={}; list.forEach(v=>{(groups[deptOf(v)]=groups[deptOf(v)]||[]).push(v);});
   const order=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);
-  let h='<table class="dtbl"><thead><tr><th>Department</th><th>Vacancy</th><th>Src</th><th>Reason</th><th>Level</th><th>Published</th><th>Closed</th><th>Closed Month</th><th class="num">Time to fill</th><th class="num">Closing year</th><th>Job boards</th><th>Staff/Non-staff</th></tr></thead><tbody>';
-  order.forEach(dep=>{const g=groups[dep];
+  let h='<table class="dtbl"><thead><tr><th>Department</th><th>Vacancy</th><th>Reason</th><th>Seniority</th><th>Published</th><th>Closed</th><th>Closed Month</th><th class="num">Time to fill</th><th class="num">Closing year</th><th>Job boards</th><th>Staff/Non-staff</th></tr></thead><tbody>';
+  order.forEach((dep,gi)=>{const g=groups[dep];
     g.forEach((v,i)=>{const cd=closeDate(v),ttf=diffDays(cd,v.sd);
-      h+='<tr>';
+      h+=(i===0&&gi>0)?'<tr class="dep-start">':'<tr>';
       if(i===0)h+=`<td rowspan="${g.length}" class="dep">${deptLabel(dep)}</td>`;
-      h+=`<td>${jl(v.key)} ${fv(v.s)}</td><td>${srcTag(v.source)}</td><td>${_reasonBadge(v.r)}</td><td>${fv(v.sn)}</td><td>${_ua(v.sd)}</td><td>${_ua(cd)}</td><td>${_monthLabel(cd)}</td><td class="num">${ttf!=null?ttf+'d':'—'}</td><td class="num">${cd?cd.slice(0,4):'—'}</td><td>${fv(v.cs)}</td><td>${_esCell(v)}</td></tr>`;
+      h+=`<td>${fv(v.s)}</td><td>${_reasonBadge(v.r)}</td><td>${fv(v.sn)}</td><td>${_ua(v.sd)}</td><td>${_ua(cd)}</td><td>${_monthLabel(cd)}</td><td class="num">${ttf!=null?ttf+'d':'—'}</td><td class="num">${cd?cd.slice(0,4):'—'}</td><td>${fv(v.cs)}</td><td>${_esCell(v)}</td></tr>`;
     });
   });
   return h+'</tbody></table>';
@@ -1662,15 +1648,11 @@ function renderClosed(){
   const avg=a=>a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):null;
   const noDate=bySource(CV).filter(v=>!closeDate(v)).length;
   document.getElementById('closed-kpis').innerHTML=
-    kpi('green','✅',roles,_rangeLabel(scope),'Closed Roles',{bucket:'closed',scope,dim:'all',title:'Closed Roles'})+
-    kpi('blue','⏱️',avg(ttfs)!=null?avg(ttfs)+'d':'—',`${ttfs.length} з датою`,'Avg Time-to-Fill')+
-    kpi('orange','📞',avg(tths)!=null?avg(tths)+'d':'—',`${tths.length} з датою`,'Avg Time-to-Hire')+
-    kpi('','🧑‍💼',C.filter(v=>esBucket(v)==='Staff').length,'','Staff',{bucket:'closed',scope,dim:'es',val:'Staff',title:'Closed · Staff'})+
-    kpi('','🤝',C.filter(v=>esBucket(v)==='Non-staff').length,'','Non-staff',{bucket:'closed',scope,dim:'es',val:'Non-staff',title:'Closed · Non-staff'})+
-    kpi('','💡',C.filter(v=>esBucket(v)==='Consulting').length,'','Consulting',{bucket:'closed',scope,dim:'es',val:'Consulting',title:'Closed · Consulting'});
+    kpi('green','',roles,'','Closed Roles',{bucket:'closed',scope,dim:'all',title:'Closed Roles'})+
+    kpi('blue','',avg(ttfs)!=null?avg(ttfs)+'d':'—','','Avg Time-to-Fill')+
+    kpi('orange','',avg(tths)!=null?avg(tths)+'d':'—','','Avg Time-to-Hire');
   document.getElementById('closed-detail-note').textContent=`${roles} закритих · ${_rangeLabel(scope)}`+(noDate?` · ⚠ ${noDate} без дати закриття`:'');
   document.getElementById('closed-detail').innerHTML=roles?closedDetailTable(C,scope):'<div class="empty-note">Немає закритих ролей у цьому періоді. Обери інший місяць/квартал/рік.</div>';
-  hsPopulate(false); hsRender();
 }
 
 // ── render orchestration ──
