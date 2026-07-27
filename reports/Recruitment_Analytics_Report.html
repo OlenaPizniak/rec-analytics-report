@@ -587,6 +587,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .modal-close:hover { color:var(--text); }
 .modal-body { overflow:auto; padding:8px 26px 26px; }
 .modal-body .dtbl thead th { position:sticky; top:0; z-index:2; }
+.gc-sel { font-family:inherit; font-size:12.5px; padding:5px 9px; border:1px solid var(--border); border-radius:7px; background:var(--white); color:var(--text); cursor:pointer; }
 /* View-only report — all click affordances & modals removed (2026-07) */
 .clickable{cursor:default!important;transition:none!important;}
 .kpi-hint{display:none!important;}
@@ -627,25 +628,12 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
       <div class="gc-group">
         <span class="gc-label">Період</span>
         <div class="seg" id="f-overview-period">
-          <button data-p="week"      onclick="setPeriod('overview','week')">Тиждень</button>
-          <button data-p="month"     onclick="setPeriod('overview','month')" class="on">Цей місяць</button>
-          <button data-p="lastmonth" onclick="setPeriod('overview','lastmonth')">Минулий місяць</button>
-          <button data-p="quarter"   onclick="setPeriod('overview','quarter')">Квартал</button>
-          <button data-p="all"       onclick="setPeriod('overview','all')">Весь час</button>
+          <button data-p="week"  onclick="setPeriod('overview','week')">Поточний тиждень</button>
+          <button data-p="month" onclick="setPeriod('overview','month')" class="on">Поточний місяць</button>
         </div>
-        <span class="gc-dates">
-          <input type="date" id="f-overview-from" onchange="setCustom('overview')">
-          <span style="color:#a89a80">—</span>
-          <input type="date" id="f-overview-to" onchange="setCustom('overview')">
-        </span>
-      </div>
-      <div class="gc-group">
-        <span class="gc-label">Джерело</span>
-        <div class="seg" id="f-overview-source">
-          <button data-s="all"    onclick="setSrc('overview','all')" class="on">Всі</button>
-          <button data-s="mobile" onclick="setSrc('overview','mobile')">📱 Mobile</button>
-          <button data-s="web"    onclick="setSrc('overview','web')">💻 Web</button>
-        </div>
+        <select class="gc-sel" id="f-overview-month"   onchange="setMonth('overview',this.value)"></select>
+        <select class="gc-sel" id="f-overview-quarter" onchange="setQuarter('overview',this.value)"></select>
+        <select class="gc-sel" id="f-overview-year"    onchange="setYear('overview',this.value)"></select>
       </div>
     </div>
     <div class="section">
@@ -706,15 +694,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="gc-bar">
       <div class="gc-group">
         <span class="gc-label">Період</span>
-        <span class="gc-dates" style="color:#a89a80">Усі відкриті ролі (поточний зріз) — незалежно від дати відкриття</span>
-      </div>
-      <div class="gc-group">
-        <span class="gc-label">Джерело</span>
-        <div class="seg" id="f-active-source">
-          <button data-s="all"    onclick="setSrc('active','all')" class="on">Всі</button>
-          <button data-s="mobile" onclick="setSrc('active','mobile')">📱 Mobile</button>
-          <button data-s="web"    onclick="setSrc('active','web')">💻 Web</button>
-        </div>
+        <span class="gc-dates" style="color:#a89a80">Усі відкриті ролі у роботі (поточний зріз) — незалежно від дати відкриття</span>
       </div>
     </div>
     <div class="kpi-row" id="active-kpis"></div>
@@ -735,25 +715,12 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
       <div class="gc-group">
         <span class="gc-label">Період</span>
         <div class="seg" id="f-closed-period">
-          <button data-p="week"      onclick="setPeriod('closed','week')">Тиждень</button>
-          <button data-p="month"     onclick="setPeriod('closed','month')" class="on">Цей місяць</button>
-          <button data-p="lastmonth" onclick="setPeriod('closed','lastmonth')">Минулий місяць</button>
-          <button data-p="quarter"   onclick="setPeriod('closed','quarter')">Квартал</button>
-          <button data-p="all"       onclick="setPeriod('closed','all')">Весь час</button>
+          <button data-p="week"  onclick="setPeriod('closed','week')">Поточний тиждень</button>
+          <button data-p="month" onclick="setPeriod('closed','month')" class="on">Поточний місяць</button>
         </div>
-        <span class="gc-dates">
-          <input type="date" id="f-closed-from" onchange="setCustom('closed')">
-          <span style="color:#a89a80">—</span>
-          <input type="date" id="f-closed-to" onchange="setCustom('closed')">
-        </span>
-      </div>
-      <div class="gc-group">
-        <span class="gc-label">Джерело</span>
-        <div class="seg" id="f-closed-source">
-          <button data-s="all"    onclick="setSrc('closed','all')" class="on">Всі</button>
-          <button data-s="mobile" onclick="setSrc('closed','mobile')">📱 Mobile</button>
-          <button data-s="web"    onclick="setSrc('closed','web')">💻 Web</button>
-        </div>
+        <select class="gc-sel" id="f-closed-month"   onchange="setMonth('closed',this.value)"></select>
+        <select class="gc-sel" id="f-closed-quarter" onchange="setQuarter('closed',this.value)"></select>
+        <select class="gc-sel" id="f-closed-year"    onchange="setYear('closed',this.value)"></select>
       </div>
     </div>
     <div class="kpi-row" id="closed-kpis"></div>
@@ -1243,7 +1210,7 @@ function inRange(dateStr,scope){
   return true;
 }
 function _rangeLabel(scope){const [f,t]=_range(scope);return (!f&&!t)?'усі дати':`${f||'…'} → ${t||'…'}`;}
-function bySource(arr){return SRC.v==='all'?arr:arr.filter(v=>v.source===SRC.v);}
+function bySource(arr){return arr;}  // source (Mobile/Web) split removed — C-level view is combined
 // Active = currently-open roles that are actually IN PROGRESS. Period-independent
 // (an open vacancy is open *now* regardless of when it started) and PLANNED roles
 // (status "Plan") are excluded — only work that's actively being recruited counts.
@@ -1252,10 +1219,38 @@ function closedItems(scope){return bySource(CV).filter(v=>inRange(closeDate(v),s
 function canceledItems(scope){return bySource(typeof CX!=='undefined'?CX:[]);}
 
 // ── controls (per scope) ──
+// Period bar: two quick buttons (Поточний тиждень / Поточний місяць) + three
+// dropdowns (specific Місяць / Квартал / Рік). Exactly one is active at a time;
+// dropdowns set an explicit [from,to] range (p:'custom'). Source split removed.
+const _MONTHS_UA=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
 function _segOn(id,attr,val){const el=document.getElementById(id);if(el)el.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.getAttribute(attr)===val));}
-function setPeriod(scope,p){ST[scope].p=p;ST[scope].f=ST[scope].t=null;const fi=document.getElementById('f-'+scope+'-from'),ti=document.getElementById('f-'+scope+'-to');if(fi)fi.value='';if(ti)ti.value='';_segOn('f-'+scope+'-period','data-p',p);renderScope(scope);}
-function setCustom(scope){const f=document.getElementById('f-'+scope+'-from').value,t=document.getElementById('f-'+scope+'-to').value;if(!f&&!t)return;ST[scope].p='custom';ST[scope].f=f||null;ST[scope].t=t||null;_segOn('f-'+scope+'-period','data-p','__none__');renderScope(scope);}
-function setSrc(scope,s){SRC.v=s;['overview','active','closed'].forEach(sc=>_segOn('f-'+sc+'-source','data-s',s));renderAll();}
+function _periodReset(scope){
+  _segOn('f-'+scope+'-period','data-p','__none__');
+  ['month','quarter','year'].forEach(k=>{const el=document.getElementById('f-'+scope+'-'+k);if(el)el.selectedIndex=0;});
+}
+function setPeriod(scope,p){_periodReset(scope);ST[scope]={p:p,f:null,t:null};_segOn('f-'+scope+'-period','data-p',p);renderScope(scope);}
+function setMonth(scope,val){if(!val)return;_periodReset(scope);const el=document.getElementById('f-'+scope+'-month');if(el)el.value=val;const y=+val.slice(0,4),m=+val.slice(5,7);ST[scope]={p:'custom',f:_fmt(new Date(y,m-1,1)),t:_fmt(new Date(y,m,0))};renderScope(scope);}
+function setQuarter(scope,val){if(!val)return;_periodReset(scope);const el=document.getElementById('f-'+scope+'-quarter');if(el)el.value=val;const y=+val.slice(0,4),q=+val.slice(6);ST[scope]={p:'custom',f:_fmt(new Date(y,(q-1)*3,1)),t:_fmt(new Date(y,q*3,0))};renderScope(scope);}
+function setYear(scope,val){if(!val)return;_periodReset(scope);const el=document.getElementById('f-'+scope+'-year');if(el)el.value=val;const y=+val;ST[scope]={p:'custom',f:_fmt(new Date(y,0,1)),t:_fmt(new Date(y,11,31))};renderScope(scope);}
+function _allDates(){const ds=[];[OP,RA,CV,(typeof CX!=='undefined'?CX:[])].forEach(a=>a.forEach(v=>{if(v.sd)ds.push(v.sd);const c=closeDate(v);if(c)ds.push(c);}));return ds;}
+function _populatePeriodSelects(){
+  const dates=_allDates().filter(Boolean).sort();
+  const td=new Date(TODAY), maxY=td.getFullYear();
+  const minY=dates.length?Math.min(+dates[0].slice(0,4),maxY):maxY;
+  const months=[],quarters=[],years=[];
+  for(let y=maxY;y>=minY;y--){const mEnd=(y===maxY?td.getMonth():11);for(let m=mEnd;m>=0;m--)months.push([y,m]);}
+  const curQ=Math.floor(td.getMonth()/3);
+  for(let y=maxY;y>=minY;y--){const qEnd=(y===maxY?curQ:3);for(let q=qEnd;q>=0;q--)quarters.push([y,q]);}
+  for(let y=maxY;y>=minY;y--)years.push(y);
+  ['overview','closed'].forEach(function(sc){
+    const mo=document.getElementById('f-'+sc+'-month');
+    if(mo)mo.innerHTML='<option value="">Місяць…</option>'+months.map(a=>`<option value="${a[0]}-${String(a[1]+1).padStart(2,'0')}">${_MONTHS_UA[a[1]]} ${a[0]}</option>`).join('');
+    const qo=document.getElementById('f-'+sc+'-quarter');
+    if(qo)qo.innerHTML='<option value="">Квартал…</option>'+quarters.map(a=>`<option value="${a[0]}-Q${a[1]+1}">Q${a[1]+1} ${a[0]}</option>`).join('');
+    const yo=document.getElementById('f-'+sc+'-year');
+    if(yo)yo.innerHTML='<option value="">Рік…</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  });
+}
 
 // ── tabs ──
 function switchView(view){
@@ -1604,13 +1599,14 @@ function renderClosed(){
     kpi('','💡',C.filter(v=>esBucket(v)==='Consulting').length,'','Consulting',{bucket:'closed',scope,dim:'es',val:'Consulting',title:'Closed · Consulting'})+
     kpi('','🚫',canceledItems(scope).length,'не увійшли в закриті','Canceled',{bucket:'canceled',scope,dim:'all',title:'Canceled Roles'});
   document.getElementById('closed-detail-note').textContent=`${roles} закритих · ${_rangeLabel(scope)}`+(noDate?` · ⚠ ${noDate} без дати закриття`:'');
-  document.getElementById('closed-detail').innerHTML=roles?closedDetailTable(C,scope):'<div class="empty-note">Немає закритих ролей у періоді. Спробуй «Весь час» або перевір Factual close date.</div>';
+  document.getElementById('closed-detail').innerHTML=roles?closedDetailTable(C,scope):'<div class="empty-note">Немає закритих ролей у цьому періоді. Обери інший місяць/квартал/рік.</div>';
   hsPopulate(false); hsRender();
 }
 
 // ── render orchestration ──
 function renderScope(scope){if(scope==='overview')renderOverview();else if(scope==='active')renderActive();else if(scope==='closed')renderClosed();}
 function renderAll(){renderOverview();renderActive();renderClosed();}
+_populatePeriodSelects();
 renderAll();
 </script>
 </body>
