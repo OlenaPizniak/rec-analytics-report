@@ -651,7 +651,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 30 липня 2026, оновлено 10:42 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
+    <!--<<<AUTO_DATE_START>>>-->Дані: 30 липня 2026, оновлено 17:28 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
   </div>
 </div>
 
@@ -810,6 +810,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 // Combined mobile(REC)+web(WRP) active roles. Each item: source, kind, r(reason),
 // sn(seniority), es(employee status), t/sb(dept), h(hires). See update_recruitment_analytics.py
 const OP=[
+  {key:"REC-606",s:"Admin Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Junior",r:"Extention",es:"Staff",rec:"Anastasiia Shapovalenko",src:"Anastasiia Melnyk",so:"Alina Skoryk",sd:"2026-07-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-30"},
   {key:"REC-603",s:"Fashion Operations Manager",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Polina Serdiuk",src:null,so:"Olha Pyrozhenko",sd:"2026-07-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-29"},
   {key:"REC-602",s:"AI Creative Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Oleksandr Honcharuk",sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-27",pk:"REC-593"},
   {key:"REC-598",s:"Motion Designer/Video Editor",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Kate Tsykalo",sd:"2026-07-21",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"Creative",cr:"2026-07-21",pk:"REC-586"},
@@ -837,6 +838,11 @@ const OP=[
 ];
 // Consultant track (REC Recruitment Assignment + WRP Consultant), active
 const RA=[
+  {key:"REC-611",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-610",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-609",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-608",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-607",s:"2D Motion Designer",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30"},
   {key:"REC-601",s:"Marketing Expert",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:null,src:"Kateryna Yaremenko",so:"Vika Repa",sd:"2026-07-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"User Acquisition",cr:"2026-07-23"},
   {key:"REC-564",s:"Beauty consultation",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22"},
   {key:"REC-350",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:"Alina Muravchyk",src:null,so:null,sd:"2026-03-16",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-14"},
@@ -845,6 +851,12 @@ const RA=[
 ];
 // Start dates lookup
 const SD={
+  "REC-611":"2026-07-28",
+  "REC-610":"2026-07-28",
+  "REC-609":"2026-07-28",
+  "REC-608":"2026-07-28",
+  "REC-607":"2026-07-28",
+  "REC-606":"2026-07-29",
   "REC-603":"2026-07-29",
   "REC-602":"2026-07-22",
   "REC-601":"2026-07-23",
@@ -877,6 +889,7 @@ const SD={
 };
 // Seniority lookup
 const SN={
+  "REC-606":"Junior",
   "REC-603":"Middle",
   "REC-602":"Middle",
   "REC-598":"Middle",
@@ -906,6 +919,12 @@ const SN={
 };
 // Recruiter lookup
 const RECR={
+  "REC-611":"Mariia Salabai",
+  "REC-610":"Mariia Salabai",
+  "REC-609":"Mariia Salabai",
+  "REC-608":"Mariia Salabai",
+  "REC-607":"Mariia Salabai",
+  "REC-606":"Anastasiia Shapovalenko",
   "REC-603":"Polina Serdiuk",
   "REC-602":"Anastasiia Shapovalenko",
   "REC-598":"Mariia Salabai",
@@ -934,6 +953,7 @@ const RECR={
 };
 // Sourcer lookup
 const SRCR={
+  "REC-606":"Anastasiia Melnyk",
   "REC-601":"Kateryna Yaremenko",
   "REC-578":"Kateryna Yaremenko",
   "REC-543":"Kateryna Yaremenko",
@@ -944,13 +964,10 @@ const SRCR={
 // Combined closed roles (mobile Hired+Done, web Closed). Close date = fcd (Factual
 // close date) preferred, else hd (transition into Hired/Closed via changelog), else rd.
 const CV=[
-  {key:"REC-605",s:"Google Ads Demand Gen Expert",source:"mobile",type:"subtask",kind:"ra_sub",st:"Hired",pr:"High",sn:null,r:"Consultation",es:null,rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:"2026-07-08",rd:null,cs:"External Referral",cs_other:null,h:1,t:"Marketing",sb:"PPC",cr:"2026-07-29",pk:"REC-589",hd:"2026-07-29"},
-  {key:"REC-604",s:"Google Ads Demand Gen Expert ",source:"mobile",type:"subtask",kind:"ra_sub",st:"Hired",pr:"High",sn:null,r:"Consultation",es:null,rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-13",fcd_c:"2026-07-03",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Marketing",sb:"PPC",cr:"2026-07-29",pk:"REC-589",hd:"2026-07-29"},
   {key:"REC-599",s:"Junior Creative Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Alina Muravchyk",src:null,so:"Олександра Мозгова",sd:"2026-06-30",ed:null,fcd:"2026-07-22",fcd_c:"2026-06-30",rd:null,cs:"Happy Monday",cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-22",hd:"2026-07-22"},
   {key:"REC-595",s:"First Sale Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Prygoniuk",sd:"2026-07-15",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-16",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-07-15",hd:null},
   {key:"REC-592",s:"Junior Digital Marketing Specialist",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Non-staff",rec:"Polina Serdiuk",src:"Polina Serdiuk",so:"Грабинська, Бучака",sd:"2026-05-12",ed:null,fcd:"2026-07-16",fcd_c:"2026-07-01",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-07-09",pk:"REC-237",hd:"2026-07-16"},
-  {key:"REC-589",s:"Google Ads Demand Gen Expert",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:null,r:"Consultation",es:null,rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:"2026-07-03",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Marketing",sb:"PPC",cr:"2026-07-08",hd:null},
-  {key:"REC-588",s:"Google Ads Demand Gen Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:"2026-07-03",rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"PPC",cr:"2026-07-08",hd:null},
+  {key:"REC-588",s:"Google Ads Demand Gen Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"PPC",cr:"2026-07-08",hd:null},
   {key:"REC-579",s:"Legal Counsel",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Anastasiia Yefimenko",sd:"2026-06-09",ed:null,fcd:"2026-07-10",fcd_c:"2026-06-17",rd:null,cs:"Dou",cs_other:null,h:1,t:"Legal",sb:"Legal",cr:"2026-07-01",pk:"REC-539",hd:"2026-07-10"},
   {key:"REC-574",s:"Video Editor",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:"2026-07-21",fcd_c:"2026-07-10",rd:null,cs:"Robota.ua",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",hd:null},
   {key:"REC-571",s:"Supplements Industry Consultant",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-30",pk:"REC-565",hd:null},
