@@ -651,7 +651,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 30 липня 2026, оновлено 17:28 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
+    <!--<<<AUTO_DATE_START>>>-->Дані: 31 липня 2026, оновлено 11:08 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
   </div>
 </div>
 
@@ -810,6 +810,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 // Combined mobile(REC)+web(WRP) active roles. Each item: source, kind, r(reason),
 // sn(seniority), es(employee status), t/sb(dept), h(hires). See update_recruitment_analytics.py
 const OP=[
+  {key:"REC-607",s:"2D Motion Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Low",sn:"Junior",r:"Extention",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30"},
   {key:"REC-606",s:"Admin Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Junior",r:"Extention",es:"Staff",rec:"Anastasiia Shapovalenko",src:"Anastasiia Melnyk",so:"Alina Skoryk",sd:"2026-07-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-30"},
   {key:"REC-603",s:"Fashion Operations Manager",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Polina Serdiuk",src:null,so:"Olha Pyrozhenko",sd:"2026-07-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-29"},
   {key:"REC-602",s:"AI Creative Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Oleksandr Honcharuk",sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-27",pk:"REC-593"},
@@ -842,7 +843,6 @@ const RA=[
   {key:"REC-610",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
   {key:"REC-609",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
   {key:"REC-608",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
-  {key:"REC-607",s:"2D Motion Designer",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30"},
   {key:"REC-601",s:"Marketing Expert",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:null,src:"Kateryna Yaremenko",so:"Vika Repa",sd:"2026-07-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"User Acquisition",cr:"2026-07-23"},
   {key:"REC-564",s:"Beauty consultation",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22"},
   {key:"REC-350",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:"Alina Muravchyk",src:null,so:null,sd:"2026-03-16",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-14"},
@@ -889,6 +889,7 @@ const SD={
 };
 // Seniority lookup
 const SN={
+  "REC-607":"Junior",
   "REC-606":"Junior",
   "REC-603":"Middle",
   "REC-602":"Middle",
