@@ -651,7 +651,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 2 серпня 2026, оновлено 16:49 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
+    <!--<<<AUTO_DATE_START>>>-->Дані: 3 серпня 2026, оновлено 11:41 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
   </div>
 </div>
 
@@ -810,7 +810,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 // Combined mobile(REC)+web(WRP) active roles. Each item: source, kind, r(reason),
 // sn(seniority), es(employee status), t/sb(dept), h(hires). See update_recruitment_analytics.py
 const OP=[
-  {key:"REC-607",s:"2D Motion Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Low",sn:"Junior",r:"Extention",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30"},
+  {key:"REC-607",s:"2D Motion Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Low",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30"},
   {key:"REC-606",s:"Admin Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Junior",r:"Extention",es:"Staff",rec:"Anastasiia Shapovalenko",src:"Anastasiia Melnyk",so:"Alina Skoryk",sd:"2026-07-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-30"},
   {key:"REC-603",s:"Fashion Operations Manager",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Polina Serdiuk",src:null,so:"Olha Pyrozhenko",sd:"2026-07-29",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-29"},
   {key:"REC-602",s:"AI Creative Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Oleksandr Honcharuk",sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-27",pk:"REC-593"},
@@ -844,10 +844,8 @@ const RA=[
   {key:"REC-609",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
   {key:"REC-608",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
   {key:"REC-601",s:"Marketing Expert",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:null,src:"Kateryna Yaremenko",so:"Vika Repa",sd:"2026-07-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"User Acquisition",cr:"2026-07-23"},
-  {key:"REC-564",s:"Beauty consultation",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22"},
   {key:"REC-350",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:"Alina Muravchyk",src:null,so:null,sd:"2026-03-16",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-14"},
   {key:"REC-245",s:"TaiChi Instructor ",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Polina Serdiuk",src:null,so:"Viktoriia Dumuch / Anabel Chupruna",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-04-16"},
-  {key:"WRP-83",s:"RD + PhD expert",source:"web",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:null,cr:"2026-07-17"},
 ];
 // Start dates lookup
 const SD={
@@ -871,7 +869,6 @@ const SD={
   "REC-568":"2026-07-03",
   "REC-567":"2026-06-29",
   "REC-566":"2026-06-29",
-  "REC-564":"2026-06-23",
   "REC-544":"2026-05-27",
   "REC-543":"2026-05-26",
   "REC-539":"2026-07-01",
@@ -883,7 +880,6 @@ const SD={
   "REC-195":"2026-04-02",
   "REC-191":"2026-04-02",
   "WRP-84":"2026-07-22",
-  "WRP-83":null,
   "WRP-82":null,
   "WRP-76":"2026-02-23"
 };
@@ -939,7 +935,6 @@ const RECR={
   "REC-568":"Anastasiia Shapovalenko",
   "REC-567":"Alina Muravchyk",
   "REC-566":"Alina Muravchyk",
-  "REC-564":"Kateryna Yaremenko",
   "REC-544":"Mariia Salabai",
   "REC-543":"Nadiia Brusova",
   "REC-539":"Yaroslava Bondarchuk",
@@ -974,6 +969,7 @@ const CV=[
   {key:"REC-571",s:"Supplements Industry Consultant",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-30",pk:"REC-565",hd:null},
   {key:"REC-570",s:"Product Designer",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olha Pyrozhenko",sd:"2026-06-30",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-03",rd:null,cs:"Dou",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-06-30",hd:null},
   {key:"REC-565",s:"Supplements Industry Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
+  {key:"REC-564",s:"Beauty Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:null,r:"Consultation",es:null,rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
   {key:"REC-563",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-06-18",fcd_c:"2026-06-08",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-06-19",pk:"REC-495",hd:null},
   {key:"REC-560",s:"Gym Trainer - female",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Victoriia Dumuch",sd:"2026-04-02",ed:null,fcd:"2026-06-08",fcd_c:"2026-04-29",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Workout Content",cr:"2026-06-08",pk:"REC-184",hd:null},
   {key:"REC-558",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:null,sd:"2026-04-15",ed:null,fcd:"2026-06-04",fcd_c:"2026-04-17",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-06-05",pk:"REC-495",hd:null},
@@ -1058,6 +1054,7 @@ const CV=[
   {key:"REC-42",s:"Fit Technician",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Yaroslava Bondarchuk",src:null,so:"Alina Sukhenko",sd:"2026-02-23",ed:null,fcd:"2026-03-30",fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-03-26",hd:"2026-03-30"},
   {key:"REC-40",s:"International Tax Manager",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Middle",r:"Extention",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Kyrylo Bocharov",sd:"2026-04-30",ed:null,fcd:"2026-07-22",fcd_c:"2026-06-17",rd:null,cs:"LinkedIn Application",cs_other:null,h:1,t:"Legal",sb:null,cr:"2026-03-26",hd:"2026-07-22"},
   {key:"REC-16",s:"UGC Creators Manager",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Yaroslava Bondarchuk",src:null,so:"Oleg Mihalevich",sd:"2026-03-06",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-03-25",hd:"2026-04-01"},
+  {key:"WRP-83",s:"RD + PhD expert",source:"web",type:"position",kind:"ra",st:"Closed",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:null,cr:"2026-07-17",hd:"2026-08-03"},
   {key:"WRP-81",s:"Experts",source:"web",type:"position",kind:"ra",st:"Closed",pr:"Medium",sn:null,r:"Consultation",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:null,cr:"2026-05-14",hd:"2026-06-17"},
   {key:"WRP-80",s:"Backend Engineer (HC Quiz BE)",source:"web",type:"position",kind:"op",st:"Closed",pr:"High",sn:"Middle",r:"Extention",es:null,rec:"Daria Kozlova",src:null,so:null,sd:"2026-05-05",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:"Health Coaching Quiz BackEnd",cr:"2026-04-28",hd:"2026-06-15"},
   {key:"WRP-78",s:"Growth Product Manager (Style)",source:"web",type:"position",kind:"op",st:"Closed",pr:"High",sn:"Middle",r:"Extention",es:null,rec:null,src:null,so:null,sd:null,ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:"Mind",cr:"2026-03-02",hd:"2026-05-08"},
