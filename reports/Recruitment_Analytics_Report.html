@@ -440,6 +440,8 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   padding:14px 20px; margin-bottom:12px; }
 .gc-group { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .gc-group--wrap { flex-basis:100%; margin-top:-8px; }
+.info-i { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; border:1px solid #bfae92; color:#8a7860; font-size:10px; font-weight:700; font-style:italic; cursor:help; user-select:none; }
+.info-i:hover { background:#efe8dc; color:#4a3829; }
 .gc-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text2); }
 .seg { display:inline-flex; background:#f1e9db; border-radius:9px; padding:3px; gap:2px; }
 .seg button { border:none; background:transparent; cursor:pointer; font-family:inherit; font-size:12.5px;
@@ -661,7 +663,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 4 серпня 2026, оновлено 10:47 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
+    <!--<<<AUTO_DATE_START>>>-->Дані: 4 серпня 2026, оновлено 17:18 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
   </div>
 </div>
 
@@ -790,6 +792,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
           <button data-k="vac" onclick="setClosedKind('vac')">Vacancy</button>
           <button data-k="ra"  onclick="setClosedKind('ra')">Recruitment Assignment</button>
         </div>
+        <span class="info-i" tabindex="0" data-tip="Vacancy — open positions (staff or non-staff employees). Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
       </div>
     </div>
     <div id="closed-kpis"></div>
@@ -1623,18 +1626,21 @@ function activeDetailTable(items,scope){
     '<th colspan="2" class="mc grp">Staff</th><th colspan="2" class="mc grp">Non-staff</th><th rowspan="2" class="mc">Consulting</th></tr>'+
     '<tr><th class="mc">Extension</th><th class="mc">Replacement</th><th class="mc">Extension</th><th class="mc">Replacement</th></tr>'+
     '</thead><tbody>';
+  const _senIdx=s=>s?SEN_ORDER.indexOf(s):99;
   order.forEach((dep,gi)=>{
-    // collapse identical vacancy titles into one counted row
-    const byVac={};
-    groups[dep].forEach(v=>{const k=v.s||'—';(byVac[k]=byVac[k]||[]).push(v);});
-    const vacs=Object.entries(byVac).sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0]));
-    vacs.forEach(([vac,arr],i)=>{
+    // one row per (vacancy title × seniority) — never merge different seniorities
+    const byVS={};
+    groups[dep].forEach(v=>{const k=(v.s||'—')+'¦'+(v.sn||'—');(byVS[k]=byVS[k]||[]).push(v);});
+    const rows=Object.values(byVS).sort((a,b)=>{
+      const va=a[0].s||'—', vb=b[0].s||'—';
+      return va.localeCompare(vb)||(_senIdx(a[0].sn)-_senIdx(b[0].sn));
+    });
+    rows.forEach((arr,i)=>{
       const cnt=key=>arr.filter(v=>mtxCell(v)===key).length;
-      const sens=[...new Set(arr.map(v=>v.sn).filter(Boolean))].sort((a,b)=>SEN_ORDER.indexOf(a)-SEN_ORDER.indexOf(b));
-      const nameTxt=fv(vac)+(arr.length>1?` <span class="rolecount">×${arr.length}</span>`:'');
+      const nameTxt=fv(arr[0].s)+(arr.length>1?` <span class="rolecount">×${arr.length}</span>`:'');
       h+=(i===0&&gi>0)?'<tr class="dep-start">':'<tr>';
-      if(i===0) h+=`<td rowspan="${vacs.length}" class="dep">${deptLabel(dep)}</td>`;
-      h+=`<td>${nameTxt}</td><td>${sens.length?sens.join(', '):'<span class="dash-val">—</span>'}</td>`+
+      if(i===0) h+=`<td rowspan="${rows.length}" class="dep">${deptLabel(dep)}</td>`;
+      h+=`<td>${nameTxt}</td><td>${fv(arr[0].sn)}</td>`+
          `<td class="mc">${cell(cnt('S_EXT'))}</td><td class="mc">${cell(cnt('S_REPL'))}</td><td class="mc">${cell(cnt('N_EXT'))}</td><td class="mc">${cell(cnt('N_REPL'))}</td><td class="mc">${cell(cnt('CONS'))}</td></tr>`;
     });
   });
