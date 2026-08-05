@@ -126,6 +126,8 @@ BOARDS = {
 
 UA_MONTHS = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня',
              'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня']
+EN_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+             'July', 'August', 'September', 'October', 'November', 'December']
 
 
 # ── Value mappers (normalize web → mobile taxonomy) ─────────
@@ -527,8 +529,8 @@ def rewrite_html(data):
         html, r'// <<<AUTO_CV_START>>>[^\n]*', r'// <<<AUTO_CV_END>>>', cv_block)
 
     now_kyiv = datetime.now(timezone(timedelta(hours=3)))
-    date_str = (f"Дані: {now_kyiv.day} {UA_MONTHS[now_kyiv.month - 1]} {now_kyiv.year}, "
-                f"оновлено {now_kyiv:%H:%M} (Kyiv)")
+    date_str = (f"Data: {EN_MONTHS[now_kyiv.month - 1]} {now_kyiv.day}, {now_kyiv.year}, "
+                f"updated {now_kyiv:%H:%M} (Kyiv)")
     html = re.sub(
         r'<!--<<<AUTO_DATE_START>>>-->.*?<!--<<<AUTO_DATE_END>>>-->',
         f'<!--<<<AUTO_DATE_START>>>-->{date_str}<!--<<<AUTO_DATE_END>>>-->',
