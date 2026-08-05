@@ -659,7 +659,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 5 серпня 2026, оновлено 13:57 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Дані: 5 серпня 2026, оновлено 16:41 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -752,7 +752,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="gc-bar">
       <div class="gc-group">
         <span class="gc-label">Період</span>
-        <span class="gc-dates" style="color:#a89a80">Усі відкриті ролі у роботі (поточний зріз) — незалежно від дати відкриття</span>
+        <span class="gc-dates" style="color:#a89a80">Усі відкриті ролі у роботі — незалежно від дати відкриття</span>
       </div>
     </div>
     <div class="kpi-row" id="active-kpis"></div>
@@ -862,8 +862,8 @@ const OP=[
 ];
 // Consultant track (REC Recruitment Assignment + WRP Consultant), active
 const RA=[
-  {key:"REC-601",s:"Marketing Expert (Trendyol, Oner Active/DFYNE, Fashion Nova)",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:null,src:"Kateryna Yaremenko",so:"Vika Repa",sd:"2026-07-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"User Acquisition",cr:"2026-07-23"},
-  {key:"REC-350",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:"Alina Muravchyk",src:null,so:null,sd:"2026-03-16",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-14"},
+  {key:"REC-601",s:"Marketing Expert (Trendyol, Oner Active/DFYNE, Fashion Nova)",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:null,src:"Kateryna Yaremenko",so:"Vika Repa",sd:"2026-07-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"User Acquisition",cr:"2026-07-23"},
+  {key:"REC-350",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Alina Muravchyk",src:null,so:null,sd:"2026-03-16",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-14"},
   {key:"REC-245",s:"TaiChi Instructor ",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Polina Serdiuk",src:null,so:"Viktoriia Dumuch / Anabel Chupruna",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-04-16"},
 ];
 // Start dates lookup
@@ -927,6 +927,7 @@ const SN={
   "REC-606":"Junior",
   "REC-603":"Middle",
   "REC-602":"Middle",
+  "REC-601":"Expert",
   "REC-598":"Middle",
   "REC-594":"Junior",
   "REC-593":"Middle",
@@ -1006,16 +1007,16 @@ const SRCR={
 const CV=[
   {key:"REC-612",s:"Content Project Manager",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Alina Muravchyk",src:null,so:"Viktoriia Dumych (Monastyrska)",sd:"2026-06-29",ed:null,fcd:"2026-08-03",fcd_c:"2026-07-17",rd:null,cs:"Internal remote employee",cs_other:null,h:1,t:"Content",sb:"Workout Content",cr:"2026-08-03",pk:"REC-566",hd:"2026-08-03"},
   {key:"REC-599",s:"Junior Creative Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Alina Muravchyk",src:null,so:"Олександра Мозгова",sd:"2026-06-30",ed:null,fcd:"2026-07-22",fcd_c:"2026-06-30",rd:null,cs:"Happy Monday",cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-22",hd:"2026-07-22"},
-  {key:"REC-595",s:"First Sale Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Prygoniuk",sd:"2026-07-15",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-16",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-07-15",hd:null},
+  {key:"REC-595",s:"First Sale Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Prygoniuk",sd:"2026-07-15",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-16",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-07-15",hd:null},
   {key:"REC-592",s:"Junior Digital Marketing Specialist",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Non-staff",rec:"Polina Serdiuk",src:"Polina Serdiuk",so:"Грабинська, Бучака",sd:"2026-05-12",ed:null,fcd:"2026-07-16",fcd_c:"2026-07-01",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-07-09",pk:"REC-237",hd:"2026-07-16"},
-  {key:"REC-588",s:"Google Ads Demand Gen Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"PPC",cr:"2026-07-08",hd:null},
+  {key:"REC-588",s:"Google Ads Demand Gen Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"PPC",cr:"2026-07-08",hd:null},
   {key:"REC-579",s:"Legal Counsel",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Anastasiia Yefimenko",sd:"2026-06-09",ed:null,fcd:"2026-07-10",fcd_c:"2026-06-17",rd:null,cs:"Dou",cs_other:null,h:1,t:"Legal",sb:"Legal",cr:"2026-07-01",pk:"REC-539",hd:"2026-07-10"},
   {key:"REC-574",s:"Video Editor",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:"2026-07-21",fcd_c:"2026-07-10",rd:null,cs:"Robota.ua",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",hd:null},
   {key:"REC-571",s:"Supplements Industry Consultant",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-30",pk:"REC-565",hd:null},
   {key:"REC-570",s:"Product Designer",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olha Pyrozhenko",sd:"2026-06-30",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-03",rd:null,cs:"Dou",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-06-30",hd:null},
   {key:"REC-569",s:"AI Creative Designer",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Max Kovalenko",sd:"2026-07-02",ed:null,fcd:"2026-08-04",fcd_c:"2026-07-13",rd:null,cs:"Internal Database",cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-06-29",hd:"2026-08-04"},
-  {key:"REC-565",s:"Supplements Industry Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
-  {key:"REC-564",s:"Beauty Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:null,r:"Consultation",es:null,rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:"2026-08-04",fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
+  {key:"REC-565",s:"Supplements Industry Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
+  {key:"REC-564",s:"Beauty Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:"2026-08-04",fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
   {key:"REC-563",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-06-18",fcd_c:"2026-06-08",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-06-19",pk:"REC-495",hd:null},
   {key:"REC-560",s:"Gym Trainer - female",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Victoriia Dumuch",sd:"2026-04-02",ed:null,fcd:"2026-06-08",fcd_c:"2026-04-29",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Workout Content",cr:"2026-06-08",pk:"REC-184",hd:null},
   {key:"REC-558",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:null,sd:"2026-04-15",ed:null,fcd:"2026-06-04",fcd_c:"2026-04-17",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-06-05",pk:"REC-495",hd:null},
@@ -1034,7 +1035,7 @@ const CV=[
   {key:"REC-495",s:"Line Producer (China)",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-07-06",fcd_c:null,rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-05-21",hd:null},
   {key:"REC-484",s:"2D Motion Designer",source:"mobile",type:"position",kind:"ra",st:"Hired",pr:"Low",sn:"Junior",r:"Consultation",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-05-12",ed:null,fcd:"2026-07-28",fcd_c:"2026-07-10",rd:null,cs:"Djinni",cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-05-19",hd:"2026-07-28"},
   {key:"REC-395",s:"UX Writer",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"High",sn:"Middle",r:"Replacement",es:"Non-staff",rec:"Yaroslava Bondarchuk",src:null,so:"Kateryna Mykytchenko",sd:"2026-05-21",ed:null,fcd:"2026-07-16",fcd_c:"2026-05-21",rd:null,cs:"Djinni",cs_other:null,h:1,t:"Product",sb:"UX Research",cr:"2026-05-18",hd:"2026-07-16"},
-  {key:"REC-362",s:"Calisthenics Expert (male)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Anastasiia Shapovalenko",src:null,so:"Viktoriia Dumuch",sd:"2026-03-05",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-141",hd:null},
+  {key:"REC-362",s:"Calisthenics Expert (male)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Anastasiia Shapovalenko",src:null,so:"Viktoriia Dumuch",sd:"2026-03-05",ed:null,fcd:"2026-07-01",fcd_c:null,rd:null,cs:"Internal Database",cs_other:null,h:2,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-141",hd:null},
   {key:"REC-361",s:"Gym Trainer - male",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:null,sd:"2026-04-01",ed:null,fcd:"2026-05-25",fcd_c:"2026-05-04",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-184",hd:null},
   {key:"REC-360",s:"REC-185  Gym Trainer - male",source:"mobile",type:"subtask",kind:"ra_sub",st:"Hired",pr:"High",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Viktoriia Dumuch",sd:"2026-04-01",ed:null,fcd:"2026-05-21",fcd_c:"2026-05-07",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-184",hd:"2026-05-25"},
   {key:"REC-359",s:"Gym Trainer - female",source:"mobile",type:"subtask",kind:"ra_sub",st:"Hired",pr:"High",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Viktoriia Dumuch",sd:"2026-04-02",ed:"2026-05-08",fcd:"2026-05-08",fcd_c:"2026-04-07",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-05-15",pk:"REC-184",hd:"2026-05-15"},
@@ -1272,7 +1273,21 @@ function bySource(arr){return arr;}  // source (Mobile/Web) split removed — C-
 // Active = currently-open roles that are actually IN PROGRESS. Period-independent
 // (an open vacancy is open *now* regardless of when it started). PLANNED ("Plan")
 // and ON-HOLD ("On hold") roles are excluded — only work actively being recruited.
-function activeItems(scope){return bySource(OP.concat(RA)).filter(v=>v.st!=='Plan'&&v.st!=='On hold');}
+function activeItems(scope){
+  const arr=bySource(OP.concat(RA)).filter(v=>v.st!=='Plan'&&v.st!=='On hold');
+  // Collapse multi-hire sub-tasks into their parent vacancy → one row per vacancy
+  // everywhere (KPIs, charts, pivots, detail, modals). A vacancy = 1 role; its
+  // "Number of hires" (parent field) is the hires-needed count. Orphan sub-tasks
+  // (parent not active) are kept as standalone roles.
+  const present=new Set(arr.map(v=>v.key));
+  let out=arr.filter(v=>!((v.kind==='op_sub'||v.kind==='ra_sub')&&v.pk&&present.has(v.pk)));
+  // Manual same-vacancy merge: specific tickets that are actually ONE vacancy
+  // (counted once, hires summed). Key → surviving key. Extend as needed.
+  const MERGE_INTO={'REC-616':'REC-568'};  // Graphic Designer (Junior) — one vacancy, 3 hires
+  const outKeys=new Set(out.map(v=>v.key)), addH={}, drop=new Set();
+  out.forEach(v=>{const t=MERGE_INTO[v.key]; if(t&&outKeys.has(t)){drop.add(v.key);addH[t]=(addH[t]||0)+(v.h||1);}});
+  return out.filter(v=>!drop.has(v.key)).map(v=>addH[v.key]?{...v,h:(v.h||1)+addH[v.key]}:v);
+}
 function closedItems(scope){return bySource(CV).filter(v=>inRange(closeDate(v),scope));}
 function canceledItems(scope){return bySource(typeof CX!=='undefined'?CX:[]);}
 
@@ -1591,14 +1606,11 @@ function _setBlock(chartId,tableId,items,chartFn,tableFn,kind){
 function renderOverview(){
   const scope='overview';
   const A=activeItems(scope), C=closedItems(scope);
-  document.getElementById('ov-active').innerHTML=ovPanel('Active Roles',A,'active',scope,'поточний зріз відкритих ролей');
+  document.getElementById('ov-active').innerHTML=ovPanel('Active Roles',A,'active',scope,'відкриті ролі');
   document.getElementById('ov-closed').innerHTML=ovPanel('Total Closed Roles',C,'closed',scope,_rangeLabel(scope));
   _setBlock('ov-barchart','ov-depttable',A,()=>barChartH(A,'Total Active Roles','Expert'),()=>deptPivot(A,'Total Active Roles','active',scope,'Total Active Roles'),'active');
   _setBlock('ov-prio-donut','ov-prio-table',A,()=>donutChart(A,scope),()=>prioTable(A,scope),'active');
   _setBlock('ov-closedbar','ov-closedtable',C,()=>barChartH(C,'Total Closed Roles','Consultant'),()=>deptPivot(C,'Total Closed Roles','closed',scope,'Total Closed Roles',true),'closed');
-  document.getElementById('ov-deptnote').textContent=`${A.length} відкритих ролей · поточний зріз`;
-  document.getElementById('ov-closednote').textContent=`${C.length} закритих · ${_rangeLabel(scope)}`;
-  document.getElementById('ov-prionote').textContent=`${A.length} відкритих ролей · поточний зріз`;
   _fitBlocks();
 }
 // Each block's height is driven by its LEFT chart: the table card is capped at the
@@ -1641,7 +1653,7 @@ function activeDetailTable(items,scope){
   const order=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);
   const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
   let h='<table class="dtbl mtx"><thead>'+
-    '<tr><th rowspan="2">Department</th><th rowspan="2">Vacancy</th><th rowspan="2">Seniority</th>'+
+    '<tr><th rowspan="2">Department</th><th rowspan="2">Vacancy</th><th rowspan="2">Seniority</th><th rowspan="2" class="mc">Hires</th>'+
     '<th colspan="2" class="mc grp">Staff</th><th colspan="2" class="mc grp">Non-staff</th><th rowspan="2" class="mc">Consulting</th></tr>'+
     '<tr><th class="mc">Extension</th><th class="mc">Replacement</th><th class="mc">Extension</th><th class="mc">Replacement</th></tr>'+
     '</thead><tbody>';
@@ -1655,11 +1667,12 @@ function activeDetailTable(items,scope){
       return va.localeCompare(vb)||(_senIdx(a[0].sn)-_senIdx(b[0].sn));
     });
     rows.forEach((arr,i)=>{
-      const cnt=key=>arr.filter(v=>mtxCell(v)===key).length;
-      const nameTxt=fv(arr[0].s)+(arr.length>1?` <span class="rolecount">×${arr.length}</span>`:'');
+      const cnt=key=>arr.filter(v=>mtxCell(v)===key).reduce((s,v)=>s+(v.h||1),0);  // count hires (Number of hires), not vacancies
+      const hires=arr.reduce((s,v)=>s+(v.h||1),0);
+      const nameTxt=fv(arr[0].s);
       h+=(i===0&&gi>0)?'<tr class="dep-start">':'<tr>';
       if(i===0) h+=`<td rowspan="${rows.length}" class="dep">${deptLabel(dep)}</td>`;
-      h+=`<td>${nameTxt}</td><td>${fv(arr[0].sn)}</td>`+
+      h+=`<td>${nameTxt}</td><td>${fv(arr[0].sn)}</td><td class="mc">${cell(hires)}</td>`+
          `<td class="mc">${cell(cnt('S_EXT'))}</td><td class="mc">${cell(cnt('S_REPL'))}</td><td class="mc">${cell(cnt('N_EXT'))}</td><td class="mc">${cell(cnt('N_REPL'))}</td><td class="mc">${cell(cnt('CONS'))}</td></tr>`;
     });
   });
@@ -1673,7 +1686,6 @@ function renderActive(){
   document.getElementById('active-kpis').innerHTML=
     kpi('blue','',roles,'','Total Active Roles',{bucket:'active',scope,dim:'all',title:'Active Roles'})+
     kpi('red','',hires,'','Hires needed',{bucket:'active',scope,dim:'all',title:'Active Roles (hires)'});
-  document.getElementById('active-detail-note').textContent=`${roles} відкритих ролей · поточний зріз`;
   document.getElementById('active-detail').innerHTML=activeDetailTable(A,scope);
 }
 
@@ -1766,7 +1778,6 @@ function renderClosed(){
   else kpis=_vacKpiRow(C)+_raKpiRow(C);    // All → two separated groups
   document.getElementById('closed-kpis').innerHTML=kpis;
   const noDate=_closedKindFilter(bySource(CV)).filter(v=>!closeDate(v)).length;
-  document.getElementById('closed-detail-note').textContent=`${roles} закритих · ${_rangeLabel(scope)}`+(noDate?` · ⚠ ${noDate} без дати закриття`:'');
   document.getElementById('closed-detail').innerHTML=roles?closedDetailTable(shown,scope):_emptyNote('closed');
 }
 
