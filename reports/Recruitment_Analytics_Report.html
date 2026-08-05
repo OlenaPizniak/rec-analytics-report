@@ -583,7 +583,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .srcbar { height:8px; border-radius:4px; background:linear-gradient(90deg,#8a7860,#c9bfac); min-width:2px; display:inline-block; vertical-align:middle; }
 .dept-badge { display:inline-block; margin-left:8px; font-size:11px; font-weight:600; padding:2px 9px; border-radius:7px; vertical-align:middle; letter-spacing:.1px; }
 .dept-badge.mobile { background:#efe8dc; color:#8a7a62; }
-.dept-badge.web { background:#e6eef6; color:#5f7fa3; }
+.dept-badge.web { background:#e8dac4; color:#8a5c3c; }
 .tag-src { font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; }
 .tag-src.mobile { background:#ece3d5; color:#4a3829; }
 .tag-src.web { background:#e6ddc7; color:#5c4a2e; }
@@ -655,15 +655,11 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 <body>
 <div class="header">
   <div class="header-logo">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-      <rect width="30" height="30" rx="8" fill="rgba(255,255,255,0.2)"/>
-      <path d="M9 15h12M15 9v12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>
     <h1>Recruitment Analytics Report</h1>
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 5 серпня 2026, оновлено 10:48 (Kyiv)<!--<<<AUTO_DATE_END>>>--> &nbsp;·&nbsp; Проєкти REC (Mobile) + WRP (Web)
+    <!--<<<AUTO_DATE_START>>>-->Дані: 5 серпня 2026, оновлено 12:12 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -682,7 +678,6 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
       <div class="gc-group">
         <span class="gc-label">Період</span>
         <div class="seg" id="f-overview-period">
-          <button data-p="week"  onclick="setPeriod('overview','week')">Поточний тиждень</button>
           <button data-p="month" onclick="setPeriod('overview','month')" class="on">Поточний місяць</button>
         </div>
         <select class="gc-sel" id="f-overview-month"   onchange="setMonth('overview',this.value)"></select>
@@ -778,7 +773,6 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
       <div class="gc-group">
         <span class="gc-label">Період</span>
         <div class="seg" id="f-closed-period">
-          <button data-p="week"  onclick="setPeriod('closed','week')">Поточний тиждень</button>
           <button data-p="month" onclick="setPeriod('closed','month')" class="on">Поточний місяць</button>
         </div>
         <select class="gc-sel" id="f-closed-month"   onchange="setMonth('closed',this.value)"></select>
@@ -859,10 +853,10 @@ const OP=[
 ];
 // Consultant track (REC Recruitment Assignment + WRP Consultant), active
 const RA=[
-  {key:"REC-611",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
-  {key:"REC-610",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
-  {key:"REC-609",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
-  {key:"REC-608",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-611",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-610",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-609",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
+  {key:"REC-608",s:"2D Motion Designer",source:"mobile",type:"subtask",kind:"ra_sub",st:"In progress",pr:"Low",sn:null,r:"Consultation",es:"Non-staff",rec:"Mariia Salabai",src:null,so:"Maksym Kovalenko",sd:"2026-07-28",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-07-30",pk:"REC-607"},
   {key:"REC-601",s:"Marketing Expert (Trendyol, Oner Active/DFYNE, Fashion Nova)",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:null,r:"Consultation",es:null,rec:null,src:"Kateryna Yaremenko",so:"Vika Repa",sd:"2026-07-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"User Acquisition",cr:"2026-07-23"},
   {key:"REC-350",s:"Content  Production Specialist",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:null,rec:"Alina Muravchyk",src:null,so:null,sd:"2026-03-16",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-05-14"},
   {key:"REC-245",s:"TaiChi Instructor ",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Polina Serdiuk",src:null,so:"Viktoriia Dumuch / Anabel Chupruna",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-04-16"},
