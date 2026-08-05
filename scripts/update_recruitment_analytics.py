@@ -161,6 +161,24 @@ def map_employee_status(raw, kind):
     return raw  # passthrough; Consulting split is derived from kind in the report
 
 
+def resolve_kind(source, fld, itype):
+    """Kind from the item's own issue type, BUT a sub-task inherits its nature from
+    its PARENT. Recruiters sometimes create the wrong sub-task type (e.g. a
+    'Recruitment Assignment sub-task' under an actual vacancy) — the parent is the
+    source of truth, so such a sub-task counts as a vacancy hire (op_sub), not
+    consulting. Parent-less items keep their own mapping."""
+    kinds = BOARDS[source]['kinds']
+    kind = kinds.get(itype, 'op')
+    if kind in ('op_sub', 'ra_sub'):
+        pit = (((fld.get('parent') or {}).get('fields') or {}).get('issuetype') or {}).get('name')
+        pkind = kinds.get(pit)
+        if pkind in ('op', 'op_sub'):
+            kind = 'op_sub'
+        elif pkind in ('ra', 'ra_sub'):
+            kind = 'ra_sub'
+    return kind
+
+
 # ── Auth ────────────────────────────────────────────────────
 def get_auth_header():
     email = os.environ.get('JIRA_EMAIL')
@@ -427,7 +445,7 @@ def build_data():
         for issue in b['active']:
             fld = issue['fields']
             itype = (fld.get('issuetype') or {}).get('name')
-            kind = kinds.get(itype, 'op')
+            kind = resolve_kind(source, fld, itype)
             status_name = (fld.get('status') or {}).get('name')
             it = item_common(source, issue, kind, status_name)
             (RA if kind in ('ra', 'ra_sub') else OP).append(it)
@@ -445,7 +463,7 @@ def build_data():
         for issue in b['closed']:
             fld = issue['fields']
             itype = (fld.get('issuetype') or {}).get('name')
-            kind = kinds.get(itype, 'op')
+            kind = resolve_kind(source, fld, itype)
             status_name = (fld.get('status') or {}).get('name')
             it = item_common(source, issue, kind, status_name)
             it['hd'] = close_transition.get(it['key'])  # transition→terminal (both boards)
@@ -455,7 +473,7 @@ def build_data():
         for issue in b.get('canceled', []):
             fld = issue['fields']
             itype = (fld.get('issuetype') or {}).get('name')
-            kind = kinds.get(itype, 'op')
+            kind = resolve_kind(source, fld, itype)
             status_name = (fld.get('status') or {}).get('name')
             it = item_common(source, issue, kind, status_name)
             CX.append(it)
