@@ -4,27 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recruitment Analytics Report — Mobile + Web</title>
-<!-- ── access gate (soft, client-side; not between AUTO markers so auto-update preserves it) ── -->
-<script>
-(function(){
-  if(sessionStorage.getItem('rec_auth')==='1') return;
-  var overlay=document.createElement('div');
-  overlay.id='rec-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:#4a3829;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:Segoe UI,system-ui,sans-serif';
-  overlay.innerHTML='<div style="background:#faf4e8;border:1px solid #e4d7bf;border-radius:16px;padding:40px 48px;text-align:center;width:340px;box-shadow:0 12px 40px rgba(0,0,0,.35)"><div style="font-size:28px;margin-bottom:8px">🔒</div><div style="color:#4a3829;font-size:18px;font-weight:700;margin-bottom:4px">Recruitment Analytics Report</div><div style="color:#8a7860;font-size:13px;margin-bottom:24px">Mobile (REC) + Web (WRP)</div><input id="rec-pwd" type="password" placeholder="Пароль" autocomplete="off" style="width:100%;padding:10px 14px;background:#fffdf9;border:1px solid #e4d7bf;border-radius:8px;color:#4a3829;font-size:15px;outline:none;text-align:center;box-sizing:border-box" /><div id="rec-err" style="color:#c0392b;font-size:12px;margin-top:8px;height:16px"></div><button id="rec-btn" style="margin-top:16px;width:100%;padding:10px;background:#b0894f;border:none;border-radius:8px;color:#fffdf9;font-weight:700;font-size:15px;cursor:pointer">Увійти</button></div>';
-  function check(){
-    var v=document.getElementById('rec-pwd').value;
-    if(v==='Report26'){sessionStorage.setItem('rec_auth','1');document.getElementById('rec-overlay').remove();}
-    else{document.getElementById('rec-err').textContent='Невірний пароль';document.getElementById('rec-pwd').value='';document.getElementById('rec-pwd').focus();}
-  }
-  document.addEventListener('DOMContentLoaded',function(){
-    document.body.appendChild(overlay);
-    document.getElementById('rec-pwd').focus();
-    document.getElementById('rec-btn').addEventListener('click',check);
-    document.getElementById('rec-pwd').addEventListener('keydown',function(e){if(e.key==='Enter')check();});
-  });
-})();
-</script>
 <style>
 :root {
   --blue:      #4a3829;
@@ -122,7 +101,7 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .kpi-card.blue::before  { background: linear-gradient(90deg,#a3927a,#c2ab93); }
 .kpi-card.green::before { background: linear-gradient(90deg,#7d6a4f,#9c8a6a); }
 .kpi-card.orange::before{ background: linear-gradient(90deg,#a3927a,#c2ab93); }
-.kpi-card.red::before   { background: linear-gradient(90deg,#ef4444,#f87171); }
+.kpi-card.red::before   { background: linear-gradient(90deg,#8a4a2e,#b5765a); }
 .kpi-icon { font-size: 22px; margin-bottom: 8px; line-height: 1; }
 .kpi-num { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
 .kpi-sub { font-size: 14px; color: var(--slate); font-weight: 400; }
@@ -131,6 +110,9 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color
 .kpi-card.orange .kpi-num{ color: var(--orange); }
 .kpi-card.red .kpi-num   { color: var(--red); }
 .kpi-label { font-size: 10.5px; color: var(--text2); margin-top: 5px; text-align: center; text-transform: uppercase; letter-spacing: .5px; font-weight: 500; }
+.kpi-card--dual { flex-direction: row; justify-content: center; gap: 32px; padding: 20px 24px; }
+.kpi-dual-item { display: flex; flex-direction: column; align-items: center; }
+.kpi-dual-sep { width: 1px; align-self: stretch; background: var(--border); }
 
 /* ── CHARTS ──────────────────────────────────────────────── */
 .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
@@ -659,7 +641,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Дані: 5 серпня 2026, оновлено 17:29 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: August 5, 2026, updated 16:41 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -676,9 +658,9 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   <div id="view-overview">
     <div class="gc-bar">
       <div class="gc-group">
-        <span class="gc-label">Період</span>
+        <span class="gc-label">Period</span>
         <div class="seg" id="f-overview-period">
-          <button data-p="month" onclick="setPeriod('overview','month')" class="on">Поточний місяць</button>
+          <button data-p="month" onclick="setPeriod('overview','month')" class="on">Current month</button>
         </div>
         <select class="gc-sel" id="f-overview-month"   onchange="setMonth('overview',this.value)"></select>
         <select class="gc-sel" id="f-overview-quarter" onchange="setQuarter('overview',this.value)"></select>
@@ -701,7 +683,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="section">
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#8a7860,#a3927a)">📋</div>
-        <h2>Деталі — Active Roles Data</h2>
+        <h2>Details —Active Roles Data</h2>
         <span class="section-note" id="ov-deptnote"></span>
       </div>
       <div class="sec-body">
@@ -733,7 +715,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="section">
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#7d6a4f,#9c8a6a)">📋</div>
-        <h2>Деталі — Closed Roles Data</h2>
+        <h2>Details —Closed Roles Data</h2>
         <span class="section-note" id="ov-closednote"></span>
       </div>
       <div class="sec-body">
@@ -751,11 +733,21 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   <div id="view-active" style="display:none">
     <div class="gc-bar">
       <div class="gc-group">
-        <span class="gc-label">Період</span>
-        <span class="gc-dates" style="color:#a89a80">Усі відкриті ролі у роботі — незалежно від дати відкриття</span>
+        <span class="gc-label">Period</span>
+        <span class="gc-dates" style="color:#a89a80">All active roles in progress — regardless of opening date</span>
+      </div>
+      <div class="gc-group gc-group--wrap">
+        <span class="gc-label">Type</span>
+        <div class="seg sm" id="f-active-kind">
+          <button data-k="all" class="on" onclick="setActiveKind('all')">All</button>
+          <button data-k="vac" onclick="setActiveKind('vac')">Vacancy</button>
+          <button data-k="ra"  onclick="setActiveKind('ra')">Recruitment Assignment</button>
+        </div>
+        <span class="info-i" tabindex="0" data-tip="Vacancy — open positions (staff or non-staff employees). Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
       </div>
     </div>
     <div class="kpi-row" id="active-kpis"></div>
+    <div id="active-kpis-breakdown"></div>
 
     <div class="section">
       <div class="section-header" style="cursor:default">
@@ -771,22 +763,22 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   <div id="view-closed" style="display:none">
     <div class="gc-bar">
       <div class="gc-group">
-        <span class="gc-label">Період</span>
+        <span class="gc-label">Period</span>
         <div class="seg" id="f-closed-period">
-          <button data-p="month" onclick="setPeriod('closed','month')" class="on">Поточний місяць</button>
+          <button data-p="month" onclick="setPeriod('closed','month')" class="on">Current month</button>
         </div>
         <select class="gc-sel" id="f-closed-month"   onchange="setMonth('closed',this.value)"></select>
         <select class="gc-sel" id="f-closed-quarter" onchange="setQuarter('closed',this.value)"></select>
         <select class="gc-sel" id="f-closed-year"    onchange="setYear('closed',this.value)"></select>
       </div>
       <div class="gc-group gc-group--wrap">
-        <span class="gc-label">Тип</span>
+        <span class="gc-label">Type</span>
         <div class="seg sm" id="f-closed-kind">
           <button data-k="all" class="on" onclick="setClosedKind('all')">All</button>
           <button data-k="vac" onclick="setClosedKind('vac')">Vacancy</button>
           <button data-k="ra"  onclick="setClosedKind('ra')">Recruitment Assignment</button>
         </div>
-        <span class="info-i" tabindex="0" data-tip="Vacancy — open positions (staff or non-staff employees). Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
+        <span class="info-i" tabindex="0" data-tip="Vacancy — closed positions (staff or non-staff employees). Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
       </div>
     </div>
     <div id="closed-kpis"></div>
@@ -856,7 +848,7 @@ const OP=[
   {key:"REC-237",s:"Junior Digital Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Junior",r:"Replacement",es:"Non-staff",rec:"Polina Serdiuk",src:null,so:"Kateryna Hrabynska, Mariia Vydyborets",sd:"2026-07-07",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-04-07"},
   {key:"REC-195",s:"Backend Engineer Core Team (GoLang + PHP)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Senior",r:"Extention",es:"Staff",rec:"Alina Muravchyk",src:null,so:"Daryna Varycheva",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:"Backend Core",cr:"2026-04-02"},
   {key:"REC-191",s:"Data Analyst (Marketing)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Extention",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Pavlo Boiko",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Analytics",sb:"Analytics",cr:"2026-04-02"},
-  {key:"WRP-84",s:"Video Editor (freelance) ",source:"web",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Daria Kozlova",src:null,so:null,sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:3,t:"Content",sb:"Mobile Team",cr:"2026-07-22"},
+  {key:"WRP-84",s:"Video Editor (freelance) ",source:"web",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Daria Kozlova",src:null,so:null,sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:"Mobile Team",cr:"2026-07-22"},
   {key:"WRP-82",s:"Partnership Manager",source:"web",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Replacement",es:"Staff",rec:null,src:null,so:null,sd:"2026-07-17",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Payment",sb:"Payment",cr:"2026-07-06"},
   {key:"WRP-76",s:"Growth Product Manager (Creators Quiz)",source:"web",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Extention",es:"Staff",rec:null,src:null,so:null,sd:"2026-02-23",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:"Сreator quiz",cr:"2026-02-26"},
 ];
@@ -1009,14 +1001,14 @@ const CV=[
   {key:"REC-599",s:"Junior Creative Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Alina Muravchyk",src:null,so:"Олександра Мозгова",sd:"2026-06-30",ed:null,fcd:"2026-07-22",fcd_c:"2026-06-30",rd:null,cs:"Happy Monday",cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-07-22",hd:"2026-07-22"},
   {key:"REC-595",s:"First Sale Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Prygoniuk",sd:"2026-07-15",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-16",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"E-commerce",sb:"Non-tech",cr:"2026-07-15",hd:null},
   {key:"REC-592",s:"Junior Digital Marketing Specialist",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Non-staff",rec:"Polina Serdiuk",src:"Polina Serdiuk",so:"Грабинська, Бучака",sd:"2026-05-12",ed:null,fcd:"2026-07-16",fcd_c:"2026-07-01",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-07-09",pk:"REC-237",hd:"2026-07-16"},
-  {key:"REC-588",s:"Google Ads Demand Gen Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:null,rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"Marketing",sb:"PPC",cr:"2026-07-08",hd:null},
+  {key:"REC-588",s:"Google Ads Demand Gen Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Darina Lavrenko",src:"Kateryna Yaremenko",so:null,sd:"2026-07-01",ed:null,fcd:"2026-07-29",fcd_c:null,rd:null,cs:null,cs_other:null,h:2,t:"Marketing",sb:"PPC",cr:"2026-07-08",hd:null},
   {key:"REC-579",s:"Legal Counsel",source:"mobile",type:"subtask",kind:"op_sub",st:"Hired",pr:"Medium",sn:"Junior",r:"Replacement",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Anastasiia Yefimenko",sd:"2026-06-09",ed:null,fcd:"2026-07-10",fcd_c:"2026-06-17",rd:null,cs:"Dou",cs_other:null,h:1,t:"Legal",sb:"Legal",cr:"2026-07-01",pk:"REC-539",hd:"2026-07-10"},
   {key:"REC-574",s:"Video Editor",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olia Vorobei",sd:"2026-06-30",ed:null,fcd:"2026-07-21",fcd_c:"2026-07-10",rd:null,cs:"Robota.ua",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-07-01",hd:null},
   {key:"REC-571",s:"Supplements Industry Consultant",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-30",pk:"REC-565",hd:null},
-  {key:"REC-570",s:"Product Designer",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:"Middle",r:"Consultation",es:"Expert",rec:"Mariia Salabai",src:null,so:"Olha Pyrozhenko",sd:"2026-06-30",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-03",rd:null,cs:"Dou",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-06-30",hd:null},
+  {key:"REC-570",s:"Product Designer",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Mariia Salabai",src:null,so:"Olha Pyrozhenko",sd:"2026-06-30",ed:null,fcd:"2026-07-27",fcd_c:"2026-07-03",rd:null,cs:"Dou",cs_other:null,h:1,t:"Content",sb:"Content",cr:"2026-06-30",hd:null},
   {key:"REC-569",s:"AI Creative Designer",source:"mobile",type:"position",kind:"op",st:"Hired",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Max Kovalenko",sd:"2026-07-02",ed:null,fcd:"2026-08-04",fcd_c:"2026-07-13",rd:null,cs:"Internal Database",cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-06-29",hd:"2026-08-04"},
   {key:"REC-565",s:"Supplements Industry Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Yaroslava Bondarchuk",src:null,so:"Andrii Savchuk",sd:"2026-06-22",ed:null,fcd:"2026-06-30",fcd_c:"2026-06-24",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:2,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
-  {key:"REC-564",s:"Beauty Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:"2026-08-04",fcd_c:null,rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
+  {key:"REC-564",s:"Beauty Consultant",source:"mobile",type:"position",kind:"ra",st:"Done",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Kateryna Yaremenko",src:null,so:"Andrii Savchuk",sd:"2026-06-23",ed:null,fcd:"2026-08-04",fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"E-commerce",sb:"Supply",cr:"2026-06-22",hd:null},
   {key:"REC-563",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Tetiana Shneider",sd:"2026-04-17",ed:null,fcd:"2026-06-18",fcd_c:"2026-06-08",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-06-19",pk:"REC-495",hd:null},
   {key:"REC-560",s:"Gym Trainer - female",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:"Victoriia Dumuch",sd:"2026-04-02",ed:null,fcd:"2026-06-08",fcd_c:"2026-04-29",rd:null,cs:"LinkedIn Sourced",cs_other:null,h:1,t:"Content",sb:"Workout Content",cr:"2026-06-08",pk:"REC-184",hd:null},
   {key:"REC-558",s:"Line Producer (China)",source:"mobile",type:"subtask",kind:"ra_sub",st:"Done",pr:"Medium",sn:null,r:"Consultation",es:null,rec:"Yaroslava Bondarchuk",src:null,so:null,sd:"2026-04-15",ed:null,fcd:"2026-06-04",fcd_c:"2026-04-17",rd:null,cs:"WeChat",cs_other:null,h:1,t:"Content",sb:"Content Production",cr:"2026-06-05",pk:"REC-495",hd:null},
@@ -1237,7 +1229,7 @@ function esBucket(v){
 // Teams that exist on BOTH boards and must be split Mobile/Web (each gets a board pill).
 // Every other department is a single merged group — web + mobile roll up together, no pill.
 const DEPT_BADGE_DEPTS=['Engineering','Product','Product Design'];
-function deptOf(v){const d=v.t;if(!d)return '(не вказано)';return DEPT_BADGE_DEPTS.includes(d)?d+(v.source==='web'?' (Web)':' (Mobile)'):d;}
+function deptOf(v){const d=v.t;if(!d)return '(Not specified)';return DEPT_BADGE_DEPTS.includes(d)?d+(v.source==='web'?' (Web)':' (Mobile)'):d;}
 // Render a department name with its board as a small pill instead of "(Mobile)/(Web)" text.
 function deptLabel(d){const m=/^(.*) \((Mobile|Web)\)$/.exec(d);if(!m)return d;return DEPT_BADGE_DEPTS.includes(m[1])?`${m[1]}<span class="dept-badge ${m[2].toLowerCase()}">${m[2]}</span>`:m[1];}
 
@@ -1248,6 +1240,7 @@ const ST={
   closed:{p:'month',f:null,t:null}
 };
 const SRC={v:'all'};  // source (Mobile/Web) is SHARED across all tabs; period is per-tab
+let ACTIVE_KIND='all';  // Active tab: 'all' | 'vac' (op/op_sub) | 'ra' (ra/ra_sub)
 let CLOSED_KIND='all';  // Closed tab: 'all' | 'vac' (op/op_sub) | 'ra' (ra/ra_sub) — kept apart from ST (period funcs replace ST[scope])
 function _presetRange(p){
   if(p==='all'||p==='custom') return null;
@@ -1268,7 +1261,7 @@ function inRange(dateStr,scope){
   if(t&&d>t) return false;
   return true;
 }
-function _rangeLabel(scope){const [f,t]=_range(scope);return (!f&&!t)?'усі дати':`${f?_ua(f):'…'} → ${t?_ua(t):'…'}`;}
+function _rangeLabel(scope){const [f,t]=_range(scope);return (!f&&!t)?'all dates':`${f?_ua(f):'…'} → ${t?_ua(t):'…'}`;}
 function bySource(arr){return arr;}  // source (Mobile/Web) split removed — C-level view is combined
 // Active = currently-open roles that are actually IN PROGRESS. Period-independent
 // (an open vacancy is open *now* regardless of when it started). PLANNED ("Plan")
@@ -1292,10 +1285,10 @@ function closedItems(scope){return bySource(CV).filter(v=>inRange(closeDate(v),s
 function canceledItems(scope){return bySource(typeof CX!=='undefined'?CX:[]);}
 
 // ── controls (per scope) ──
-// Period bar: two quick buttons (Поточний тиждень / Поточний місяць) + three
-// dropdowns (specific Місяць / Квартал / Рік). Exactly one is active at a time;
+// Period bar: two quick buttons (Current week / Current month) + three
+// dropdowns (specific Month / Quarter / Year). Exactly one is active at a time;
 // dropdowns set an explicit [from,to] range (p:'custom'). Source split removed.
-const _MONTHS_UA=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+const _MONTHS_UA=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function _segOn(id,attr,val){const el=document.getElementById(id);if(el)el.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.getAttribute(attr)===val));}
 function _periodReset(scope){
   _segOn('f-'+scope+'-period','data-p','__none__');
@@ -1317,11 +1310,11 @@ function _populatePeriodSelects(){
   for(let y=maxY;y>=minY;y--)years.push(y);
   ['overview','closed'].forEach(function(sc){
     const mo=document.getElementById('f-'+sc+'-month');
-    if(mo)mo.innerHTML='<option value="">Місяць…</option>'+months.map(a=>`<option value="${a[0]}-${String(a[1]+1).padStart(2,'0')}">${_MONTHS_UA[a[1]]} ${a[0]}</option>`).join('');
+    if(mo)mo.innerHTML='<option value="">Month…</option>'+months.map(a=>`<option value="${a[0]}-${String(a[1]+1).padStart(2,'0')}">${_MONTHS_UA[a[1]]} ${a[0]}</option>`).join('');
     const qo=document.getElementById('f-'+sc+'-quarter');
-    if(qo)qo.innerHTML='<option value="">Квартал…</option>'+quarters.map(a=>`<option value="${a[0]}-Q${a[1]+1}">Q${a[1]+1} ${a[0]}</option>`).join('');
+    if(qo)qo.innerHTML='<option value="">Quarter…</option>'+quarters.map(a=>`<option value="${a[0]}-Q${a[1]+1}">Q${a[1]+1} ${a[0]}</option>`).join('');
     const yo=document.getElementById('f-'+sc+'-year');
-    if(yo)yo.innerHTML='<option value="">Рік…</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+    if(yo)yo.innerHTML='<option value="">Year…</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
   });
 }
 
@@ -1348,15 +1341,17 @@ function itemsFor(mf){
   if(mf.reason) arr=arr.filter(v=>reasonLabel(v.r)===mf.reason);
   if(mf.dept) arr=arr.filter(v=>deptOf(v)===mf.dept);
   if(mf.prio) arr=arr.filter(v=>prBucket(v)===mf.prio);
-  if(mf.cs) arr=arr.filter(v=>(v.cs||'(не вказано)')===mf.cs);
+  if(mf.cs) arr=arr.filter(v=>(v.cs||'(Not specified)')===mf.cs);
   if(mf.sen) arr=arr.filter(v=>(v.sn||'—')===mf.sen);
   if(mf.kindGroup==='op') arr=arr.filter(v=>v.kind==='op'||v.kind==='op_sub');
   if(mf.kindGroup==='ra') arr=arr.filter(v=>v.kind==='ra'||v.kind==='ra_sub');
+  if(mf.role==='vac') arr=arr.filter(v=>esBucket(v)!=='Consulting');
+  if(mf.role==='ra') arr=arr.filter(v=>esBucket(v)==='Consulting');
   if(mf.dim==='es') arr=arr.filter(v=>esBucket(v)===mf.val);
   else if(mf.dim==='reason') arr=arr.filter(v=>reasonLabel(v.r)===mf.val);
   else if(mf.dim==='dept') arr=arr.filter(v=>deptOf(v)===mf.val);
   else if(mf.dim==='sen') arr=arr.filter(v=>(v.sn||'—')===mf.val);
-  else if(mf.dim==='src') arr=arr.filter(v=>(v.cs||'(не вказано)')===mf.val);
+  else if(mf.dim==='src') arr=arr.filter(v=>(v.cs||'(Not specified)')===mf.val);
   return arr;
 }
 
@@ -1366,7 +1361,9 @@ function openModal(mf){
   _modalItems=itemsFor(mf); _modalBucket=mf.bucket; _modalPrio=!!mf.dept; _modalSort={col:mf.bucket==='closed'?'closed':'key',dir:mf.bucket==='closed'?-1:1};
   const hires=_modalItems.reduce((s,v)=>s+(v.h||1),0);
   document.getElementById('modal-title').textContent=mf.title||'Vacancies';
-  document.getElementById('modal-sub').textContent=`${_modalItems.length} ролей`+(mf.bucket==='active'?` · ${hires} наймів потрібно`:'');
+  const roleWord=_modalItems.length===1?'role':'roles';
+  const headcountWord=hires===1?'headcount':'headcount';
+  document.getElementById('modal-sub').textContent=`${_modalItems.length} ${roleWord}`+(mf.bucket==='active'?` · ${hires} ${headcountWord} needed`:'');
   _renderModal();
   document.getElementById('modal-overlay').style.display='flex';
   document.body.style.overflow='hidden';
@@ -1411,7 +1408,7 @@ function _renderModal(){
     h+='</tr>';
   });
   h+='</tbody></table>';
-  if(!arr.length)h='<div class="empty-note">Немає ролей за цим фільтром.</div>';
+  if(!arr.length)h='<div class="empty-note">No roles match this filter.</div>';
   document.getElementById('modal-body').innerHTML=h;
 }
 // Modals open ONLY from table rows (charts/KPIs/panels carry no clickable table context).
@@ -1425,7 +1422,7 @@ document.addEventListener('mousemove',e=>{if(!_tipEl)return;let x=e.clientX+14,y
 
 // ── pivots ──
 // Empty-state note shown wherever a period yields 0 roles. kind: 'closed'|'active'.
-function _emptyNote(kind){const w=kind==='closed'?'закритих':'відкритих';return `<div class="empty-note">Немає ${w} ролей у цьому періоді. Оберіть інший місяць/квартал/рік.</div>`;}
+function _emptyNote(kind){const w=kind==='closed'?'closed':'open';return `<div class="empty-note">No ${w} roles in this period. Select another month/quarter/year.</div>`;}
 function deptPivot(items,totalLabel,bucket,scope,totalCol,hideTotal){
   if(!items.length)return _emptyNote(bucket==='closed'?'closed':'active');
   totalCol=totalCol||'Total';
@@ -1502,7 +1499,7 @@ function barChart(items,scope,bucket,title,thirdLabel){
   // Chart is display-only (not clickable).
   const seg=(lbl,r,col,tx)=>{const n=(r==='—')?counts[lbl]._other:counts[lbl][r];if(!n)return '';
     const hpx=Math.max(3,n/maxTotal*PLOT);
-    return `<div class="bc-seg" style="height:${hpx}px;background:${col};color:${tx}" data-tip="${r==='—'?'Не вказано':r} — ${n}">${hpx>16?n:''}</div>`;};
+    return `<div class="bc-seg" style="height:${hpx}px;background:${col};color:${tx}" data-tip="${r==='—'?'Not specified':r} — ${n}">${hpx>16?n:''}</div>`;};
   let bars='';
   cols.forEach(([lbl,esb])=>{
     bars+=`<div class="bc-col"><div class="bc-bar">`+
@@ -1542,7 +1539,7 @@ function barChartH(items,title,thirdLabel){
           seg(r.c.Extension,r.total,BAR_REASON.Extension,'#fff','Extension')+
           seg(r.c.Replacement,r.total,BAR_REASON.Replacement,'#fff','Replacement')+
           seg(r.c.Consultation,r.total,BAR_REASON.Consultation,'#5c4a2e','Consultation')+
-          seg(r.c._other,r.total,'#e2d6c0','#5c4a2e','Не вказано')+
+          seg(r.c._other,r.total,'#e2d6c0','#5c4a2e','Not specified')+
         `</div>`
       : `<div class="hbc-bar hbc-bar--empty" data-tip="${r.lbl} — 0">0</div>`;
     return `<div class="hbc-row"><div class="hbc-label">${r.lbl}</div><div class="hbc-track">${bar}</div></div>`;
@@ -1582,7 +1579,7 @@ function donutChart(items,scope){
   let acc=0,arcs='',labels='';
   cols.forEach(k=>{
     const n=counts[k],frac=n/total,dash=frac*C;
-    arcs+=`<circle cx="${cx}" cy="${cy}" r="${rMid}" fill="none" stroke="${PRIO_COLOR[k]}" stroke-width="${sw}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc*C}" transform="rotate(-90 ${cx} ${cy})" data-tip="${k==='—'?'Не вказано':k} — ${n}"></circle>`;
+    arcs+=`<circle cx="${cx}" cy="${cy}" r="${rMid}" fill="none" stroke="${PRIO_COLOR[k]}" stroke-width="${sw}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc*C}" transform="rotate(-90 ${cx} ${cy})" data-tip="${k==='—'?'Not specified':k} — ${n}"></circle>`;
     const ang=(acc+frac/2)*2*Math.PI-Math.PI/2;
     const lx=cx+rMid*Math.cos(ang),ly=cy+rMid*Math.sin(ang);
     const tx=(k==='LIGHT'||k==='—')?'#5c4a2e':'#fff';
@@ -1593,7 +1590,7 @@ function donutChart(items,scope){
   const centerKPI=`<text x="${cx}" y="${cy-9}" text-anchor="middle" dominant-baseline="central" font-size="52" font-weight="800" fill="#4a3829" style="pointer-events:none">${total}</text>`+
     `<text x="${cx}" y="${cy+28}" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="600" fill="#8a7860" style="pointer-events:none">Active Roles</text>`;
   const svg=`<svg class="dc-svg" viewBox="0 0 300 300">${arcs}${labels}${centerKPI}</svg>`;
-  const capL=k=>k==='—'?'Не вказано':k.charAt(0)+k.slice(1).toLowerCase();
+  const capL=k=>k==='—'?'Not specified':k.charAt(0)+k.slice(1).toLowerCase();
   const legend=cols.map(k=>`<div class="dc-leg"><span class="dot" style="background:${PRIO_COLOR[k]}"></span><span class="dc-leg-lbl">${capL(k)}</span><span class="dc-leg-pct">${(counts[k]/total*100).toFixed(1)}%</span></div>`).join('');
   return `<div class="dc"><div class="dc-title">Active Roles Priority</div><div class="dc-legend">${legend}</div><div class="dc-donut">${svg}</div></div>`;
 }
@@ -1606,7 +1603,7 @@ function _setBlock(chartId,tableId,items,chartFn,tableFn,kind){
 function renderOverview(){
   const scope='overview';
   const A=activeItems(scope), C=closedItems(scope);
-  document.getElementById('ov-active').innerHTML=ovPanel('Active Roles',A,'active',scope,'відкриті ролі');
+  document.getElementById('ov-active').innerHTML=ovPanel('Active Roles',A,'active',scope,'open roles');
   document.getElementById('ov-closed').innerHTML=ovPanel('Total Closed Roles',C,'closed',scope,_rangeLabel(scope));
   _setBlock('ov-barchart','ov-depttable',A,()=>barChartH(A,'Total Active Roles','Expert'),()=>deptPivot(A,'Total Active Roles','active',scope,'Total Active Roles'),'active');
   _setBlock('ov-prio-donut','ov-prio-table',A,()=>donutChart(A,scope),()=>prioTable(A,scope),'active');
@@ -1616,7 +1613,7 @@ function renderOverview(){
 // Each block's height is driven by its LEFT chart: the table card is capped at the
 // chart's natural height; rows that don't fit are hidden behind a ▾ arrow. The chart
 // (align-items:start) never moves when the table expands.
-function _setToggleLabel(btn,exp){const ic=btn.querySelector('.tg-ic'),tx=btn.querySelector('.tg-tx');if(ic)ic.textContent=exp?'▴':'▾';if(tx)tx.textContent=exp?'Згорнути':'Показати всі';}
+function _setToggleLabel(btn,exp){const ic=btn.querySelector('.tg-ic'),tx=btn.querySelector('.tg-tx');if(ic)ic.textContent=exp?'▴':'▾';if(tx)tx.textContent=exp?'Collapse':'Show all';}
 function toggleBlock(btn){const card=btn.closest('.prio-cell--table');if(!card)return;_setToggleLabel(btn,card.classList.toggle('expanded'));}
 function _fitBlocks(){
   document.querySelectorAll('.prio-grid').forEach(function(grid){
@@ -1650,21 +1647,33 @@ function activeDetailTable(items,scope){
   const list=items.slice().sort((a,b)=>deptOf(a).localeCompare(deptOf(b))||(a.s||'').localeCompare(b.s||''));
   const groups={};
   list.forEach(v=>{(groups[deptOf(v)]=groups[deptOf(v)]||[]).push(v);});
-  const order=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);
+  const _senIdx=s=>s?SEN_ORDER.indexOf(s):99;
+  const order=Object.keys(groups).sort((a,b)=>{
+    const cntCmp=groups[b].length-groups[a].length;
+    if(cntCmp!==0)return cntCmp;
+    const maxSenA=Math.min(...groups[a].map(v=>_senIdx(v.sn)));
+    const maxSenB=Math.min(...groups[b].map(v=>_senIdx(v.sn)));
+    return maxSenB-maxSenA;
+  });
   const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
   let h='<table class="dtbl mtx"><thead>'+
     '<tr><th rowspan="2">Department</th><th rowspan="2">Vacancy</th><th rowspan="2">Seniority</th><th rowspan="2" class="mc">Hires</th>'+
     '<th colspan="2" class="mc grp">Staff</th><th colspan="2" class="mc grp">Non-staff</th><th rowspan="2" class="mc">Consulting</th></tr>'+
     '<tr><th class="mc">Extension</th><th class="mc">Replacement</th><th class="mc">Extension</th><th class="mc">Replacement</th></tr>'+
     '</thead><tbody>';
-  const _senIdx=s=>s?SEN_ORDER.indexOf(s):99;
   order.forEach((dep,gi)=>{
     // one row per (vacancy title × seniority) — never merge different seniorities
     const byVS={};
     groups[dep].forEach(v=>{const k=(v.s||'—')+'¦'+(v.sn||'—');(byVS[k]=byVS[k]||[]).push(v);});
+    const _esBucketOrder=es=>es==='Staff'?0:es==='Non-staff'?1:es==='Consulting'?2:3;
     const rows=Object.values(byVS).sort((a,b)=>{
+      const esA=esBucket(a[0]), esB=esBucket(b[0]);
+      const esCmp=_esBucketOrder(esA)-_esBucketOrder(esB);
+      if(esCmp!==0)return esCmp;
+      const senCmp=_senIdx(b[0].sn)-_senIdx(a[0].sn);
+      if(senCmp!==0)return senCmp;
       const va=a[0].s||'—', vb=b[0].s||'—';
-      return va.localeCompare(vb)||(_senIdx(a[0].sn)-_senIdx(b[0].sn));
+      return va.localeCompare(vb);
     });
     rows.forEach((arr,i)=>{
       const cnt=key=>arr.filter(v=>mtxCell(v)===key).reduce((s,v)=>s+(v.h||1),0);  // count hires (Number of hires), not vacancies
@@ -1680,12 +1689,25 @@ function activeDetailTable(items,scope){
 }
 function renderActive(){
   const scope='active';
-  const A=activeItems(scope);
+  const A=_activeKindFilter(activeItems(scope));
   const roles=A.length, staff=A.filter(v=>esBucket(v)==='Staff').length, nonstaff=A.filter(v=>esBucket(v)==='Non-staff').length, consulting=A.filter(v=>esBucket(v)==='Consulting').length;
   const hires=A.reduce((s,v)=>s+(v.h||1),0);
   document.getElementById('active-kpis').innerHTML=
-    kpi('blue','',roles,'','Total Active Roles',{bucket:'active',scope,dim:'all',title:'Active Roles'})+
-    kpi('red','',hires,'','Hires needed',{bucket:'active',scope,dim:'all',title:'Active Roles (hires)'});
+    `<div class="kpi-card blue kpi-card--dual clickable" ${_attr({bucket:'active',scope,dim:'all',title:'Active Roles'})}>`+
+      `<span class="kpi-hint">↗</span>`+
+      `<div class="kpi-dual-item"><div class="kpi-num">${roles}</div><div class="kpi-label">Total Active Roles</div></div>`+
+      `<div class="kpi-dual-sep"></div>`+
+      `<div class="kpi-dual-item"><div class="kpi-num" style="color:var(--red)">${hires}</div><div class="kpi-label">Total Headcount Needed</div></div>`+
+    `</div>`;
+  const vacancies=A.filter(v=>esBucket(v)!=='Consulting'), recAssignments=A.filter(v=>esBucket(v)==='Consulting');
+  const hiresNeeded=vacancies.reduce((s,v)=>s+(v.h||1),0), specialistsNeeded=recAssignments.reduce((s,v)=>s+(v.h||1),0);
+  document.getElementById('active-kpis-breakdown').innerHTML=
+    `<div class="kpi-row">`+
+      kpi('blue','',vacancies.length,'','Vacancies',{bucket:'active',scope,role:'vac',title:'Vacancies'})+
+      kpi('red','',hiresNeeded,'','Hires Needed',{bucket:'active',scope,role:'vac',title:'Hires Needed'})+
+      kpi('orange','',recAssignments.length,'','Recruitment Assignments',{bucket:'active',scope,role:'ra',title:'Recruitment Assignments'})+
+      kpi('green','',specialistsNeeded,'','Specialists Needed',{bucket:'active',scope,role:'ra',title:'Specialists Needed'})+
+    `</div>`;
   document.getElementById('active-detail').innerHTML=activeDetailTable(A,scope);
 }
 
@@ -1729,24 +1751,26 @@ function hsRender(){
   let arr=_hsBase();
   if(HS.dept!=='All') arr=arr.filter(v=>deptOf(v)===HS.dept);
   if(HS.sen!=='All') arr=arr.filter(v=>(v.sn||'—')===HS.sen);
-  const bySrc={}; arr.forEach(v=>{const s=v.cs||'(не вказано)';bySrc[s]=(bySrc[s]||0)+(v.h||1);});
-  const rows=Object.entries(bySrc).sort((a,b)=>((a[0]==='(не вказано)')-(b[0]==='(не вказано)'))||b[1]-a[1]);
-  const totalHires=rows.reduce((s,[,n])=>s+n,0), nSources=rows.length, top=rows.filter(([s])=>s!=='(не вказано)')[0]||rows[0];
+  const bySrc={}; arr.forEach(v=>{const s=v.cs||'(Not specified)';bySrc[s]=(bySrc[s]||0)+(v.h||1);});
+  const rows=Object.entries(bySrc).sort((a,b)=>((a[0]==='(Not specified)')-(b[0]==='(Not specified)'))||b[1]-a[1]);
+  const totalHires=rows.reduce((s,[,n])=>s+n,0), nSources=rows.length, top=rows.filter(([s])=>s!=='(Not specified)')[0]||rows[0];
   document.getElementById('hs-cards').innerHTML=
-    `<div class="hs-card"><div class="lbl">Total hires</div><div class="val">${totalHires}</div><div class="sub">у періоді</div></div>`+
+    `<div class="hs-card"><div class="lbl">Total hires</div><div class="val">${totalHires}</div><div class="sub">in period</div></div>`+
     `<div class="hs-card"><div class="lbl">Sources</div><div class="val">${nSources}</div><div class="sub">unique</div></div>`+
     `<div class="hs-card"><div class="lbl">Top source</div><div class="val src">${top?top[0]:'—'}</div><div class="sub">${top?top[1]+' hires':''}</div></div>`;
   const max=top?top[1]:1;
   let bars='';
   rows.forEach(([s,n],i)=>{const w=Math.max(2,n/max*100);
     bars+=`<div class="hsbh-row"><div class="hsbh-name" title="${s}">${s}</div><div class="hsbh-track"><div class="hsbh-bar" style="width:${w}%;background:${HS_EARTH[i%HS_EARTH.length]}" data-tip="${s} — ${n}"></div><div class="hsbh-val">${n}</div></div></div>`;});
-  document.getElementById('hs-chart').innerHTML=rows.length?`<div class="hsbh">${bars}</div>`:'<div class="empty-note">Немає даних по джерелах за цим фільтром.</div>';
+  document.getElementById('hs-chart').innerHTML=rows.length?`<div class="hsbh">${bars}</div>`:'<div class="empty-note">No data for sources matching this filter.</div>';
 }
 // Closed tab: filter by role kind (all / vacancies / recruitment assignments)
 function _isVac(v){return v.kind==='op'||v.kind==='op_sub';}
 function _isRA(v){return v.kind==='ra'||v.kind==='ra_sub';}
 function _closedKindFilter(arr){return CLOSED_KIND==='vac'?arr.filter(_isVac):CLOSED_KIND==='ra'?arr.filter(_isRA):arr;}
+function _activeKindFilter(arr){return ACTIVE_KIND==='vac'?arr.filter(_isVac):ACTIVE_KIND==='ra'?arr.filter(_isRA):arr;}
 function setClosedKind(k){CLOSED_KIND=k;_segOn('f-closed-kind','data-k',k);renderClosed();}
+function setActiveKind(k){ACTIVE_KIND=k;_segOn('f-active-kind','data-k',k);renderActive();}
 function _avgD(a){return a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):null;}
 function _fmtD(n){return n!=null?n+'d':'—';}
 // Vacancies group: count + Avg TTF + Avg TTH
