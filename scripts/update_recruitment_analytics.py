@@ -298,7 +298,9 @@ def resolve_dept(source, fld):
 def resolve_seniority(source, fld):
     if source == 'mobile':
         return map_seniority(get_option(fld.get(F['rec_seniority'])))
-    return map_seniority(get_option(fld.get(F['wrp_grade'])))
+    # WRP moved to the unified "Seniority" field (22876, same as REC); older tickets
+    # may still carry the legacy "Grade" (13941) — read the new one first, fall back.
+    return map_seniority(get_option(fld.get(F['rec_seniority'])) or get_option(fld.get(F['wrp_grade'])))
 
 
 def resolve_reason(source, fld, kind):
