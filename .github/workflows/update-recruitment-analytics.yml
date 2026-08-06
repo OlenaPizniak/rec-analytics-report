@@ -2,24 +2,26 @@ name: Update Recruitment Analytics Report from Jira
 
 on:
   schedule:
-    # Twice a day (UTC). Kyiv is UTC+3 (summer) / UTC+2 (winter):
-    #   05:10 UTC → morning refresh (offset 10 min from REC job to avoid API contention)
-    #   12:10 UTC → midday refresh
-    - cron: '10 5 * * *'
-    - cron: '10 12 * * *'
+    #   03:40 UTC → morning refresh (early, before the 06:00 UTC Jenkins publish)
+    #   17:00 UTC → evening refresh (20:00 Kyiv, after the workday)
+    - cron: '40 3 * * *'
+    - cron: '0 17 * * *'
   workflow_dispatch: {}   # allow manual trigger from Actions tab
 
 permissions:
   contents: write
 
-concurrency:
-  group: update-recruitment-analytics
-  cancel-in-progress: false
+# No concurrency group on purpose: with a group, queued runs get auto-cancelled
+# ("All jobs were cancelled" emails). The conflict-safe push-retry below makes
+# overlapping runs harmless, so we let them all finish instead of cancelling.
 
 jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,30 +35,41 @@ jobs:
           python-version: '3.11'
 
       - name: Run updater (REC + WRP → Recruitment Analytics Report)
-        env:
-          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-        run: |
-          python3 scripts/update_recruitment_analytics.py
+        run: python3 scripts/update_recruitment_analytics.py
 
-      - name: Commit & push if data changed
+      - name: Commit & push if data changed (conflict-safe)
         run: |
+          set -uo pipefail
           git config user.name  "rec-dashboard-bot[github-actions]"
           git config user.email "rec-dashboard-bot@users.noreply.github.com"
-          if [[ -n "$(git status --porcelain reports/Recruitment_Analytics_Report.html)" ]]; then
-            git add reports/Recruitment_Analytics_Report.html
-            git commit -m "chore(analytics): auto-refresh Recruitment Analytics Report from Jira [skip ci]"
-            for i in 1 2 3; do
-              if git push; then
-                echo "✓ Recruitment Analytics Report updated and pushed (attempt $i)."
-                exit 0
-              fi
-              echo "Push attempt $i rejected, rebasing on remote main..."
-              git pull --rebase origin main
-              sleep 2
-            done
-            echo "✗ Failed to push after 3 attempts."
-            exit 1
-          else
+          REPORT=reports/Recruitment_Analytics_Report.html
+          BRANCH="${GITHUB_REF_NAME:-main}"
+          # No [skip ci]: this repo has no push-triggered workflows (only schedule +
+          # workflow_dispatch), so nothing loops. Jenkins (which honours [skip ci])
+          # must see these data-refresh commits to republish to pages.bttrm.tech.
+          MSG="chore(analytics): auto-refresh Recruitment Analytics Report from Jira"
+          if [[ -z "$(git status --porcelain "$REPORT")" ]]; then
             echo "ℹ No data changes — skipping commit."
+            exit 0
           fi
+          for attempt in 1 2 3; do
+            git add "$REPORT"
+            git commit -m "$MSG" || true
+            if git push; then
+              echo "✓ Pushed (attempt $attempt)."
+              exit 0
+            fi
+            # Remote advanced (a concurrent refresh or a merged PR). Rather than a
+            # rebase that can conflict on the data block, reset to the latest remote
+            # and regenerate fresh data on top — the next push is a clean fast-forward.
+            echo "Push rejected — syncing to origin/$BRANCH and regenerating (attempt $attempt)…"
+            git fetch --quiet origin "$BRANCH"
+            git reset --hard "origin/$BRANCH"
+            python3 scripts/update_recruitment_analytics.py
+            if [[ -z "$(git status --porcelain "$REPORT")" ]]; then
+              echo "✓ Already up to date after regenerate — nothing to push."
+              exit 0
+            fi
+          done
+          echo "✗ Could not push after 3 attempts."
+          exit 1
