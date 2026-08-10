@@ -662,7 +662,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Data: August 10, 2026, updated 08:10 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: August 10, 2026, updated 20:47 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -835,6 +835,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 // Combined mobile(REC)+web(WRP) active roles. Each item: source, kind, r(reason),
 // sn(seniority), es(employee status), t/sb(dept), h(hires). See update_recruitment_analytics.py
 const OP=[
+  {key:"REC-626",s:"AI Engineer ",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Senior",r:"Extention",es:"Staff",rec:"Alina Muravchyk",src:"Anastasiia Melnyk",so:"Vitalii Malakhovskyi",sd:"2026-08-10",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:null,cr:"2026-08-10"},
   {key:"REC-625",s:"Graphic Designer",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"High",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Masha Kolomiiets",sd:"2026-08-03",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"Creative",cr:"2026-08-05",pk:"REC-568"},
   {key:"REC-624",s:"AI Creative Designer ",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Maksym Kovalenko",sd:"2026-08-05",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-08-05",pk:"REC-620"},
   {key:"REC-623",s:"AI Creative Designer ",source:"mobile",type:"subtask",kind:"op_sub",st:"In progress",pr:"Medium",sn:"Junior",r:"Extention",es:"Non-staff",rec:"Anastasiia Shapovalenko",src:null,so:"Maksym Kovalenko",sd:"2026-08-05",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:5,t:"Marketing",sb:"Creative",cr:"2026-08-05",pk:"REC-620"},
@@ -868,7 +869,7 @@ const OP=[
   {key:"REC-315",s:"Product Designer",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Senior",r:"Replacement",es:"Staff",rec:"Anastasiia Shapovalenko",src:"Mariia Salabai",so:"Anna Yasinkovska",sd:"2026-05-05",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:"Design",cr:"2026-05-05"},
   {key:"REC-237",s:"Junior Digital Marketing Specialist",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Junior",r:"Replacement",es:"Non-staff",rec:"Polina Serdiuk",src:null,so:"Kateryna Hrabynska, Mariia Vydyborets",sd:"2026-07-07",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Marketing",sb:"User Acquisition",cr:"2026-04-07"},
   {key:"REC-195",s:"Backend Engineer Core Team (GoLang + PHP)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Senior",r:"Extention",es:"Staff",rec:"Alina Muravchyk",src:null,so:"Daryna Varycheva",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Engineering",sb:"Backend Core",cr:"2026-04-02"},
-  {key:"REC-191",s:"Data Analyst (Marketing)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Middle",r:"Extention",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Pavlo Boiko",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Analytics",sb:"Analytics",cr:"2026-04-02"},
+  {key:"REC-191",s:"Data Analyst (Marketing)",source:"mobile",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Staff",rec:"Yaroslava Bondarchuk",src:null,so:"Pavlo Boiko",sd:"2026-04-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Analytics",sb:"Analytics",cr:"2026-04-02"},
   {key:"WRP-85",s:"Junior Growth Product Manager",source:"web",type:"position",kind:"op",st:"In progress",pr:"High",sn:"Junior",r:"Extention",es:"Staff",rec:null,src:null,so:"Max Shatokhin",sd:"2026-08-06",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Product",sb:"Product",cr:"2026-08-06"},
   {key:"WRP-84",s:"Video Editor (freelance) ",source:"web",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Extention",es:"Non-staff",rec:"Daria Kozlova",src:null,so:null,sd:"2026-07-22",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:3,t:"Content",sb:"Mobile Team",cr:"2026-07-22"},
   {key:"WRP-82",s:"Partnership Manager",source:"web",type:"position",kind:"op",st:"In progress",pr:"Medium",sn:"Middle",r:"Replacement",es:"Staff",rec:null,src:null,so:null,sd:"2026-07-17",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Payment",sb:"Payment",cr:"2026-07-06"},
@@ -882,6 +883,7 @@ const RA=[
 ];
 // Start dates lookup
 const SD={
+  "REC-626":"2026-08-10",
   "REC-625":"2026-08-03",
   "REC-624":"2026-08-05",
   "REC-623":"2026-08-05",
@@ -926,6 +928,7 @@ const SD={
 };
 // Seniority lookup
 const SN={
+  "REC-626":"Senior",
   "REC-625":"Junior",
   "REC-624":"Junior",
   "REC-623":"Junior",
@@ -970,6 +973,7 @@ const SN={
 };
 // Recruiter lookup
 const RECR={
+  "REC-626":"Alina Muravchyk",
   "REC-625":"Anastasiia Shapovalenko",
   "REC-624":"Anastasiia Shapovalenko",
   "REC-623":"Anastasiia Shapovalenko",
@@ -1010,6 +1014,7 @@ const RECR={
 };
 // Sourcer lookup
 const SRCR={
+  "REC-626":"Anastasiia Melnyk",
   "REC-606":"Anastasiia Melnyk",
   "REC-601":"Kateryna Yaremenko",
   "REC-578":"Kateryna Yaremenko",
