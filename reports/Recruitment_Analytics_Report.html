@@ -636,6 +636,27 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .modal-close:hover { color:var(--text); }
 .modal-body { overflow:auto; padding:8px 26px 26px; }
 .modal-body .dtbl thead th { position:sticky; top:0; z-index:2; }
+.gc-lock { font-size:12px; font-weight:600; padding:5px 12px; border-radius:7px; cursor:pointer;
+           border:1px solid var(--border); background:var(--white); color:var(--text2); }
+.gc-lock.on { background:#4a3829; border-color:#4a3829; color:#fff; }
+.gc-sel:disabled, .seg button:disabled { opacity:.45; cursor:not-allowed; }
+
+/* Three panels instead of two. The stat rows and legend carry FIXED pixel
+   widths (280 / 240) sized for a two-column layout; at three columns the panel
+   is ~30% narrower and "Recruitment Assignment" wraps onto a second line, which
+   makes the three panels visibly different heights. Fluid widths + nowrap keeps
+   them identical. */
+.ov-grid--3 { grid-template-columns:1fr 1fr 1fr !important; gap:0 28px !important; }
+.ov-grid--3 .ov-panel--r { padding-left:28px !important; }
+.ov-grid--3 .ov-rows   { width:100%; max-width:280px; }
+.ov-grid--3 .ov-legend { width:auto; flex:1 1 auto; min-width:0; }
+.ov-grid--3 .ov-donut-row { gap:16px; width:100%; }
+.ov-grid--3 .donut { width:88px; height:88px; }
+.ov-stat { min-width:0; }
+.ov-stat .lbl { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ov-stat .val { white-space:nowrap; padding-left:10px; }
+/* Equal height regardless of how many legend rows each panel happens to have. */
+.ov-grid .ov-panel { height:100%; justify-content:flex-start; }
 .gc-sel { font-family:inherit; font-size:12.5px; padding:5px 9px; border:1px solid var(--border); border-radius:7px; background:var(--white); color:var(--text); cursor:pointer; }
 /* Interactivity: ONLY table rows open modals; charts / KPIs / overview panels are display-only */
 .clickable{cursor:default!important;transition:none!important;}
@@ -662,7 +683,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Data: August 20, 2026, updated 20:24 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: August 20, 2026, updated 20:12 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -684,19 +705,21 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
           <button data-p="month" onclick="setPeriod('overview','month')" class="on">Current month</button>
         </div>
         <select class="gc-sel" id="f-overview-month"   onchange="setMonth('overview',this.value)"></select>
-        <select class="gc-sel" id="f-overview-quarter" onchange="setQuarter('overview',this.value)"></select>
-        <select class="gc-sel" id="f-overview-year"    onchange="setYear('overview',this.value)"></select>
+        <button class="gc-lock" id="f-lock" onclick="toggleLock()">🔓 Freeze period</button>
+        <span class="info-i" tabindex="0" data-tip="Freeze the period before sending the report, so the reader sees exactly the month you selected.">i</span>
       </div>
     </div>
     <div class="section">
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#4a3829,#6f5a44)">📊</div>
         <h2>Recruitment Overview</h2>
+        <span class="info-i" tabindex="0" data-tip="Staff / Non-staff &mdash; full-time engagement. Recruitment Assignment &mdash; a consulting call, expert session or project-based engagement rather than a hire.">i</span>
       </div>
       <div class="sec-body">
-        <div class="ov-grid">
+        <div class="ov-grid" id="ov-grid">
           <div class="ov-panel" id="ov-active"></div>
           <div class="ov-panel ov-panel--r" id="ov-closed"></div>
+          <div class="ov-panel ov-panel--r" id="ov-canceled" style="display:none"></div>
         </div>
       </div>
     </div>
@@ -704,14 +727,13 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="section">
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#8a7860,#a3927a)">📋</div>
-        <h2>Details —Active Roles Data</h2>
-        <span class="section-note" id="ov-deptnote"></span>
+        <h2>Details — Active Roles Data</h2>
       </div>
       <div class="sec-body">
         <div class="prio-grid">
-          <div class="prio-cell prio-cell--chart" id="ov-barchart"></div>
+          <div class="prio-cell prio-cell--chart" id="ov-abar"></div>
           <div class="prio-cell prio-cell--table pc-open">
-            <div class="pc-body" id="ov-depttable"></div>
+            <div class="pc-body" id="ov-atable"></div>
           </div>
         </div>
       </div>
@@ -720,8 +742,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="section">
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#9b7d6a,#c2ab93)">🎯</div>
-        <h2>Active Roles Priority — by department</h2>
-        <span class="section-note" id="ov-prionote"></span>
+        <h2>Active Roles Priority</h2>
       </div>
       <div class="sec-body">
         <div class="prio-grid">
@@ -736,18 +757,33 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="section">
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#7d6a4f,#9c8a6a)">📋</div>
-        <h2>Details —Closed Roles Data</h2>
-        <span class="section-note" id="ov-closednote"></span>
+        <h2>Details — Closed Roles Data</h2>
       </div>
       <div class="sec-body">
-        <div class="prio-grid closed-grid">
-          <div class="prio-cell prio-cell--chart" id="ov-closedbar"></div>
+        <div class="prio-grid">
+          <div class="prio-cell prio-cell--chart" id="ov-cbar"></div>
           <div class="prio-cell prio-cell--table pc-open">
-            <div class="pc-body" id="ov-closedtable"></div>
+            <div class="pc-body" id="ov-ctable"></div>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="section" id="sec-canceled" style="display:none">
+      <div class="section-header" style="cursor:default">
+        <div class="section-icon" style="background:linear-gradient(135deg,#8a4a2e,#b5765a)">🚫</div>
+        <h2>Details — Canceled Roles Data</h2>
+      </div>
+      <div class="sec-body">
+        <div class="prio-grid">
+          <div class="prio-cell prio-cell--chart" id="ov-xbar"></div>
+          <div class="prio-cell prio-cell--table pc-open">
+            <div class="pc-body" id="ov-xtable"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ══════════ ACTIVE ROLES ══════════ -->
@@ -755,7 +791,8 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="gc-bar">
       <div class="gc-group">
         <span class="gc-label">Period</span>
-        <span class="gc-dates" style="color:#a89a80">All active roles in progress — regardless of opening date</span>
+        <span class="gc-dates" id="active-range" style="color:#a89a80"></span>
+        <span class="info-i" tabindex="0" data-tip="The period is set on the Overview tab and applies everywhere.">i</span>
       </div>
       <div class="gc-group gc-group--wrap">
         <span class="gc-label">Type</span>
@@ -785,12 +822,8 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
     <div class="gc-bar">
       <div class="gc-group">
         <span class="gc-label">Period</span>
-        <div class="seg" id="f-closed-period">
-          <button data-p="month" onclick="setPeriod('closed','month')" class="on">Current month</button>
-        </div>
-        <select class="gc-sel" id="f-closed-month"   onchange="setMonth('closed',this.value)"></select>
-        <select class="gc-sel" id="f-closed-quarter" onchange="setQuarter('closed',this.value)"></select>
-        <select class="gc-sel" id="f-closed-year"    onchange="setYear('closed',this.value)"></select>
+        <span class="gc-dates" id="closed-range" style="color:#a89a80"></span>
+        <span class="info-i" tabindex="0" data-tip="The period is set on the Overview tab and applies everywhere.">i</span>
       </div>
       <div class="gc-group gc-group--wrap">
         <span class="gc-label">Type</span>
@@ -1247,7 +1280,9 @@ const TODAY=(()=>{const t=new Date();return new Date(t.getFullYear(),t.getMonth(
 const _fmt=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
 // ── badges / helpers ──
-const _esColors={'Staff':{bg:'#e6ddc7',tx:'#5c4a2e'},'Non-staff':{bg:'#efe0cb',tx:'#8a5a2e'},'Expert':{bg:'#eae0d3',tx:'#6b4a3a'}};
+const RA_LABEL='Recruitment Assignment';
+const _esColors={'Staff':{bg:'#e6ddc7',tx:'#5c4a2e'},'Non-staff':{bg:'#efe0cb',tx:'#8a5a2e'},
+                 'Expert':{bg:'#eae0d3',tx:'#6b4a3a'},[RA_LABEL]:{bg:'#eae0d3',tx:'#6b4a3a'}};
 function _esBadge(es){if(!es)return `<span class="dash-val">—</span>`;const c=_esColors[es]||{bg:'#f1e9db',tx:'#8a7358'};return `<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:nowrap;background:${c.bg};color:${c.tx}">${es}</span>`;}
 const _reasonColors={'Replacement':{bg:'#ece2d2',tx:'#8a6b4e'},'Extension':{bg:'#e7ddcb',tx:'#4a3829'},'Consultation':{bg:'#f1ebe0',tx:'#7a6647'}};
 function reasonLabel(r){return r==='Extention'?'Extension':(r||null);}
@@ -1300,7 +1335,13 @@ function _presetRange(p){
   if(p==='quarter'){const q=Math.floor(t.getMonth()/3);return [_fmt(new Date(t.getFullYear(),q*3,1)),_fmt(new Date(t.getFullYear(),q*3+3,0))];}
   return null;
 }
-function _range(scope){const s=ST[scope];if(s.p==='custom')return [s.f,s.t];return _presetRange(s.p)||[null,null];}
+// Period is GLOBAL — picked once on Overview, obeyed by every tab.
+// ST is kept only so older per-scope call sites keep working; it is no longer read.
+const PERIOD={p:'month',f:null,t:null};
+function _range(scope){
+  if(PERIOD.p==='custom') return [PERIOD.f,PERIOD.t];
+  return _presetRange(PERIOD.p)||[null,null];
+}
 function inRange(dateStr,scope){
   const [f,t]=_range(scope);
   if(!f&&!t) return true;
@@ -1312,25 +1353,94 @@ function inRange(dateStr,scope){
 }
 function _rangeLabel(scope){const [f,t]=_range(scope);return (!f&&!t)?'all dates':`${f?_ua(f):'…'} → ${t?_ua(t):'…'}`;}
 function bySource(arr){return arr;}  // source (Mobile/Web) split removed — C-level view is combined
-// Active = currently-open roles that are actually IN PROGRESS. Period-independent
-// (an open vacancy is open *now* regardless of when it started). PLANNED ("Plan")
-// and ON-HOLD ("On hold") roles are excluded — only work actively being recruited.
+// ═══════════ ACTIVE ROLES — period-scoped ═══════════
+// A CARD (parent vacancy or sub-task) is active in month M = [first…last] when:
+//   • it had started            sde <= last        (sub-task inherits parent's sd)
+//   • it was not filled yet     fill == null || fill > last
+//   • it was not stopped before stop == null || stop >= first
+// Asymmetric on purpose: a role FILLED inside M drops out of M (it shows under
+// Closed for that month), but one CANCELLED or PAUSED inside M stays in M —
+// otherwise it would vanish from the report entirely, having no other home.
+//
+// Role      = parent card; an orphaned sub-task stands as a role of its own
+// Headcount = live cards in the family, each judged on its OWN dates
+// The `h` field (num_hires / rec_num_spec) is deliberately NOT used.
+function fillDate(v){return v.fcd||v.hd||v.rd||null;}
+function stopDate(v){return v.cxd||null;}
+function startDate(v){return v.sde||v.sd||null;}
+// `cxd` (cancel / on-hold date) is supplied by the updater from Jira's status
+// history. A dataset produced BEFORE that change carries none, and without a
+// date every cancelled role would look permanently active. Detect that once and
+// fall back to the previous behaviour — exclude cancelled and paused roles
+// outright — so an un-refreshed dataset degrades instead of inflating.
+const HAS_STOP_DATES=(function(){
+  return OP.concat(RA).concat(CV||[]).concat(typeof CX!=='undefined'?CX:[])
+    .some(v=>v.cxd);
+})();
+function _isStopped(v){return v.st==='Canceled'||v.st==='On hold';}
+function isCardActive(v,first,last){
+  const sd=startDate(v);
+  if(!sd||sd>last) return false;              // not started (or no date at all)
+  const fill=fillDate(v);
+  if(fill&&fill<=last) return false;          // already filled by end of M
+  if(!HAS_STOP_DATES) return !_isStopped(v);  // legacy data: no dates to reason with
+  const stop=stopDate(v);
+  if(stop&&stop<=last) return false;          // cancelled/paused by end of M
+  return true;
+}
+// Cancelled or paused INSIDE the period. `On hold` is treated as Canceled
+// throughout and is labelled "Canceled" wherever it surfaces.
+function isCardStopped(v,first,last){
+  const sd=startDate(v);
+  if(!sd||sd>last) return false;
+  const stop=stopDate(v);
+  return !!stop&&stop>=first&&stop<=last;
+}
+function _allCards(){return OP.concat(RA).concat(CV||[]).concat(typeof CX!=='undefined'?CX:[]);}
+// Fold a set of matching CARDS into ROLES.
+// A sub-task folds into its parent only while the parent is in the same set;
+// otherwise it stands as a role in its own right, judged on its own dates.
+// NOTHING is ever dropped — that holds whichever way the parent is absent:
+//   • parent filled mid-month  (REC-574 filled 21.07, its positions cancelled 22.07)
+//   • parent "not started yet" (REC-249 sd 2026-05-12 over sub-tasks from 2026-03-23)
+// The second case is a data artefact — 20 of 72 sub-tasks predate their parent,
+// because a parent's start_date is rewritten when the req is reused — but the
+// work was real, so the positions still count.
+function _rolesFrom(cards){
+  const byKey={}; _allCards().forEach(v=>{byKey[v.key]=v;});
+  const isSub=v=>v.kind==='op_sub'||v.kind==='ra_sub';
+  const keys=new Set(cards.map(v=>v.key));
+  const roleOf=v=>(isSub(v)&&v.pk&&keys.has(v.pk))?v.pk:v.key;
+  const family={};
+  cards.forEach(v=>{const r=roleOf(v);(family[r]=family[r]||[]).push(v);});
+  return Object.keys(family).map(k=>({...byKey[k], h:family[k].length}));
+}
+// Each card is judged on ITS OWN dates — a sub-task's own opening and closing
+// date, never the parent's. `sde` only falls back to the parent when the
+// sub-task has no start date of its own at all.
 function activeItems(scope){
-  const arr=bySource(OP.concat(RA)).filter(v=>v.st!=='Plan'&&v.st!=='On hold');
-  // Collapse multi-hire sub-tasks into their parent vacancy → one row per vacancy
-  // everywhere (KPIs, charts, pivots, detail, modals). A vacancy = 1 role; its
-  // "Number of hires" (parent field) is the hires-needed count. Orphan sub-tasks
-  // (parent not active) are kept as standalone roles.
-  const present=new Set(arr.map(v=>v.key));
-  let out=arr.filter(v=>!((v.kind==='op_sub'||v.kind==='ra_sub')&&v.pk&&present.has(v.pk)));
-  // Manual same-vacancy merge: specific tickets that are actually ONE vacancy
-  // (counted once, hires summed). Key → surviving key. Extend as needed.
-  const MERGE_INTO={'REC-616':'REC-568'};  // Graphic Designer (Junior) — one vacancy, 3 hires
-  const outKeys=new Set(out.map(v=>v.key)), addH={}, drop=new Set();
-  out.forEach(v=>{const t=MERGE_INTO[v.key]; if(t&&outKeys.has(t)){drop.add(v.key);addH[t]=(addH[t]||0)+(v.h||1);}});
-  return out.filter(v=>!drop.has(v.key)).map(v=>addH[v.key]?{...v,h:(v.h||1)+addH[v.key]}:v);
+  const [f,t]=_range(scope);
+  return _rolesFrom(_allCards().filter(v=>isCardActive(v,f||'1900-01-01',t||'9999-12-31')));
+}
+// Roles cancelled or put on hold inside the period. They leave Active for that
+// month exactly as filled roles do, and surface here instead.
+function stoppedItems(scope){
+  const [f,t]=_range(scope);
+  return _rolesFrom(_allCards().filter(v=>isCardStopped(v,f||'1900-01-01',t||'9999-12-31')));
 }
 function closedItems(scope){return bySource(CV).filter(v=>inRange(closeDate(v),scope));}
+// Trailing 12 months ending at the selected period — the sample TTF/TTH average over.
+function _yearWindow(scope){
+  const [,t]=_range(scope);
+  const last=t||_fmt(TODAY);
+  const d=new Date(last); d.setFullYear(d.getFullYear()-1); d.setDate(d.getDate()+1);
+  return [_fmt(d),last];
+}
+function closedItemsYear(scope){
+  const [first,last]=_yearWindow(scope);
+  return bySource(CV).filter(v=>{const c=closeDate(v);return c&&c>=first&&c<=last;});
+}
+function _yearLabel(scope){const w=_yearWindow(scope);return _ua(w[0])+' — '+_ua(w[1]);}
 function canceledItems(scope){return bySource(typeof CX!=='undefined'?CX:[]);}
 
 // ── controls (per scope) ──
@@ -1343,10 +1453,10 @@ function _periodReset(scope){
   _segOn('f-'+scope+'-period','data-p','__none__');
   ['month','quarter','year'].forEach(k=>{const el=document.getElementById('f-'+scope+'-'+k);if(el)el.selectedIndex=0;});
 }
-function setPeriod(scope,p){_periodReset(scope);ST[scope]={p:p,f:null,t:null};_segOn('f-'+scope+'-period','data-p',p);renderScope(scope);}
-function setMonth(scope,val){if(!val)return;_periodReset(scope);const el=document.getElementById('f-'+scope+'-month');if(el)el.value=val;const y=+val.slice(0,4),m=+val.slice(5,7);ST[scope]={p:'custom',f:_fmt(new Date(y,m-1,1)),t:_fmt(new Date(y,m,0))};renderScope(scope);}
-function setQuarter(scope,val){if(!val)return;_periodReset(scope);const el=document.getElementById('f-'+scope+'-quarter');if(el)el.value=val;const y=+val.slice(0,4),q=+val.slice(6);ST[scope]={p:'custom',f:_fmt(new Date(y,(q-1)*3,1)),t:_fmt(new Date(y,q*3,0))};renderScope(scope);}
-function setYear(scope,val){if(!val)return;_periodReset(scope);const el=document.getElementById('f-'+scope+'-year');if(el)el.value=val;const y=+val;ST[scope]={p:'custom',f:_fmt(new Date(y,0,1)),t:_fmt(new Date(y,11,31))};renderScope(scope);}
+function setPeriod(scope,p){_periodReset('overview');PERIOD.p=p;PERIOD.f=null;PERIOD.t=null;_segOn('f-overview-period','data-p',p);renderAll();}
+function setMonth(scope,val){if(!val)return;_periodReset('overview');const el=document.getElementById('f-overview-month');if(el)el.value=val;const y=+val.slice(0,4),m=+val.slice(5,7);PERIOD.p='custom';PERIOD.f=_fmt(new Date(y,m-1,1));PERIOD.t=_fmt(new Date(y,m,0));renderAll();}
+function setQuarter(scope,val){if(!val)return;_periodReset('overview');const el=document.getElementById('f-overview-quarter');if(el)el.value=val;const y=+val.slice(0,4),q=+val.slice(6);PERIOD.p='custom';PERIOD.f=_fmt(new Date(y,(q-1)*3,1));PERIOD.t=_fmt(new Date(y,q*3,0));renderAll();}
+function setYear(scope,val){if(!val)return;_periodReset('overview');const el=document.getElementById('f-overview-year');if(el)el.value=val;const y=+val;PERIOD.p='custom';PERIOD.f=_fmt(new Date(y,0,1));PERIOD.t=_fmt(new Date(y,11,31));renderAll();}
 function _allDates(){const ds=[];[OP,RA,CV,(typeof CX!=='undefined'?CX:[])].forEach(a=>a.forEach(v=>{if(v.sd)ds.push(v.sd);const c=closeDate(v);if(c)ds.push(c);}));return ds;}
 function _populatePeriodSelects(){
   const dates=_allDates().filter(Boolean).sort();
@@ -1385,7 +1495,13 @@ function kpi(cls,icon,num,sub,label,mf){
 // ── item filter for modal (data-mf carries its scope) ──
 function itemsFor(mf){
   const scope=mf.scope||'active';
-  let arr = mf.bucket==='active'? activeItems(scope) : mf.bucket==='canceled'? canceledItems(scope) : closedItems(scope);
+  let arr;
+  if(mf.bucket==='active')        arr=activeItems(scope).map(v=>({...v,_state:'Active'}));
+  else if(mf.bucket==='canceled') arr=stoppedItems(scope).map(v=>({...v,_state:'Canceled'}));
+  else if(mf.bucket==='total')    arr=activeItems(scope).map(v=>({...v,_state:'Active'}))
+      .concat(closedItems(scope).map(v=>({...v,_state:'Closed'})),
+              stoppedItems(scope).map(v=>({...v,_state:'Canceled'})));
+  else                            arr=closedItems(scope).map(v=>({...v,_state:'Closed'}));
   if(mf.es) arr=arr.filter(v=>esBucket(v)===mf.es);
   if(mf.reason) arr=arr.filter(v=>reasonLabel(v.r)===mf.reason);
   if(mf.dept) arr=arr.filter(v=>deptOf(v)===mf.dept);
@@ -1406,8 +1522,14 @@ function itemsFor(mf){
 
 // ── modal ──
 let _modalItems=[], _modalBucket='active', _modalSort={col:'key',dir:1}, _modalPrio=false;
+let _modalHasPrio=false;   // drill-down came from the Priority table
 function openModal(mf){
-  _modalItems=itemsFor(mf); _modalBucket=mf.bucket; _modalPrio=!!mf.dept; _modalSort={col:mf.bucket==='closed'?'closed':'key',dir:mf.bucket==='closed'?-1:1};
+  _modalItems=itemsFor(mf); _modalBucket=mf.bucket;
+  // Opened from a department → always the same columns, whichever table it came
+  // from, so the drill-down reads identically everywhere.
+  _modalPrio=!!(mf.dept||mf.dim==='dept');
+  _modalHasPrio=!!mf.prioCol; _modalSort=_modalPrio?{col:'_role',dir:1}
+    :{col:mf.bucket==='closed'?'closed':'key',dir:mf.bucket==='closed'?-1:1};
   const hires=_modalItems.reduce((s,v)=>s+(v.h||1),0);
   document.getElementById('modal-title').textContent=mf.title||'Vacancies';
   const roleWord=_modalItems.length===1?'role':'roles';
@@ -1421,12 +1543,30 @@ function closeModal(){document.getElementById('modal-overlay').style.display='no
 function modalSort(col){if(_modalSort.col===col)_modalSort.dir*=-1;else{_modalSort.col=col;_modalSort.dir=1;}_renderModal();}
 function _renderModal(){
   const closed=_modalBucket==='closed';
-  const cols = closed
+  // A department drill-down always reads Vacancy · Headcount · Status, whatever
+  // table it was opened from. This must be tested BEFORE the bucket branches,
+  // otherwise the merged Total table would impose its own wider layout.
+  const cols = _modalPrio
+    // Headcount Needed answers "how many are still to hire", which only means
+    // something while the role is open — omitted for closed and cancelled.
+    // Status is redundant here: each block drills into a single state already.
+    ? (_modalBucket==='active'
+        ? [['vac','Vacancy'],['h','Headcount Needed'],['sn','Seniority'],['es','Employee status']]
+            .concat(_modalHasPrio?[['pr','Priority']]:[])
+        : [['vac','Vacancy'],['sn','Seniority'],['es','Employee status']])
+    : _modalBucket==='total'
+    ? [['vac','Vacancy'],['sn','Seniority'],['state','Status'],['opened','Opened'],['ended','Closed / Canceled']]
+    : closed
     ? [['s','Vacancy'],['sn','Seniority'],['r','Reason'],['cs','Source'],['closed','Closed'],['ttf','TTF']]
     : _modalPrio
-      ? [['vac','Vacancy'],['pr','Priority'],['sn','Seniority']]
+      ? (_modalBucket==='active'
+        ? [['vac','Vacancy'],['h','Headcount Needed'],['sn','Seniority'],['es','Employee status'],['state','Status']]
+        : [['vac','Vacancy'],['sn','Seniority'],['es','Employee status'],['state','Status']])
       : [['vac','Vacancy'],['sn','Seniority'],['es','Employee status']];
   const val=(v,c)=>{
+    if(c==='state')return v._state||'';
+    if(c==='opened')return v.sde||v.sd||'';
+    if(c==='ended')return v.cxd||fillDate(v)||'';
     if(c==='closed')return closeDate(v)||'';
     if(c==='ttf'){const d=diffDays(closeDate(v),v.sd);return d==null?-1:d;}
     if(c==='key')return v.key||'';
@@ -1434,7 +1574,9 @@ function _renderModal(){
     if(c==='es')return esBucket(v);
     return (v[c]==null?'':v[c]);
   };
-  const arr=_modalItems.slice().sort((a,b)=>{let x=val(a,_modalSort.col),y=val(b,_modalSort.col);if(typeof x==='number'&&typeof y==='number')return (x-y)*_modalSort.dir;return String(x).localeCompare(String(y))*_modalSort.dir;});
+  const arr=_modalItems.slice().sort((a,b)=>{
+    if(_modalSort.col==='_role') return _roleCmp(a,b)*_modalSort.dir;
+    let x=val(a,_modalSort.col),y=val(b,_modalSort.col);if(typeof x==='number'&&typeof y==='number')return (x-y)*_modalSort.dir;return String(x).localeCompare(String(y))*_modalSort.dir;});
   const arrow=c=>_modalSort.col===c?(_modalSort.dir>0?' ↑':' ↓'):' ↕';
   let h='<table class="dtbl"><thead><tr>'+cols.map(([c,l])=>`<th onclick="modalSort('${c}')">${l}${arrow(c)}</th>`).join('')+'</tr></thead><tbody>';
   arr.forEach(v=>{
@@ -1445,12 +1587,17 @@ function _renderModal(){
       else if(c==='s')h+=`<td>${fv(v.s)}</td>`;
       else if(c==='pr')h+=`<td>${pb(v.pr)}</td>`;
       else if(c==='es')h+=`<td>${_esCell(v)}</td>`;
+      else if(c==='h')h+=`<td class="num">${v.h||1}</td>`;
       else if(c==='sn')h+=`<td>${fv(v.sn)}</td>`;
       else if(c==='r')h+=`<td>${_reasonBadge(v.r)}</td>`;
       else if(c==='rec')h+=`<td>${fv(v.rec)}</td>`;
       else if(c==='src')h+=`<td>${fv(v.src)}</td>`;
       else if(c==='cs')h+=`<td>${fv(v.cs)}</td>`;
       else if(c==='sd')h+=`<td>${fv(v.sd)}</td>`;
+      else if(c==='state'){const m={'Active':['#e7ddcb','#4a3829'],'Closed':['#e9dfcb','#5c4a2e'],'Canceled':['#f0ddce','#8a4a2e']}[v._state]||['#f1e9db','#8a7358'];
+        h+=`<td><span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:${m[0]};color:${m[1]}">${v._state}</span></td>`;}
+      else if(c==='opened')h+=`<td style="white-space:nowrap">${fv(_ua(v.sde||v.sd))}</td>`;
+      else if(c==='ended'){const d=v.cxd||fillDate(v);h+=`<td style="white-space:nowrap">${d?_ua(d):fv(null)}</td>`;}
       else if(c==='closed')h+=`<td>${fv(closeDate(v))}</td>`;
       else if(c==='ttf'){const d=diffDays(closeDate(v),v.sd);h+=`<td class="num">${d!=null?d+'d':'—'}</td>`;}
     });
@@ -1472,37 +1619,6 @@ document.addEventListener('mousemove',e=>{if(!_tipEl)return;let x=e.clientX+14,y
 // ── pivots ──
 // Empty-state note shown wherever a period yields 0 roles. kind: 'closed'|'active'.
 function _emptyNote(kind){const w=kind==='closed'?'closed':'open';return `<div class="empty-note">No ${w} roles in this period. Select another month/quarter/year.</div>`;}
-function deptPivot(items,totalLabel,bucket,scope,totalCol,hideTotal){
-  if(!items.length)return _emptyNote(bucket==='closed'?'closed':'active');
-  totalCol=totalCol||'Total';
-  const map={};
-  items.forEach(v=>{const d=deptOf(v);(map[d]=map[d]||{Staff:0,'Non-staff':0,Consulting:0,'n/a':0,total:0});map[d][esBucket(v)]++;map[d].total++;});
-  const rows=Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
-  const grand={Staff:0,'Non-staff':0,Consulting:0,'n/a':0,total:0};
-  rows.forEach(([,r])=>['Staff','Non-staff','Consulting','n/a','total'].forEach(c=>grand[c]+=r[c]));
-  const naCol=grand['n/a']>0;
-  const totCol=!hideTotal;   // Closed table hides the Total column
-  const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
-  let h='<table class="ptbl"><thead><tr><th>Department</th>'+(totCol?'<th>'+totalCol+'</th>':'')+'<th>Staff</th><th>Non-staff</th><th>Consulting</th>'+(naCol?'<th>n/a</th>':'')+'</tr></thead><tbody>';
-  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket,scope,dim:'dept',val:d,title:`${totalLabel} · ${d}`})}><td>${deptLabel(d)}</td>`+(totCol?`<td>${cell(r.total)}</td>`:'')+`<td>${cell(r.Staff)}</td><td>${cell(r['Non-staff'])}</td><td>${cell(r.Consulting)}</td>`+(naCol?`<td>${cell(r['n/a'])}</td>`:'')+'</tr>';});
-  h+=`<tr class="tot-row"><td>${totalLabel}</td>`+(totCol?`<td>${cell(grand.total)}</td>`:'')+`<td>${cell(grand.Staff)}</td><td>${cell(grand['Non-staff'])}</td><td>${cell(grand.Consulting)}</td>`+(naCol?`<td>${cell(grand['n/a'])}</td>`:'')+'</tr>';
-  return h+'</tbody></table>';
-}
-function seniorityPivot(items,bucket,scope){
-  const present=SEN_ORDER.filter(s=>items.some(v=>v.sn===s));
-  const cols=present.length?present:[];
-  const anyNo=items.some(v=>!v.sn);
-  const map={};
-  items.forEach(v=>{const d=deptOf(v);(map[d]=map[d]||{total:0});const s=v.sn||'—';map[d][s]=(map[d][s]||0)+1;map[d].total++;});
-  const rows=Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
-  const grand={total:0};cols.forEach(c=>grand[c]=0);let gno=0;
-  rows.forEach(([,r])=>{grand.total+=r.total;cols.forEach(c=>grand[c]+=(r[c]||0));gno+=(r['—']||0);});
-  const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
-  let h='<table class="ptbl"><thead><tr><th>Department</th><th>Total</th>'+cols.map(c=>`<th>${c}</th>`).join('')+(anyNo?'<th>—</th>':'')+'</tr></thead><tbody>';
-  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket,scope,dim:'dept',val:d,title:`Seniority · ${d}`})}><td>${deptLabel(d)}</td><td>${cell(r.total)}</td>`+cols.map(c=>`<td>${cell(r[c]||0)}</td>`).join('')+(anyNo?`<td>${cell(r['—']||0)}</td>`:'')+'</tr>';});
-  h+=`<tr class="tot-row"><td>Total</td><td>${cell(grand.total)}</td>`+cols.map(c=>`<td>${cell(grand[c])}</td>`).join('')+(anyNo?`<td>${cell(gno)}</td>`:'')+'</tr>';
-  return h+'</tbody></table>';
-}
 
 // ── OVERVIEW (symmetric, centered) ──
 function _esBreakdown(items){const b={Staff:0,'Non-staff':0,Consulting:0,'n/a':0};items.forEach(v=>b[esBucket(v)]++);return b;}
@@ -1513,7 +1629,7 @@ function _donut(b,total){
   if(!total||!order.length) return `<svg class="donut" viewBox="0 0 104 104"><circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#f1e9db" stroke-width="${SW}"></circle></svg>`;
   let acc=0,arcs='';
   order.forEach(k=>{const n=b[k],frac=n/total,dash=frac*C;
-    arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${ES_COLOR[k]}" stroke-width="${SW}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc*C}" transform="rotate(-90 ${cx} ${cy})" data-tip="${k==='n/a'?'N/A':k} — ${n}"></circle>`;
+    arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${ES_COLOR[k]}" stroke-width="${SW}" stroke-dasharray="${dash} ${C-dash}" stroke-dashoffset="${-acc*C}" transform="rotate(-90 ${cx} ${cy})" data-tip="${k==='n/a'?'N/A':(k==='Consulting'?RA_LABEL:k)} — ${n}"></circle>`;
     acc+=frac;});
   return `<svg class="donut" viewBox="0 0 104 104">${arcs}</svg>`;
 }
@@ -1523,7 +1639,7 @@ function ovPanel(title,items,bucket,scope,sub){
   // Active column → percentages only; Closed column → counts only.
   const fmtN=n=>bucket==='closed'?`${n}`:`${Math.round(n/tot*100)}%`;
   const esKeys=['Staff','Non-staff','Consulting'].concat(es['n/a']?['n/a']:[]);
-  const esLabel=k=>k==='n/a'?'N/A':k;
+  const esLabel=k=>k==='n/a'?'N/A':(k==='Consulting'?RA_LABEL:k);
   const legend=esKeys.map(k=>`<div class="ov-stat clickable" ${_attr({bucket,scope,dim:'es',val:k,title:`${title} · ${esLabel(k)}`})}><span class="lbl"><span class="dot" style="background:${ES_COLOR[k]}"></span>${esLabel(k)}</span><span class="val">${fmtN(es[k])}</span></div>`).join('');
   const reasons=['Extension','Replacement','Consultation'].map(l=>`<div class="ov-stat clickable" ${_attr({bucket,scope,dim:'reason',val:l,title:`${title} · ${l}`})}><span class="lbl">${l}</span><span class="val">${fmtN(rs[l]||0)}</span></div>`).join('');
   return `<div class="ov-title">${title}</div>`+
@@ -1531,43 +1647,10 @@ function ovPanel(title,items,bucket,scope,sub){
     `<div class="ov-rows">${reasons}</div>`+
     `<div class="ov-donut-row">${_donut(es,tot)}<div class="ov-legend">${legend}</div></div>`;
 }
-function barChart(items,scope,bucket,title,thirdLabel){
-  bucket=bucket||'active'; title=title||'Total Active Roles'; thirdLabel=thirdLabel||'Expert';
-  const cols=[['Staff','Staff'],['Non-staff','Non-staff'],[thirdLabel,'Consulting']];
-  if(items.some(v=>esBucket(v)==='n/a')) cols.push(['N/A','n/a']);
-  const order=['Consultation','Replacement','Extension'];   // top → bottom
-  const counts={}; let maxTotal=1, total=0;
-  cols.forEach(([lbl,esb])=>{
-    const sub=items.filter(v=>esBucket(v)===esb);
-    counts[lbl]={_sub:sub, _other:0};
-    order.forEach(r=>counts[lbl][r]=0);
-    sub.forEach(v=>{const r=reasonLabel(v.r);if(order.includes(r))counts[lbl][r]++;else counts[lbl]._other++;});
-    total+=sub.length; if(sub.length>maxTotal)maxTotal=sub.length;
-  });
-  const PLOT=280;
-  // Chart is display-only (not clickable).
-  const seg=(lbl,r,col,tx)=>{const n=(r==='—')?counts[lbl]._other:counts[lbl][r];if(!n)return '';
-    const hpx=Math.max(3,n/maxTotal*PLOT);
-    return `<div class="bc-seg" style="height:${hpx}px;background:${col};color:${tx}" data-tip="${r==='—'?'Not specified':r} — ${n}">${hpx>16?n:''}</div>`;};
-  let bars='';
-  cols.forEach(([lbl,esb])=>{
-    bars+=`<div class="bc-col"><div class="bc-bar">`+
-      seg(lbl,'Consultation',BAR_REASON.Consultation,'#5c4a2e')+
-      seg(lbl,'Replacement',BAR_REASON.Replacement,'#fff')+
-      seg(lbl,'Extension',BAR_REASON.Extension,'#fff')+
-      seg(lbl,'—','#e2d6c0','#5c4a2e')+
-      `</div><div class="bc-xlabel">${lbl}</div></div>`;
-  });
-  const legend=['Consultation','Replacement','Extension'].map(r=>`<div class="bc-leg-item"><span class="dot" style="background:${BAR_REASON[r]}"></span>${r}</div>`).join('');
-  return `<div class="bc"><div class="bc-legend">${legend}</div>`+
-    `<div class="bc-title">${title}</div>`+
-    `<div class="bc-big">${total}</div>`+
-    `<div class="bc-plot">${bars}</div></div>`;
-}
 // Horizontal stacked-bar variant (used for the narrow side-by-side Active chart) —
 // one row per es-bucket, bar length ∝ row total, segments ∝ reason. Display-only.
 function barChartH(items,title,thirdLabel){
-  thirdLabel=thirdLabel||'Expert';
+  thirdLabel=thirdLabel||RA_LABEL;
   const cols=[['Staff','Staff'],['Non-staff','Non-staff'],[thirdLabel,'Consulting']];
   if(items.some(v=>esBucket(v)==='n/a')) cols.push(['N/A','n/a']);
   const rorder=['Extension','Replacement','Consultation'];
@@ -1604,20 +1687,6 @@ function donutSVG(order,counts,colorMap,total){
   order.forEach(k=>{if(!counts[k])return;const from=acc/total*360;acc+=counts[k];const to=acc/total*360;seg.push(`${colorMap[k]} ${from}deg ${to}deg`);});
   return `<div class="donut donut-hole" style="background:conic-gradient(${seg.join(',')})"></div>`;
 }
-function prioTable(items,scope){
-  const order=['HIGH','MEDIUM','LIGHT'];
-  const map={};
-  items.forEach(v=>{const d=deptOf(v);(map[d]=map[d]||{HIGH:0,MEDIUM:0,LIGHT:0,'—':0,total:0});map[d][prBucket(v)]++;map[d].total++;});
-  const rows=Object.entries(map).sort((a,b)=>b[1].total-a[1].total);
-  const grand={HIGH:0,MEDIUM:0,LIGHT:0,'—':0,total:0};
-  rows.forEach(([,r])=>['HIGH','MEDIUM','LIGHT','—','total'].forEach(c=>grand[c]+=r[c]));
-  const cols=grand['—']?order.concat('—'):order;
-  const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
-  let h='<table class="ptbl"><thead><tr><th>Department</th>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';
-  rows.forEach(([d,r])=>{h+=`<tr class="clickable" ${_attr({bucket:'active',scope,dept:d,title:`Active Priority · ${d}`})}><td>${deptLabel(d)}</td>`+cols.map(c=>`<td>${cell(r[c])}</td>`).join('')+'</tr>';});
-  h+=`<tr class="tot-row"><td>Total</td>`+cols.map(c=>`<td>${cell(grand[c])}</td>`).join('')+'</tr>';
-  return h+'</tbody></table>';
-}
 function donutChart(items,scope){
   const order=['HIGH','MEDIUM','LIGHT'];
   const counts={HIGH:0,MEDIUM:0,LIGHT:0,'—':0};
@@ -1649,14 +1718,126 @@ function _setBlock(chartId,tableId,items,chartFn,tableFn,kind){
   if(!items.length){ chart.innerHTML=_emptyNote(kind); table.innerHTML=''; grid.classList.add('is-empty'); }
   else { chart.innerHTML=chartFn(); table.innerHTML=tableFn(); grid.classList.remove('is-empty'); }
 }
+
+// ── role-level tables, one shape for Active / Closed / Canceled ──────────────
+// Grouped by department (canonical order), and inside a department:
+//   Staff → Non-staff → Recruitment Assignment last,
+//   each by seniority, most senior first, then vacancy name.
+const _ES_RANK={'Staff':0,'Non-staff':1,'Consulting':2,'n/a':3};
+function _senRank(s){return s?SEN_ORDER.indexOf(s):-1;}   // unknown sorts last
+function _roleCmp(a,b){
+  return (_ES_RANK[esBucket(a)]-_ES_RANK[esBucket(b)])
+      || (_senRank(b.sn)-_senRank(a.sn))
+      || String(a.s||'').localeCompare(String(b.s||''));
+}
+const _DEPT_TIP='Press a department to see its vacancies — name, headcount and status.';
+function _deptHead(){
+  return '<th>Department <span class="info-i" tabindex="0" data-tip="'+_DEPT_TIP+'">i</span></th>';
+}
+// Rolled up to ONE ROW PER DEPARTMENT. The per-vacancy detail lives in the
+// popup, which is why every row is clickable.
+function _deptPivotTable(items,scope,bucket,title,cols,extraMf){
+  if(!items.length) return _emptyNote(bucket==='closed'?'closed':'active');
+  const map={};
+  items.forEach(v=>{
+    const d=deptOf(v);
+    if(!map[d]){map[d]={roles:0};cols.forEach(c=>{map[d][c.key]=0;});}
+    map[d].roles++;
+    cols.forEach(c=>{if(c.match(v))map[d][c.key]++;});
+  });
+  const order=Object.keys(map).sort(_deptCmp);
+  const g={roles:0}; cols.forEach(c=>{g[c.key]=0;});
+  order.forEach(d=>{g.roles+=map[d].roles;cols.forEach(c=>{g[c.key]+=map[d][c.key];});});
+  const shown=cols.filter(c=>g[c.key]>0);        // empty columns just add noise
+  const num=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
+  // Headcount deliberately NOT here — it lives in the drill-down, and only for
+  // active roles, where "how many still to hire" is the question being asked.
+  let h='<table class="ptbl"><thead><tr>'+_deptHead()+'<th class="mc">Roles</th>'+
+        shown.map(c=>`<th class="mc">${c.label}</th>`).join('')+'</tr></thead><tbody>';
+  order.forEach(d=>{
+    h+=`<tr class="clickable" data-tip="Press to see details" `+
+       `${_attr(Object.assign({bucket,scope,dim:'dept',val:d,title:`${title} · ${d}`},extraMf||{}))}>`+
+       `<td>${deptLabel(d)}</td><td class="mc">${num(map[d].roles)}</td>`+
+       shown.map(c=>`<td class="mc">${num(map[d][c.key])}</td>`).join('')+'</tr>';});
+  h+=`<tr class="tot-row"><td>Total</td><td class="mc">${num(g.roles)}</td>`+
+     shown.map(c=>`<td class="mc">${num(g[c.key])}</td>`).join('')+'</tr>';
+  return h+'</tbody></table>';
+}
+const _ES_COLS=[
+  {key:'Staff',      label:'Staff',    match:v=>esBucket(v)==='Staff'},
+  {key:'Non-staff',  label:'Non-staff',match:v=>esBucket(v)==='Non-staff'},
+  {key:'Consulting', label:RA_LABEL,   match:v=>esBucket(v)==='Consulting'},
+  {key:'n/a',        label:'N/A',      match:v=>esBucket(v)==='n/a'},
+];
+function rolesDetailTable(items,scope,bucket,title){
+  return _deptPivotTable(items,scope,bucket,title,_ES_COLS);
+}
+function rolesPriorityTable(items,scope){
+  // `prioCol` rides along in data-mf so the drill-down knows to show a Priority
+  // column — the bucket alone cannot tell it apart from Active Roles Data.
+  // NOT `prio`: itemsFor() already uses that key to filter BY priority bucket,
+  // so `prio:1` silently filtered the list down to nothing.
+  return _deptPivotTable(items,scope,'active','Active Roles Priority',[
+    {key:'HIGH',  label:'High',   match:v=>prBucket(v)==='HIGH'},
+    {key:'MEDIUM',label:'Medium', match:v=>prBucket(v)==='MEDIUM'},
+    {key:'LIGHT', label:'Light',  match:v=>prBucket(v)==='LIGHT'},
+    {key:'NA',    label:'—',      match:v=>prBucket(v)==='—'},
+  ],{prioCol:1});
+}
+// Period can be frozen so a report sent to someone else opens on the month you chose.
+let PERIOD_LOCKED=false;
+function toggleLock(){PERIOD_LOCKED=!PERIOD_LOCKED;_applyLock();}
+function _applyLock(){
+  const mo=document.getElementById('f-overview-month'); if(mo)mo.disabled=PERIOD_LOCKED;
+  const seg=document.getElementById('f-overview-period');
+  if(seg)seg.querySelectorAll('button').forEach(b=>{b.disabled=PERIOD_LOCKED;});
+  const b=document.getElementById('f-lock');
+  if(b){b.textContent=PERIOD_LOCKED?'🔒 Period frozen':'🔓 Freeze period';b.classList.toggle('on',PERIOD_LOCKED);}
+}
+
+const ES_ORDER=['Staff','Non-staff','Consulting','n/a'];
+// ── one canonical department order, shared by EVERY table ───────────────────
+// Ranking is derived from the whole period (Active + Closed + Canceled), never
+// from the individual table's own rows — otherwise each table would sort by its
+// own totals and the same department would sit at a different height on each.
+// Cached per period so switching months recomputes it exactly once.
+let _deptRankCache={key:null,map:null};
+function _deptRank(){
+  const [f,t]=_range('overview');
+  const key=(f||'')+'|'+(t||'');
+  if(_deptRankCache.key===key) return _deptRankCache.map;
+  const cnt={};
+  activeItems('overview').concat(closedItems('overview'),stoppedItems('overview'))
+    .forEach(v=>{const d=deptOf(v);cnt[d]=(cnt[d]||0)+1;});
+  const map={};
+  Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a.localeCompare(b)).forEach((d,i)=>{map[d]=i;});
+  _deptRankCache={key,map};
+  return map;
+}
+function _deptCmp(a,b){
+  const m=_deptRank(), ra=m[a], rb=m[b];
+  return (ra===undefined?9e3:ra)-(rb===undefined?9e3:rb)||String(a).localeCompare(String(b));
+}
 function renderOverview(){
   const scope='overview';
-  const A=activeItems(scope), C=closedItems(scope);
+  const A=activeItems(scope), C=closedItems(scope), X=stoppedItems(scope);
   document.getElementById('ov-active').innerHTML=ovPanel('Active Roles',A,'active',scope,'open roles');
-  document.getElementById('ov-closed').innerHTML=ovPanel('Total Closed Roles',C,'closed',scope,_rangeLabel(scope));
-  _setBlock('ov-barchart','ov-depttable',A,()=>barChartH(A,'Total Active Roles','Expert'),()=>deptPivot(A,'Total Active Roles','active',scope,'Total Active Roles'),'active');
-  _setBlock('ov-prio-donut','ov-prio-table',A,()=>donutChart(A,scope),()=>prioTable(A,scope),'active');
-  _setBlock('ov-closedbar','ov-closedtable',C,()=>barChartH(C,'Total Closed Roles','Consultant'),()=>deptPivot(C,'Total Closed Roles','closed',scope,'Total Closed Roles',true),'closed');
+  document.getElementById('ov-closed').innerHTML=ovPanel('Closed Roles',C,'closed',scope,_rangeLabel(scope));
+  // Canceled panel appears only in months that actually had cancellations.
+  const xEl=document.getElementById('ov-canceled'), grid=document.getElementById('ov-grid');
+  if(xEl){
+    xEl.style.display=X.length?'':'none';
+    if(X.length)xEl.innerHTML=ovPanel('Canceled Roles',X,'canceled',scope,_rangeLabel(scope));
+  }
+  if(grid)grid.classList.toggle('ov-grid--3',X.length>0);
+  _setBlock('ov-abar','ov-atable',A,()=>barChartH(A,'Active Roles',RA_LABEL),()=>rolesDetailTable(A,scope,'active','Active Roles'),'active');
+  _setBlock('ov-prio-donut','ov-prio-table',A,()=>donutChart(A,scope),()=>rolesPriorityTable(A,scope),'active');
+  _setBlock('ov-cbar','ov-ctable',C,()=>barChartH(C,'Closed Roles',RA_LABEL),()=>rolesDetailTable(C,scope,'closed','Closed Roles'),'closed');
+  // Canceled block exists only in months that actually had cancellations.
+  const xSec=document.getElementById('sec-canceled');
+  if(xSec)xSec.style.display=X.length?'':'none';
+  if(X.length)_setBlock('ov-xbar','ov-xtable',X,()=>barChartH(X,'Canceled Roles',RA_LABEL),()=>rolesDetailTable(X,scope,'canceled','Canceled Roles'),'active');
+  _applyLock();
   _fitBlocks();
 }
 // Each block's height is driven by its LEFT chart: the table card is capped at the
@@ -1697,17 +1878,11 @@ function activeDetailTable(items,scope){
   const groups={};
   list.forEach(v=>{(groups[deptOf(v)]=groups[deptOf(v)]||[]).push(v);});
   const _senIdx=s=>s?SEN_ORDER.indexOf(s):99;
-  const order=Object.keys(groups).sort((a,b)=>{
-    const cntCmp=groups[b].length-groups[a].length;
-    if(cntCmp!==0)return cntCmp;
-    const maxSenA=Math.min(...groups[a].map(v=>_senIdx(v.sn)));
-    const maxSenB=Math.min(...groups[b].map(v=>_senIdx(v.sn)));
-    return maxSenB-maxSenA;
-  });
+  const order=Object.keys(groups).sort(_deptCmp);
   const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
   let h='<table class="dtbl mtx"><thead>'+
     '<tr><th rowspan="2">Department</th><th rowspan="2">Vacancy</th><th rowspan="2">Seniority</th><th rowspan="2" class="mc">Hires</th>'+
-    '<th colspan="2" class="mc grp">Staff</th><th colspan="2" class="mc grp">Non-staff</th><th rowspan="2" class="mc">Consulting</th></tr>'+
+    '<th colspan="2" class="mc grp">Staff</th><th colspan="2" class="mc grp">Non-staff</th><th rowspan="2" class="mc">'+RA_LABEL+'</th></tr>'+
     '<tr><th class="mc">Extension</th><th class="mc">Replacement</th><th class="mc">Extension</th><th class="mc">Replacement</th></tr>'+
     '</thead><tbody>';
   order.forEach((dep,gi)=>{
@@ -1738,6 +1913,8 @@ function activeDetailTable(items,scope){
 }
 function renderActive(){
   const scope='active';
+  const rangeEl=document.getElementById('active-range');
+  if(rangeEl)rangeEl.textContent=_rangeLabel(scope);
   const A=_activeKindFilter(activeItems(scope));
   const roles=A.length, staff=A.filter(v=>esBucket(v)==='Staff').length, nonstaff=A.filter(v=>esBucket(v)==='Non-staff').length, consulting=A.filter(v=>esBucket(v)==='Consulting').length;
   const hires=A.reduce((s,v)=>s+(v.h||1),0);
@@ -1763,7 +1940,7 @@ function renderActive(){
 // ── CLOSED ──
 function _ua(d){if(!d)return '—';const p=d.slice(0,10).split('-');return p.length===3?`${p[2]}.${p[1]}.${p[0]}`:d;}  // DD.MM.YYYY
 function _monthLabel(d){if(!d)return '—';const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const p=d.slice(0,7).split('-');return `${M[(+p[1])-1]} ${p[0]}`;}
-function _esCell(v){const b=esBucket(v);return b==='n/a'?fv(null):_esBadge(b==='Consulting'?'Expert':b);}
+function _esCell(v){const b=esBucket(v);return b==='n/a'?fv(null):_esBadge(b==='Consulting'?RA_LABEL:b);}
 function closedDetailTable(items,scope){
   const list=items.slice().sort((a,b)=>deptOf(a).localeCompare(deptOf(b))||(closeDate(b)||'').localeCompare(closeDate(a)||''));
   const groups={}; list.forEach(v=>{(groups[deptOf(v)]=groups[deptOf(v)]||[]).push(v);});
@@ -1823,32 +2000,39 @@ function setActiveKind(k){ACTIVE_KIND=k;_segOn('f-active-kind','data-k',k);rende
 function _avgD(a){return a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):null;}
 function _fmtD(n){return n!=null?n+'d':'—';}
 // Vacancies group: count + Avg TTF + Avg TTH
-function _vacKpiRow(all){
+function _vacKpiRow(all,avgSet){
   const v=all.filter(_isVac);
-  const ttf=_avgD(v.map(x=>diffDays(closeDate(x),x.sd)).filter(n=>n!=null&&n>=0));
-  const tth=_avgD(v.map(x=>diffDays(closeDate(x),x.fcd_c)).filter(n=>n!=null&&n>=0));
+  const a=(avgSet||all).filter(_isVac);          // averages use the wider sample
+  const ttf=_avgD(a.map(x=>diffDays(closeDate(x),x.sd)).filter(n=>n!=null&&n>=0));
+  const tth=_avgD(a.map(x=>diffDays(closeDate(x),x.fcd_c)).filter(n=>n!=null&&n>=0));
+  const win=_yearLabel('closed'), n=a.length;
   return `<div class="kpi-row kpi-row--3">`+
     kpi('green','',v.length,'','Closed Vacancies',{bucket:'closed',scope:'closed',dim:'all',title:'Closed Vacancies'})+
-    kpi('blue','',_fmtD(ttf),'','Avg Time-to-Fill')+
-    kpi('orange','',_fmtD(tth),'','Avg Time-to-Hire')+`</div>`;
+    kpi('blue','',_fmtD(ttf),'',`Avg Time-to-Fill <span class="info-i" tabindex="0" data-tip="Time to Fill = closing date &minus; opening date &mdash; the whole life of the vacancy, from raising the request to the hire being agreed. Averaged over the LAST 12 MONTHS (${win}), ${n} closed vacancies &mdash; not just the selected month, so one outlier cannot swing it.">i</span>`)+
+    kpi('orange','',_fmtD(tth),'',`Avg Time-to-Hire <span class="info-i" tabindex="0" data-tip="Time to Hire = closing date &minus; first contact date with the candidate who was hired. Measures the candidate&#39;s journey rather than the vacancy&#39;s. Averaged over the LAST 12 MONTHS (${win}), ${n} closed vacancies.">i</span>`)+`</div>`;
 }
 // Recruitment Assignments group: count + Avg TTF (no hire concept → no TTH)
-function _raKpiRow(all){
+function _raKpiRow(all,avgSet){
   const r=all.filter(_isRA);
-  const ttf=_avgD(r.map(x=>diffDays(closeDate(x),x.sd)).filter(n=>n!=null&&n>=0));
+  const a=(avgSet||all).filter(_isRA);
+  const ttf=_avgD(a.map(x=>diffDays(closeDate(x),x.sd)).filter(n=>n!=null&&n>=0));
+  const win=_yearLabel('closed'), n=a.length;
   return `<div class="kpi-row kpi-row--3">`+
     kpi('green','',r.length,'','Closed Recruitment Assignments',{bucket:'closed',scope:'closed',dim:'all',title:'Closed Recruitment Assignments'})+
-    kpi('blue','',_fmtD(ttf),'','Avg Time-to-Fill')+`</div>`;
+    kpi('blue','',_fmtD(ttf),'',`Avg Time-to-Fill <span class="info-i" tabindex="0" data-tip="Time to Fill = closing date &minus; opening date. Averaged over the LAST 12 MONTHS (${win}), ${n} closed assignments &mdash; not just the selected month.">i</span>`)+`</div>`;
 }
 function renderClosed(){
   const scope='closed';
+  const rangeEl=document.getElementById('closed-range');
+  if(rangeEl)rangeEl.textContent=_rangeLabel(scope);
   const C=closedItems(scope);              // all closed in period (both groups)
   const shown=_closedKindFilter(C);        // kind-filtered for the detail table
   const roles=shown.length;
   let kpis='';
-  if(CLOSED_KIND==='vac') kpis=_vacKpiRow(C);
-  else if(CLOSED_KIND==='ra') kpis=_raKpiRow(C);
-  else kpis=_vacKpiRow(C)+_raKpiRow(C);    // All → two separated groups
+  const Y=closedItemsYear(scope);          // wider sample for the averages only
+  if(CLOSED_KIND==='vac') kpis=_vacKpiRow(C,Y);
+  else if(CLOSED_KIND==='ra') kpis=_raKpiRow(C,Y);
+  else kpis=_vacKpiRow(C,Y)+_raKpiRow(C,Y);    // All → two separated groups
   document.getElementById('closed-kpis').innerHTML=kpis;
   const noDate=_closedKindFilter(bySource(CV)).filter(v=>!closeDate(v)).length;
   document.getElementById('closed-detail').innerHTML=roles?closedDetailTable(shown,scope):_emptyNote('closed');

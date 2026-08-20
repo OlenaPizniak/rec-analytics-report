@@ -97,7 +97,7 @@ BOARDS = {
         # active = In progress (not Done, not Plan — planned roles excluded).
         # closed = successfully filled → Hired (or Done for consulting calls).
         # Canceled (category Done, status "Canceled") is neither active nor closed.
-        'active_jql':   'statusCategory != Done AND status not in (Plan, "On hold")',
+        'active_jql':   'statusCategory != Done AND status != Plan',   # On hold INCLUDED
         'closed_jql':   'status in (Hired, Done)',
         'canceled_jql': 'status = Canceled',
         'terminal':     'Hired',   # success status → close-date fallback via changelog
@@ -110,7 +110,7 @@ BOARDS = {
         },
         # WRP terminal statuses (category Done): "Closed" (filled) + "Canceled".
         # active = In progress (Plan excluded); closed = "Closed" only (Canceled excluded).
-        'active_jql':   'statusCategory != Done AND status not in (Plan, "On hold")',
+        'active_jql':   'statusCategory != Done AND status != Plan',   # On hold INCLUDED
         'closed_jql':   'status = Closed',
         'canceled_jql': 'status = Canceled',
         'terminal':     'Closed',  # success status → close-date fallback via changelog
@@ -219,8 +219,12 @@ def jira_search(jql, fields, max_results=100):
     return all_issues
 
 
-def fetch_terminal_transition_date(issue_key, target_status):
+def fetch_terminal_transition_date(issue_key, target_status, void_if_reopened=True):
     """YYYY-MM-DD of the most recent transition INTO `target_status`.
+
+    With `void_if_reopened`, returns None when the issue later moved BACK to an
+    active status: REC-245 was cancelled 2026-06-25 and reopened 2026-07-02, so
+    taking the raw transition date would hide it from July onwards forever.
 
     Used as a close-date fallback: 'Hired' for REC (mobile), 'Closed' for WRP
     (web). WRP items have neither Factual close date nor resolutiondate set, so
@@ -229,7 +233,7 @@ def fetch_terminal_transition_date(issue_key, target_status):
     headers = dict(HEADERS)
     headers['Authorization'] = get_auth_header()
     base = f"{JIRA_HOST}/rest/api/3/issue/{issue_key}/changelog"
-    latest_date, start_at = None, 0
+    latest_date, start_at, reopened = None, 0, None
     while True:
         url = base + '?' + urlencode({'startAt': start_at, 'maxResults': 100})
         req = Request(url, headers=headers)
@@ -245,12 +249,21 @@ def fetch_terminal_transition_date(issue_key, target_status):
                     d = (entry.get('created') or '')[:10]
                     if d and (latest_date is None or d > latest_date):
                         latest_date = d
+        for entry in data.get('values', []):
+            for item in entry.get('items', []):
+                if (item.get('field') == 'status'
+                        and item.get('toString') in ('In progress', 'Plan', 'ToDo')):
+                    d = (entry.get('created') or '')[:10]
+                    if d and (reopened is None or d > reopened):
+                        reopened = d
         got = len(data.get('values', []))
         if got == 0 or data.get('isLast', True):
             break
         start_at += got
         if start_at >= data.get('total', start_at):
             break
+    if void_if_reopened and latest_date and reopened and reopened > latest_date:
+        return None
     return latest_date
 
 
@@ -438,6 +451,23 @@ def build_data():
         for k in keys:
             close_transition[k] = fetch_terminal_transition_date(k, tgt)
 
+    # Cancel / hold date via changelog. Jira records NO date anywhere when a
+    # role is cancelled or paused — no Factual close date, no resolutiondate, no
+    # End date — so the status transition in its history is the only evidence of
+    # WHEN it happened. Without this the render layer has to drop every cancelled
+    # role from every period. See isCardActive() in the report.
+    stop_transition = {}
+    for b in boards:
+        keys = [i['key'] for i in b.get('canceled', [])]
+        print(f"→ [{b['source']}] fetching changelog cancel-date for {len(keys)} 'Canceled' items...")
+        for k in keys:
+            stop_transition[k] = fetch_terminal_transition_date(k, 'Canceled')
+        held = [i['key'] for i in b['active']
+                if (i['fields'].get('status') or {}).get('name') == 'On hold']
+        print(f"→ [{b['source']}] fetching changelog hold-date for {len(held)} 'On hold' items...")
+        for k in held:
+            stop_transition[k] = fetch_terminal_transition_date(k, 'On hold')
+
     OP, RA, CV, CX = [], [], [], []
     SD, SN, RECR, SRCR = {}, {}, {}, {}
 
@@ -452,6 +482,8 @@ def build_data():
             kind = resolve_kind(source, fld, itype)
             status_name = (fld.get('status') or {}).get('name')
             it = item_common(source, issue, kind, status_name)
+            if status_name == 'On hold':
+                it['cxd'] = stop_transition.get(it['key'])   # transition→On hold
             (RA if kind in ('ra', 'ra_sub') else OP).append(it)
             # lookups
             key = it['key']
@@ -473,14 +505,25 @@ def build_data():
             it['hd'] = close_transition.get(it['key'])  # transition→terminal (both boards)
             CV.append(it)
 
-        # ── canceled (excluded from active + closed; shown only in Canceled KPI) ──
+        # ── canceled ──
+        # Still ACTIVE for any period that ended before the cancellation: a role
+        # cancelled in August was genuinely being worked in June. `cxd` carries
+        # that date so the render layer can decide per period.
         for issue in b.get('canceled', []):
             fld = issue['fields']
             itype = (fld.get('issuetype') or {}).get('name')
             kind = resolve_kind(source, fld, itype)
             status_name = (fld.get('status') or {}).get('name')
             it = item_common(source, issue, kind, status_name)
+            it['cxd'] = stop_transition.get(it['key'])       # transition→Canceled
             CX.append(it)
+
+    # Effective start date: a sub-task's own date wins; when it has none it
+    # inherits the parent's. Sub-tasks are individual openings carrying their own
+    # dates, which is what makes per-period headcount correct.
+    _sd = {it['key']: it.get('sd') for it in OP + RA + CV + CX}
+    for it in OP + RA + CV + CX:
+        it['sde'] = it.get('sd') or (_sd.get(it.get('pk')) if it.get('pk') else None)
 
     return {
         'OP': OP, 'RA': RA, 'CV': CV, 'CX': CX,
