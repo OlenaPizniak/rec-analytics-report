@@ -31,6 +31,7 @@ import re
 import sys
 import json
 import base64
+import excel_source
 from datetime import datetime, timezone, timedelta
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
@@ -517,6 +518,26 @@ def build_data():
             it = item_common(source, issue, kind, status_name)
             it['cxd'] = stop_transition.get(it['key'])       # transition→Canceled
             CX.append(it)
+
+    # ── 2026 H1 comes from the recruiters' spreadsheet, not Jira ───────────
+    # Jira was not filled in consistently before ~April 2026 (January holds 13
+    # of 37 real roles), so cards that ENDED on or before the cutoff are dropped
+    # here and replaced by the sheet. Splitting on the card, not the reporting
+    # period, is what stops the same role being counted twice.
+    sheet_cv, sheet_cx = excel_source.load()
+    if sheet_cv or sheet_cx:
+        dropped = excel_source.drop_superseded(OP, RA, CV, CX)
+        CV.extend(sheet_cv)
+        CX.extend(sheet_cx)
+        # A requisition split by the cutoff shares no key across the two
+        # systems, so match it on identity and fold it back into one role.
+        linked = excel_source.link_split_requisitions(
+            sheet_cv + sheet_cx, OP, RA, CV, CX)
+        for jira_key, sheet_key, n_kids in linked:
+            print(f'  linked {jira_key} → {sheet_key}'
+                  + (f' (+{n_kids} sub-tasks re-pointed)' if n_kids else ''))
+        print(f"→ spreadsheet 2026 H1: +{len(sheet_cv)} closed, +{len(sheet_cx)} canceled; "
+              f"dropped {dropped} Jira cards ended on/before {excel_source.CUTOFF}")
 
     # Effective start date: a sub-task's own date wins; when it has none it
     # inherits the parent's. Sub-tasks are individual openings carrying their own
