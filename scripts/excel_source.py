@@ -234,7 +234,26 @@ CANCELED_ATTACH_TO = {
 CANCELED_SUPERSEDES_JIRA = {'REC-274', 'REC-356'}
 
 
-def load_canceled(path=None):
+def requisition_index(items):
+    """(team, vacancy, opening date) → parent key, for the family heads in `items`.
+
+    The two sheets describe the same requisitions from different angles: one
+    lists the openings that were filled, the other the ones that were cancelled.
+    A requisition that had both appears in both files, and giving the cancelled
+    rows their own XC- key split it into two roles — Graphic Designer, opened
+    25.03, showed as one role of three hires and another of three cancellations.
+    Both files use the same columns for team, vacancy and opening date, so the
+    match needs no heuristic.
+    """
+    idx = {}
+    for it in items:
+        if it.get('pk'):
+            continue
+        idx[(it['t'], it['s'], it['sd'])] = it['key']
+    return idx
+
+
+def load_canceled(path=None, attach_to=None):
     """Cancelled mobile requisitions for 2026 H1, one row per cancelled opening.
 
     Same shape as load(), so the render layer cannot tell the two sheets apart.
@@ -259,7 +278,10 @@ def load_canceled(path=None):
     es_col = collections.Counter()
     for gi, (key, members) in enumerate(sorted(groups.items(), key=lambda kv: str(kv[0])), 1):
         team, vacancy, published = key
-        attach = CANCELED_ATTACH_TO.get(key)
+        # Two ways this requisition may already exist: as a Jira card (named
+        # outright, since nothing can match it) or as a row in the hires sheet
+        # (matched on the key both files share).
+        attach = CANCELED_ATTACH_TO.get(key) or (attach_to or {}).get(key)
         # Attached rows are all openings of an existing Jira requisition, so
         # every one of them is a sub-task of it. Standalone ones keep the usual
         # first-row-is-the-parent shape.

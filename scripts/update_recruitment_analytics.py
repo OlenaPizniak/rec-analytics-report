@@ -526,7 +526,10 @@ def build_data():
     # here and replaced by the sheet. Splitting on the card, not the reporting
     # period, is what stops the same role being counted twice.
     sheet_cv, sheet_cx = excel_source.load()
-    sheet_cxm = excel_source.load_canceled()
+    # Cancelled openings on a requisition the hires sheet already lists must fold
+    # into it, not start a second role.
+    sheet_cxm = excel_source.load_canceled(
+        attach_to=excel_source.requisition_index(sheet_cv + sheet_cx))
     if sheet_cv or sheet_cx or sheet_cxm:
         # 1. Everything the cutoff makes the sheets' business.
         dropped = excel_source.drop_superseded(OP, RA, CV, CX)
