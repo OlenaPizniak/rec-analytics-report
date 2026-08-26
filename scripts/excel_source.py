@@ -19,11 +19,19 @@ counts them without knowing where they came from: one role, N headcount on the
 Active tab, N closures on the Closed tab.
 """
 
+import collections
 import csv
 import os
 import re
 import datetime
 
+# ── Both CSVs are FINAL. ────────────────────────────────────────────────────
+# January to June 2026 is a closed period: the numbers are agreed and will not
+# change, so these files are a finished snapshot rather than a mirror of a live
+# sheet. Nobody has to re-export them, and nothing here goes stale on its own.
+# If that ever changes — a correction to H1, or the same treatment extended to
+# H2 — the export needs re-copying by hand and the traps documented in _date()
+# and load_canceled() checking again, because both were silent.
 CUTOFF = '2026-06-30'          # last day the spreadsheet is authoritative for
 FLOOR = '2026-01-01'           # nothing before this is reported
 CSV_PATH = os.path.join(
@@ -39,12 +47,53 @@ def _get(row, key):
     return ''
 
 
-def _date(s):
-    """DD.MM.YYYY → YYYY-MM-DD. The sheet also holds a few D.M.YYYY."""
-    m = re.match(r'^(\d{1,2})[./](\d{1,2})[./](\d{4})$', (s or '').strip())
-    if not m:
+def _date(s, field=None):
+    """A date from either sheet → YYYY-MM-DD. Empty input returns None.
+
+    THE SEPARATOR DECIDES THE ORDER, and that is not a guess — it is what the
+    two exports actually do, across 565 values with no exceptions:
+
+        dots  D.M.YYYY   hires sheet everywhere; cancellations `Published`
+        slash M/D/YYYY   cancellations `Closed` only
+
+    Anything impossible raises instead of returning a value. The previous
+    version accepted any three numbers and formatted them blindly, so a US date
+    fed to it produced '2026-17-02' and '31.02.2026' produced '2026-02-31' —
+    dates that sort into the wrong month and never surface as an error. A build
+    that stops with the offending value named is strictly better than a
+    dashboard that is quietly wrong about when roles closed.
+    """
+    raw = (s or '').strip()
+    if not raw:
         return None
-    return f'{m.group(3)}-{int(m.group(2)):02d}-{int(m.group(1)):02d}'
+    m = re.match(r'^(\d{1,2})([./])(\d{1,2})\2(\d{4})$', raw)
+    if not m:
+        raise SystemExit(f'unparseable date {raw!r}' + (f' in column {field!r}' if field else ''))
+    a, sep, b, year = m.group(1), m.group(2), m.group(3), m.group(4)
+    day, month = (a, b) if sep == '.' else (b, a)
+    try:
+        return datetime.date(int(year), int(month), int(day)).isoformat()
+    except ValueError as e:
+        raise SystemExit(
+            f'impossible date {raw!r}' + (f' in column {field!r}' if field else '')
+            + f' — read as day={day} month={month} year={year} ({e}). '
+              'Dots mean D.M.YYYY, slashes mean M/D/YYYY; if this export uses '
+              'another order, teach _date() about it rather than letting it through.')
+
+
+def _require(problems, label):
+    """Stop the build listing every bad row, instead of emitting a quiet guess.
+
+    Both sheets are hand-maintained exports, so a column can be renamed, blanked
+    or shifted at any time. Every such change here has been silent: a US date
+    became month 17, an empty employment column turned Expert consultations into
+    vacancies. None of it showed up on the dashboard as anything but a slightly
+    different number.
+    """
+    if problems:
+        head = '\n  '.join(problems[:12])
+        more = f'\n  … and {len(problems) - 12} more' if len(problems) > 12 else ''
+        raise SystemExit(f'{label}: {len(problems)} row(s) could not be read\n  {head}{more}')
 
 
 def _reason(raw):
@@ -106,9 +155,10 @@ def load(path=None):
     groups = {}
     for r in rows:
         groups.setdefault((_team(_get(r, 'Team')), _get(r, 'Vacancy'),
-                           _date(_get(r, 'Published'))), []).append(r)
+                           _date(_get(r, 'Published'), 'Published')), []).append(r)
 
     closed, canceled = [], []
+    problems = []
     for gi, (key, members) in enumerate(sorted(groups.items(), key=lambda kv: str(kv[0])), 1):
         team, vacancy, published = key
         parent = f'XL-{gi}'
@@ -116,7 +166,7 @@ def load(path=None):
             is_sub = mi > 0
             es = _employee_status(_get(r, 'Staff/Non-staff'))
             status = _get(r, 'Status')
-            closed_at = _date(_get(r, 'Closed'))
+            closed_at = _date(_get(r, 'Closed'), 'Closed')
             item = {
                 'key': parent if not is_sub else f'{parent}-{mi}',
                 's': vacancy or None,
@@ -134,7 +184,7 @@ def load(path=None):
                 'sde': published,
                 'ed': None,
                 'fcd': closed_at if status != 'Canceled' else None,
-                'fcd_c': _date(_get(r, '1st contact')),
+                'fcd_c': _date(_get(r, '1st contact'), '1st contact'),
                 'rd': None,
                 'hd': closed_at if status != 'Canceled' else None,
                 # Cancellations carry their date here, the same field the Jira
@@ -150,9 +200,173 @@ def load(path=None):
             }
             if is_sub:
                 item['pk'] = parent
+            if not closed_at:
+                problems.append(f'{vacancy!r} ({team}, opened {published}): '
+                                f'empty Closed date')
+            if not es:
+                problems.append(f'{vacancy!r} ({team}, opened {published}): '
+                                f'no Staff/Non-staff value')
             (canceled if status == 'Canceled' else closed).append(item)
 
+    _require(problems, f'{os.path.basename(path)}')
     return closed, canceled
+
+
+CANCELED_CSV_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'data', 'canceled_mobile_2026_h1.csv')
+
+# Requisitions the cancellation sheet describes that Jira also holds, recorded
+# there under a different title and a status that never became "Canceled".
+# Matching cannot find these — the titles disagree (one is a Ukrainian sentence)
+# and so do the dates — so they are stated outright. Confirmed with Yaroslava
+# case by case; see the note against each.
+#
+# The sheet's rows are ADDITIONAL openings on this requisition: two people were
+# found (REC-540, REC-541 → Done) and the rest of the headcount was cancelled.
+# Attaching keeps it one role with four openings instead of two roles.
+CANCELED_ATTACH_TO = {
+    ('Content', 'Gym Trainer', '2026-05-25'): 'REC-540',
+}
+# The SAME openings as the sheet's rows: left sitting in "On hold" in Jira, but
+# actually cancelled. The sheet is the record, so the Jira pair goes.
+# (Running Coach — REC-274 wanted 2 people, REC-356 is its only sub-task.)
+CANCELED_SUPERSEDES_JIRA = {'REC-274', 'REC-356'}
+
+
+def load_canceled(path=None):
+    """Cancelled mobile requisitions for 2026 H1, one row per cancelled opening.
+
+    Same shape as load(), so the render layer cannot tell the two sheets apart.
+    Grouping matches the hires sheet — team + vacancy + opening date, seniority
+    deliberately NOT part of the key, since a requisition can be opened for
+    mixed levels (this happens twice in the hires sheet too).
+    """
+    path = path or CANCELED_CSV_PATH
+    if not os.path.exists(path):
+        print(f'  ! cancellation sheet not found: {path}')
+        return []
+
+    with open(path, encoding='utf-8') as f:
+        rows = [r for r in csv.DictReader(f) if _get(r, 'Vacancy')]
+
+    groups = {}
+    for r in rows:
+        groups.setdefault((_team(_get(r, 'Team')), _get(r, 'Vacancy'),
+                           _date(_get(r, 'Published'), 'Published')), []).append(r)
+
+    out, problems = [], []
+    es_col = collections.Counter()
+    for gi, (key, members) in enumerate(sorted(groups.items(), key=lambda kv: str(kv[0])), 1):
+        team, vacancy, published = key
+        attach = CANCELED_ATTACH_TO.get(key)
+        # Attached rows are all openings of an existing Jira requisition, so
+        # every one of them is a sub-task of it. Standalone ones keep the usual
+        # first-row-is-the-parent shape.
+        parent = attach or f'XC-{gi}'
+        for mi, r in enumerate(members):
+            is_sub = bool(attach) or mi > 0
+            # The employment type sits in the LAST column of this export, headed
+            # 'Empoyee ID'; the column actually named Staff/Non-staff is empty in
+            # all 38 rows. Prefer the proper column so a corrected export wins.
+            # Which column actually carried it is tracked, so a corrected
+            # export shows up in the build log instead of passing unnoticed.
+            proper, misplaced = _get(r, 'Staff/Non-staff'), _get(r, 'Empoyee ID')
+            es_col['Staff/Non-staff' if proper else
+                   ('Empoyee ID' if misplaced else 'MISSING')] += 1
+            es = _employee_status(proper or misplaced)
+            cancelled_at = _date(_get(r, 'Closed'), 'Closed')
+            if not es:
+                problems.append(f'{vacancy!r} ({team}, opened {published}): '
+                                f'employment type missing from BOTH '
+                                f'Staff/Non-staff and Empoyee ID')
+            if not cancelled_at:
+                problems.append(f'{vacancy!r} ({team}, opened {published}): '
+                                f'empty Closed date on a cancelled row')
+            item = {
+                'key': parent if (not is_sub) else f'{parent}-c{mi + 1}',
+                's': vacancy or None,
+                'source': 'web' if '(Web)' in (team or '') else 'mobile',
+                'type': 'subtask' if is_sub else 'position',
+                'kind': _kind(es, is_sub),
+                'st': 'Canceled',
+                'pr': _priority(_get(r, 'Priority')),
+                'sn': _get(r, 'Level') or None,
+                'r': _reason(_get(r, 'Reason')),
+                'es': es or None,
+                'rec': None, 'src': None, 'so': None,
+                'sd': published, 'sde': published, 'ed': None,
+                'fcd': None, 'fcd_c': None, 'rd': None, 'hd': None,
+                'cxd': cancelled_at,
+                'cs': None, 'cs_other': None,
+                'h': 1,
+                't': team or None,
+                'sb': None,
+                'cr': published,
+                'origin': 'sheet',
+            }
+            if is_sub:
+                item['pk'] = parent
+            out.append(item)
+
+    _require(problems, os.path.basename(path))
+    if es_col.get('Empoyee ID'):
+        print(f"  ! {os.path.basename(path)}: employment type read from the "
+              f"'Empoyee ID' column for {es_col['Empoyee ID']} row(s) — the "
+              f"Staff/Non-staff column is empty there")
+    return out
+
+
+def drop_superseded_by_cancellations(*arrays):
+    """Remove the Jira cards the cancellation sheet replaces outright.
+
+    These end AFTER the cutoff, so drop_superseded() leaves them alone; without
+    this they would be counted alongside the sheet rows describing the very same
+    openings.
+    """
+    removed = []
+    for arr in arrays:
+        keep = []
+        for it in arr:
+            if it.get('origin') != 'sheet' and it['key'] in CANCELED_SUPERSEDES_JIRA:
+                removed.append(it['key'])
+            else:
+                keep.append(it)
+        arr[:] = keep
+    return removed
+
+
+def validate_reconciliation(linked, superseded, *arrays):
+    """Check the hand-written reconciliation still describes reality.
+
+    CANCELED_ATTACH_TO and CANCELED_SUPERSEDES_JIRA name Jira issues directly,
+    because no matcher can find them — the titles disagree and so do the dates.
+    That makes them the one part of this pipeline that goes stale silently: if a
+    key is renamed, deleted, or moved between boards, an attach quietly turns
+    its rows into a role of their own and a supersede quietly stops removing the
+    duplicate. Either way the dashboard keeps working and just reports too many
+    roles, which is the failure mode hardest to notice.
+    """
+    keys = {it['key'] for arr in arrays for it in arr}
+    problems = []
+    for req, target in CANCELED_ATTACH_TO.items():
+        if target not in keys:
+            problems.append(f'CANCELED_ATTACH_TO {req} → {target}: no such card in the '
+                            f'dataset, so its rows would stand as a separate role')
+    missing = CANCELED_SUPERSEDES_JIRA - set(superseded)
+    for key in sorted(missing):
+        problems.append(f'CANCELED_SUPERSEDES_JIRA {key}: nothing was removed — either it '
+                        f'is gone from Jira (drop it from the set) or it never arrived')
+    still_here = CANCELED_SUPERSEDES_JIRA & keys
+    for key in sorted(still_here):
+        problems.append(f'CANCELED_SUPERSEDES_JIRA {key}: still present after the drop')
+    if problems:
+        raise SystemExit('stale reconciliation:\n  ' + '\n  '.join(problems))
+    # The identity matcher is a heuristic, so it warns rather than fails: titles
+    # can legitimately change. Zero pairs where there were three means it broke.
+    if not linked:
+        print('  ! link_split_requisitions matched nothing — it linked 3 pairs when '
+              'written; check whether titles or start dates moved')
 
 
 def _match_key(item):

@@ -322,11 +322,21 @@ def resolve_reason(source, fld, kind):
     return map_reason(raw, kind)
 
 
-def resolve_hires(fld, kind):
-    """RA uses num_specialists on REC; everything else num_hires. Default 1."""
-    if kind in ('ra', 'ra_sub'):
-        return fld.get(F['rec_num_spec']) or fld.get(F['num_hires']) or 1
-    return fld.get(F['num_hires']) or 1
+def hires_per_card():
+    """Always 1: one CARD is one opening.
+
+    Jira's num_hires (customfield_23545) cannot be summed. Recruiters copy the
+    parent's value onto its sub-tasks instead of setting 1 — 28 of 72 REC
+    sub-tasks carry the parent's number — so adding it up across a family
+    multiplies the headcount. The dashboard therefore derives headcount by
+    COUNTING cards (see _rolesFrom in the report), and every card contributes
+    exactly one opening.
+
+    Emitting the raw field anyway is what broke the Hiring Sources block: it was
+    the last consumer still summing `h`, and reported 12 hires for August where
+    five roles closed.
+    """
+    return 1
 
 
 # ── JS literal serializer ──────────────────────────────────
@@ -360,13 +370,6 @@ def js_array_decl(name, items, indent='  '):
         return f'const {name}=[];'
     body = ',\n'.join(indent + js_value(it) for it in items)
     return f'const {name}=[\n{body},\n];'
-
-
-def js_object_decl(name, mapping, indent='  '):
-    if not mapping:
-        return f'const {name}={{}};'
-    parts = [f'{indent}"{k}":{js_value(v)}' for k, v in mapping.items()]
-    return f'const {name}={{\n' + ',\n'.join(parts) + '\n};'
 
 
 # ── Builders ────────────────────────────────────────────────
@@ -426,7 +429,7 @@ def item_common(source, issue, kind, status_name):
         'rd': get_date(fld.get('resolutiondate')),  # fallback close date (see closeDate())
         'cs': get_option(fld.get(F['cand_source'])),
         'cs_other': fld.get(F['cand_source_other']) or None,
-        'h': resolve_hires(fld, kind),
+        'h': hires_per_card(),
         't': dept,
         'sb': sb,
         'cr': get_date(fld.get('created')),
@@ -470,7 +473,7 @@ def build_data():
             stop_transition[k] = fetch_terminal_transition_date(k, 'On hold')
 
     OP, RA, CV, CX = [], [], [], []
-    SD, SN, RECR, SRCR = {}, {}, {}, {}
+    asked_for = {}          # key → num_hires, for the shortfall report below
 
     for b in boards:
         source = b['source']
@@ -486,15 +489,13 @@ def build_data():
             if status_name == 'On hold':
                 it['cxd'] = stop_transition.get(it['key'])   # transition→On hold
             (RA if kind in ('ra', 'ra_sub') else OP).append(it)
-            # lookups
-            key = it['key']
-            SD[key] = it['sd']
-            if it['sn']:
-                SN[key] = it['sn']
-            if it['rec']:
-                RECR[key] = it['rec']
-            if it['src']:
-                SRCR[key] = it['src']
+            # Parent cards only: a sub-task carries its parent's num_hires
+            # instead of 1, so including them would report openings that do
+            # not exist. Active items only — a closed requisition that
+            # under-counted is history, there is nothing left to split up.
+            if not it.get('pk'):
+                asked_for[it['key']] = (fld.get(F['rec_num_spec'])
+                                        or fld.get(F['num_hires']) or 1)
 
         # ── closed ──
         for issue in b['closed']:
@@ -525,17 +526,28 @@ def build_data():
     # here and replaced by the sheet. Splitting on the card, not the reporting
     # period, is what stops the same role being counted twice.
     sheet_cv, sheet_cx = excel_source.load()
-    if sheet_cv or sheet_cx:
+    sheet_cxm = excel_source.load_canceled()
+    if sheet_cv or sheet_cx or sheet_cxm:
+        # 1. Everything the cutoff makes the sheets' business.
         dropped = excel_source.drop_superseded(OP, RA, CV, CX)
+        # 2. Cards the cancellation sheet replaces outright. These outlive the
+        #    cutoff, so step 1 does not reach them, and they describe the very
+        #    same openings as the sheet rows — keeping both double-counts.
+        superseded = excel_source.drop_superseded_by_cancellations(OP, RA, CV, CX)
         CV.extend(sheet_cv)
         CX.extend(sheet_cx)
-        # A requisition split by the cutoff shares no key across the two
-        # systems, so match it on identity and fold it back into one role.
+        CX.extend(sheet_cxm)
+        # 3. A requisition split by the cutoff shares no key across the two
+        #    systems, so match it on identity and fold it back into one role.
         linked = excel_source.link_split_requisitions(
-            sheet_cv + sheet_cx, OP, RA, CV, CX)
+            sheet_cv + sheet_cx + sheet_cxm, OP, RA, CV, CX)
         for jira_key, sheet_key, n_kids in linked:
             print(f'  linked {jira_key} → {sheet_key}'
                   + (f' (+{n_kids} sub-tasks re-pointed)' if n_kids else ''))
+        if superseded:
+            print(f'  superseded by the cancellation sheet: {", ".join(superseded)}')
+        excel_source.validate_reconciliation(linked, superseded, OP, RA, CV, CX)
+        print(f'→ cancellations (mobile): +{len(sheet_cxm)} openings')
         print(f"→ spreadsheet 2026 H1: +{len(sheet_cv)} closed, +{len(sheet_cx)} canceled; "
               f"dropped {dropped} Jira cards ended on/before {excel_source.CUTOFF}")
 
@@ -546,9 +558,24 @@ def build_data():
     for it in OP + RA + CV + CX:
         it['sde'] = it.get('sd') or (_sd.get(it.get('pk')) if it.get('pk') else None)
 
+    # One CARD is one opening, which is right wherever sub-tasks exist and
+    # understates wherever they were never created: a requisition asking for
+    # three people with no sub-tasks counts as one. Rather than guess at the
+    # difference, name the requisitions so the sub-tasks can be added in Jira —
+    # this is a data-entry gap, and the dashboard should say so out loud instead
+    # of quietly inventing openings nobody can click through to.
+    has_children = {it['pk'] for it in OP + RA + CV + CX if it.get('pk')}
+    short = [(k, n) for k, n in asked_for.items()
+             if n and n > 1 and k not in has_children]
+    if short:
+        total = sum(n - 1 for _, n in short)
+        print(f'! {len(short)} active requisition(s) ask for more than one person but have '
+              f'no sub-tasks, so {total} opening(s) are not counted:')
+        for k, n in sorted(short, key=lambda kv: -kv[1]):
+            print(f'    {k}  asks for {n}, counted as 1')
+
     return {
         'OP': OP, 'RA': RA, 'CV': CV, 'CX': CX,
-        'SD': SD, 'SN': SN, 'RECR': RECR, 'SRCR': SRCR,
     }
 
 
@@ -571,14 +598,11 @@ def rewrite_html(data):
         js_array_decl('OP', data['OP']),
         '// Consultant track (REC Recruitment Assignment + WRP Consultant), active',
         js_array_decl('RA', data['RA']),
-        '// Start dates lookup',
-        js_object_decl('SD', data['SD']),
-        '// Seniority lookup',
-        js_object_decl('SN', data['SN']),
-        '// Recruiter lookup',
-        js_object_decl('RECR', data['RECR']),
-        '// Sourcer lookup',
-        js_object_decl('SRCR', data['SRCR']),
+        # SD / SN / RECR / SRCR used to be emitted here — four key→value maps of
+        # start date, seniority, recruiter and sourcer. Nothing in the report ever
+        # read them: every one appeared exactly once in the HTML, in its own
+        # declaration. They cost 4 KB of every build and read, to anyone opening
+        # the file, like data something depends on.
     ])
     html = replace_marker_block(
         html, r'// <<<AUTO_DATA_START>>>[^\n]*', r'// <<<AUTO_DATA_END>>>', main_block)

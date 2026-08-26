@@ -683,7 +683,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Data: August 26, 2026, updated 07:24 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: August 26, 2026, updated 07:01 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -922,167 +922,6 @@ const RA=[
   {key:"REC-272",s:"Mindful Walking Expert",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"Medium",sn:"Expert",r:"Consultation",es:"Expert",rec:"Yaroslava Bondarchuk",src:null,so:"Alex Kharchuk",sd:"2026-08-11",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-04-22",sde:"2026-08-11"},
   {key:"REC-245",s:"TaiChi Instructor ",source:"mobile",type:"position",kind:"ra",st:"In progress",pr:"High",sn:"Expert",r:"Consultation",es:"Expert",rec:"Polina Serdiuk",src:null,so:"Viktoriia Dumuch / Anabel Chupruna",sd:"2026-07-02",ed:null,fcd:null,fcd_c:null,rd:null,cs:null,cs_other:null,h:1,t:"Content",sb:null,cr:"2026-04-16",sde:"2026-07-02"},
 ];
-// Start dates lookup
-const SD={
-  "REC-639":"2026-08-25",
-  "REC-638":"2026-08-25",
-  "REC-637":"2026-08-03",
-  "REC-636":"2026-08-24",
-  "REC-631":"2026-08-18",
-  "REC-630":"2026-08-17",
-  "REC-629":"2026-08-14",
-  "REC-628":"2026-08-14",
-  "REC-627":"2026-08-14",
-  "REC-626":"2026-08-10",
-  "REC-624":"2026-08-05",
-  "REC-623":"2026-08-05",
-  "REC-620":"2026-08-05",
-  "REC-614":"2026-08-03",
-  "REC-611":"2026-07-28",
-  "REC-610":"2026-07-28",
-  "REC-609":"2026-07-28",
-  "REC-607":"2026-07-28",
-  "REC-606":"2026-07-29",
-  "REC-603":"2026-07-29",
-  "REC-602":"2026-07-22",
-  "REC-601":"2026-07-23",
-  "REC-598":"2026-07-21",
-  "REC-594":"2026-07-10",
-  "REC-593":"2026-07-09",
-  "REC-586":"2026-07-02",
-  "REC-580":"2026-07-02",
-  "REC-578":"2026-06-30",
-  "REC-568":"2026-08-03",
-  "REC-566":"2026-07-31",
-  "REC-559":"2026-06-04",
-  "REC-543":"2026-05-26",
-  "REC-539":"2026-07-01",
-  "REC-357":null,
-  "REC-356":null,
-  "REC-351":"2026-04-07",
-  "REC-350":"2026-03-16",
-  "REC-315":"2026-05-05",
-  "REC-274":"2026-08-20",
-  "REC-272":"2026-08-11",
-  "REC-245":"2026-07-02",
-  "REC-237":"2026-07-07",
-  "REC-195":"2026-04-02",
-  "REC-191":"2026-04-02",
-  "WRP-87":"2026-08-18",
-  "WRP-86":null,
-  "WRP-85":"2026-08-06",
-  "WRP-84":"2026-07-22",
-  "WRP-82":"2026-07-17",
-  "WRP-79":"2026-08-17"
-};
-// Seniority lookup
-const SN={
-  "REC-639":"Middle",
-  "REC-638":"Expert",
-  "REC-637":"Middle",
-  "REC-636":"Expert",
-  "REC-631":"Middle",
-  "REC-630":"Senior",
-  "REC-629":"Expert",
-  "REC-628":"Senior",
-  "REC-627":"Expert",
-  "REC-626":"Senior",
-  "REC-624":"Junior",
-  "REC-623":"Junior",
-  "REC-620":"Junior",
-  "REC-614":"Middle",
-  "REC-611":"Junior",
-  "REC-610":"Junior",
-  "REC-609":"Junior",
-  "REC-607":"Junior",
-  "REC-606":"Junior",
-  "REC-603":"Middle",
-  "REC-602":"Middle",
-  "REC-601":"Expert",
-  "REC-598":"Middle",
-  "REC-594":"Junior",
-  "REC-593":"Middle",
-  "REC-586":"Middle",
-  "REC-580":"Middle",
-  "REC-578":"Senior",
-  "REC-568":"Junior",
-  "REC-566":"Middle",
-  "REC-543":"Senior",
-  "REC-539":"Junior",
-  "REC-351":"Expert",
-  "REC-350":"Expert",
-  "REC-315":"Senior",
-  "REC-274":"Expert",
-  "REC-272":"Expert",
-  "REC-245":"Expert",
-  "REC-237":"Junior",
-  "REC-195":"Senior",
-  "REC-191":"Middle",
-  "WRP-87":"Senior",
-  "WRP-86":"Middle",
-  "WRP-85":"Junior",
-  "WRP-84":"Middle",
-  "WRP-82":"Middle",
-  "WRP-79":"Middle"
-};
-// Recruiter lookup
-const RECR={
-  "REC-639":"Polina Serdiuk",
-  "REC-637":"Anastasiia Shapovalenko",
-  "REC-636":"Yaroslava Bondarchuk",
-  "REC-631":"Yaroslava Bondarchuk",
-  "REC-630":"Nadiia Brusova",
-  "REC-628":"Darina Lavrenko",
-  "REC-627":"Yaroslava Bondarchuk",
-  "REC-626":"Alina Muravchyk",
-  "REC-624":"Anastasiia Shapovalenko",
-  "REC-623":"Anastasiia Shapovalenko",
-  "REC-620":"Anastasiia Shapovalenko",
-  "REC-614":"Anastasiia Shapovalenko",
-  "REC-611":"Mariia Salabai",
-  "REC-610":"Mariia Salabai",
-  "REC-609":"Mariia Salabai",
-  "REC-607":"Mariia Salabai",
-  "REC-606":"Anastasiia Shapovalenko",
-  "REC-603":"Polina Serdiuk",
-  "REC-602":"Anastasiia Shapovalenko",
-  "REC-598":"Mariia Salabai",
-  "REC-594":"Yaroslava Bondarchuk",
-  "REC-593":"Anastasiia Shapovalenko",
-  "REC-586":"Mariia Salabai",
-  "REC-580":"Polina Serdiuk",
-  "REC-578":"Darina Lavrenko",
-  "REC-568":"Anastasiia Shapovalenko",
-  "REC-566":"Alina Muravchyk",
-  "REC-559":"Anastasiia Hodyna",
-  "REC-543":"Alina Muravchyk",
-  "REC-539":"Mariia Salabai",
-  "REC-351":"Alina Muravchyk",
-  "REC-350":"Alina Muravchyk",
-  "REC-315":"Anastasiia Shapovalenko",
-  "REC-274":"Polina Serdiuk",
-  "REC-272":"Yaroslava Bondarchuk",
-  "REC-245":"Polina Serdiuk",
-  "REC-237":"Polina Serdiuk",
-  "REC-195":"Alina Muravchyk",
-  "REC-191":"Yaroslava Bondarchuk",
-  "WRP-87":"Anastasiia Asieieva",
-  "WRP-84":"Daria Kozlova"
-};
-// Sourcer lookup
-const SRCR={
-  "REC-638":"Kateryna Yaremenko",
-  "REC-630":"Anastasiia Melnyk",
-  "REC-629":"Kateryna Yaremenko",
-  "REC-628":"Kateryna Yaremenko",
-  "REC-626":"Anastasiia Melnyk",
-  "REC-606":"Anastasiia Melnyk",
-  "REC-601":"Kateryna Yaremenko",
-  "REC-594":"Anastasiia Melnyk",
-  "REC-578":"Kateryna Yaremenko",
-  "REC-559":"Kateryna Yaremenko",
-  "REC-315":"Mariia Salabai"
-};
 // <<<AUTO_DATA_END>>>
 // <<<AUTO_CV_START>>> — managed by scripts/update_recruitment_analytics.py
 // Combined closed roles (mobile Hired+Done, web Closed). Close date = fcd (Factual
@@ -1459,6 +1298,7 @@ function _allCards(){return OP.concat(RA).concat(CV||[]).concat(typeof CX!=='und
 // The second case is a data artefact — 20 of 72 sub-tasks predate their parent,
 // because a parent's start_date is rewritten when the req is reused — but the
 // work was real, so the positions still count.
+function _endOf(v){return v.cxd||v.fcd||v.hd||v.rd||'';}
 function _rolesFrom(cards){
   const byKey={}; _allCards().forEach(v=>{byKey[v.key]=v;});
   const isSub=v=>v.kind==='op_sub'||v.kind==='ra_sub';
@@ -1476,7 +1316,14 @@ function _rolesFrom(cards){
     // STATE comes from a card that actually matched — otherwise a role held
     // open by its sub-tasks would be labelled with its parent's "Hired" and
     // carry a close date while sitting on the Active tab.
-    const rep=members.find(v=>v.key===k)||members[0];
+    // The parent speaks for the role whenever it matched too. Otherwise the
+    // role takes the state of the opening that ended LAST — a requisition is
+    // only finished when its final opening is. Taking members[0] read the
+    // dataset's own order, which is no rule at all; it is unobservable today
+    // (no role has openings ending on different dates inside one month) and
+    // would start showing the wrong date the day one did.
+    const rep=members.find(v=>v.key===k) ||
+              members.reduce((a,b)=>_endOf(b)>_endOf(a)?b:a, members[0]);
     const base=byKey[k]||rep;
     return {...base, st:rep.st, fcd:rep.fcd, fcd_c:rep.fcd_c, hd:rep.hd,
             rd:rep.rd, cxd:rep.cxd, h:members.length};
