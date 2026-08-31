@@ -532,7 +532,11 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .hbc-row:last-child { border-bottom:none; }
 .hbc-seg { cursor:default; }
 .hbc-seg:hover { filter:brightness(1.06); }
-#tip { position:fixed; z-index:100000; max-width:290px; background:#2e231a; color:#f7efe0; font-size:12px; line-height:1.45; padding:8px 11px; border-radius:9px; box-shadow:0 6px 22px rgba(0,0,0,.3); pointer-events:none; opacity:0; transition:opacity .1s; }
+/* pre-line keeps the newlines the data-tip attributes carry as &#10;, so a long
+   explanation reads as paragraphs instead of one wall of text. The tooltip is
+   filled with textContent, so this is the only way to break it — markup would
+   be shown to the reader verbatim. */
+#tip { position:fixed; z-index:100000; max-width:340px; background:#2e231a; color:#f7efe0; font-size:12px; line-height:1.5; padding:10px 13px; border-radius:9px; box-shadow:0 6px 22px rgba(0,0,0,.3); pointer-events:none; opacity:0; transition:opacity .1s; white-space:pre-line; }
 .hbc-label { width:96px; flex:none; font-size:15px; color:var(--text); }
 .hbc-track { flex:1; min-width:0; }
 .hbc-bar { display:flex; height:32px; border-radius:6px; overflow:hidden; min-width:3px; }
@@ -690,7 +694,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Data: August 31, 2026, updated 13:06 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: August 31, 2026, updated 12:26 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -720,7 +724,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
       <div class="section-header" style="cursor:default">
         <div class="section-icon" style="background:linear-gradient(135deg,#4a3829,#6f5a44)">📊</div>
         <h2>Recruitment Overview</h2>
-        <span class="info-i" tabindex="0" data-tip="Staff / Non-staff &mdash; full-time engagement. Recruitment Assignment &mdash; a consulting call, expert session or project-based engagement rather than a hire.">i</span>
+        <span class="info-i" tabindex="0" data-tip="Staff / Non-staff &mdash; full-time engagement.&#10;&#10;Recruitment Assignment &mdash; a consulting call, expert session or project-based engagement rather than a hire.">i</span>
       </div>
       <div class="sec-body">
         <div class="ov-grid" id="ov-grid">
@@ -808,7 +812,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
           <button data-k="vac" onclick="setActiveKind('vac')">Vacancy</button>
           <button data-k="ra"  onclick="setActiveKind('ra')">Recruitment Assignment</button>
         </div>
-        <span class="info-i" tabindex="0" data-tip="Vacancy — open positions (staff or non-staff employees). Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
+        <span class="info-i" tabindex="0" data-tip="Vacancy — open positions (staff or non-staff employees).&#10;&#10;Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
       </div>
     </div>
     <div class="kpi-row" id="active-kpis"></div>
@@ -839,7 +843,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
           <button data-k="vac" onclick="setClosedKind('vac')">Vacancy</button>
           <button data-k="ra"  onclick="setClosedKind('ra')">Recruitment Assignment</button>
         </div>
-        <span class="info-i" tabindex="0" data-tip="Vacancy — closed positions (staff or non-staff employees). Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
+        <span class="info-i" tabindex="0" data-tip="Vacancy — closed positions (staff or non-staff employees).&#10;&#10;Recruitment Assignment — freelance, consulting calls, or project-based engagements.">i</span>
       </div>
     </div>
     <div id="closed-kpis"></div>
@@ -2049,8 +2053,8 @@ function _vacKpiRow(all,avgSet){
     kpi('green','',v.length,'','Closed Vacancies',{bucket:'closed',scope:'closed',dim:'all',title:'Closed Vacancies'})+`</div>`;
   return `<div class="kpi-row kpi-row--3">`+
     kpi('green','',v.length,'','Closed Vacancies',{bucket:'closed',scope:'closed',dim:'all',title:'Closed Vacancies'})+
-    kpi('blue','',_fmtD(ttf),'',`Avg Time-to-Fill <span class="info-i" tabindex="0" data-tip="Time to Fill = calendar days from the opening date to the closing date, both days counted &mdash; the whole life of the vacancy, from raising the request to the hire being agreed. Reported per EPISODE &mdash; the team&#39;s four-month planning block. Episode 1 = February&ndash;May, Episode 2 = June&ndash;September, Episode 3 = October&ndash;January. An episode is shown only once it has finished, so while one is still running the previous one is displayed. Now showing ${win}, ${n} closed vacancies.">i</span>`)+
-    kpi('orange','',_fmtD(tth),'',`Avg Time-to-Hire <span class="info-i" tabindex="0" data-tip="Time to Hire = WORKING days (Mon&ndash;Fri) from first contact with the candidate who was hired to the closing date, first-contact day counted. Measures the candidate&#39;s journey rather than the vacancy&#39;s. Reported per EPISODE &mdash; the team&#39;s four-month planning block. Episode 1 = February&ndash;May, Episode 2 = June&ndash;September, Episode 3 = October&ndash;January. An episode is shown only once it has finished, so while one is still running the previous one is displayed. Now showing ${win}, ${n} closed vacancies.">i</span>`)+`</div>`;
+    kpi('blue','',_fmtD(ttf),'',`Avg Time-to-Fill <span class="info-i" tabindex="0" data-tip="Time to Fill = calendar days from the opening date to the closing date, both days counted &mdash; the whole life of the vacancy, from raising the request to the hire being agreed.&#10;&#10;Reported per EPISODE &mdash; the team&#39;s four-month planning block. Episode 1 = February&ndash;May, Episode 2 = June&ndash;September, Episode 3 = October&ndash;January.&#10;&#10;An episode is shown only once it has finished, so while one is still running the previous one is displayed.&#10;Now showing ${win}, ${n} closed vacancies.">i</span>`)+
+    kpi('orange','',_fmtD(tth),'',`Avg Time-to-Hire <span class="info-i" tabindex="0" data-tip="Time to Hire = WORKING days (Mon&ndash;Fri) from first contact with the candidate who was hired to the closing date, first-contact day counted. Measures the candidate&#39;s journey rather than the vacancy&#39;s.&#10;&#10;Reported per EPISODE &mdash; the team&#39;s four-month planning block. Episode 1 = February&ndash;May, Episode 2 = June&ndash;September, Episode 3 = October&ndash;January.&#10;&#10;An episode is shown only once it has finished, so while one is still running the previous one is displayed.&#10;Now showing ${win}, ${n} closed vacancies.">i</span>`)+`</div>`;
 }
 // Recruitment Assignments group: count + Avg TTF (no hire concept → no TTH)
 function _raKpiRow(all,avgSet){
@@ -2063,7 +2067,7 @@ function _raKpiRow(all,avgSet){
     kpi('green','',r.length,'','Closed Recruitment Assignments',{bucket:'closed',scope:'closed',dim:'all',title:'Closed Recruitment Assignments'})+`</div>`;
   return `<div class="kpi-row kpi-row--3">`+
     kpi('green','',r.length,'','Closed Recruitment Assignments',{bucket:'closed',scope:'closed',dim:'all',title:'Closed Recruitment Assignments'})+
-    kpi('blue','',_fmtD(ttf),'',`Avg Time-to-Fill <span class="info-i" tabindex="0" data-tip="Time to Fill = calendar days from opening to closing, both days counted. Reported per EPISODE &mdash; the team&#39;s four-month planning block. Episode 1 = February&ndash;May, Episode 2 = June&ndash;September, Episode 3 = October&ndash;January. An episode is shown only once it has finished, so while one is still running the previous one is displayed. Now showing ${win}, ${n} closed assignments.">i</span>`)+`</div>`;
+    kpi('blue','',_fmtD(ttf),'',`Avg Time-to-Fill <span class="info-i" tabindex="0" data-tip="Time to Fill = calendar days from opening to closing, both days counted.&#10;&#10;Reported per EPISODE &mdash; the team&#39;s four-month planning block. Episode 1 = February&ndash;May, Episode 2 = June&ndash;September, Episode 3 = October&ndash;January.&#10;&#10;An episode is shown only once it has finished, so while one is still running the previous one is displayed.&#10;Now showing ${win}, ${n} closed assignments.">i</span>`)+`</div>`;
 }
 function renderClosed(){
   const scope='closed';

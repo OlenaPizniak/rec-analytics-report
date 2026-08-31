@@ -31,11 +31,12 @@ import re
 import sys
 import json
 import base64
+import time
 import excel_source
 from datetime import datetime, timezone, timedelta
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 
 # ── Configuration ───────────────────────────────────────────
 JIRA_HOST = "https://newsiteam.atlassian.net"
@@ -194,6 +195,36 @@ def get_auth_header():
 HEADERS = {'Accept': 'application/json', 'Content-Type': 'application/json'}
 
 
+# ── Transient-error retry (Jira 429/5xx + network blips) ────
+_RETRY_STATUSES = {429, 500, 502, 503, 504}
+
+
+def _http_json(req, timeout, retries=4, backoff=2.0):
+    """urlopen + json.loads with retry-with-backoff on transient failures.
+
+    Retries on HTTP 429/5xx and network errors (URLError / timeout) with
+    exponential backoff. 4xx and other HTTPErrors are raised immediately — no
+    point retrying an auth/permission error. After exhausting retries the last
+    exception is re-raised, so callers keep their existing handling. This is why
+    a single transient Jira 503 no longer kills the whole run."""
+    for attempt in range(1, retries + 1):
+        try:
+            with urlopen(req, timeout=timeout) as resp:
+                return json.loads(resp.read())
+        except HTTPError as e:
+            if e.code not in _RETRY_STATUSES or attempt == retries:
+                raise
+            wait = backoff * (2 ** (attempt - 1))
+            print(f"  ⚠ Jira HTTP {e.code} — retry {attempt}/{retries - 1} in {wait:.0f}s")
+            time.sleep(wait)
+        except (URLError, TimeoutError) as e:
+            if attempt == retries:
+                raise
+            wait = backoff * (2 ** (attempt - 1))
+            print(f"  ⚠ Jira network error ({e}) — retry {attempt}/{retries - 1} in {wait:.0f}s")
+            time.sleep(wait)
+
+
 # ── Jira API ────────────────────────────────────────────────
 def jira_search(jql, fields, max_results=100):
     headers = dict(HEADERS)
@@ -208,11 +239,12 @@ def jira_search(jql, fields, max_results=100):
         req = Request(url, data=json.dumps(body).encode('utf-8'),
                       headers=headers, method='POST')
         try:
-            with urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read())
+            data = _http_json(req, timeout=60)
         except HTTPError as e:
             err = e.read().decode('utf-8', errors='replace')
             sys.exit(f"Jira API error {e.code}: {err[:500]}")
+        except URLError as e:
+            sys.exit(f"Jira network error (after retries): {e}")
         all_issues.extend(data.get('issues', []))
         next_token = data.get('nextPageToken')
         if data.get('isLast', not next_token) or not next_token:
@@ -239,10 +271,9 @@ def fetch_terminal_transition_date(issue_key, target_status, void_if_reopened=Tr
         url = base + '?' + urlencode({'startAt': start_at, 'maxResults': 100})
         req = Request(url, headers=headers)
         try:
-            with urlopen(req, timeout=30) as resp:
-                data = json.loads(resp.read())
-        except HTTPError as e:
-            print(f"  ⚠ changelog fetch failed for {issue_key}: HTTP {e.code}")
+            data = _http_json(req, timeout=30)
+        except (HTTPError, URLError) as e:
+            print(f"  ⚠ changelog fetch failed for {issue_key}: {e}")
             return None
         for entry in data.get('values', []):
             for item in entry.get('items', []):
