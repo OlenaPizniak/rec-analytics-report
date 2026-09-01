@@ -470,6 +470,29 @@ def item_common(source, issue, kind, status_name):
     return item
 
 
+# A card whose end date precedes its start is invisible EVERYWHERE — never
+# active (it stops before it starts) and never stopped inside a period (its
+# start is later than the period its stop falls in). It is a real artefact of
+# reopening: a sub-task is paused in July, the requisition is reopened in
+# August with a fresh start date, and the sub-task inherits it. Nothing is
+# wrong with the code; the opening simply cannot be placed on a timeline, so
+# name it rather than let it vanish.
+def _report_impossible_spans(*arrays):
+    bad = []
+    for arr in arrays:
+        for it in arr:
+            start = it.get('sde') or it.get('sd')
+            end = it.get('cxd') or it.get('fcd') or it.get('hd') or it.get('rd')
+            if start and end and end < start:
+                bad.append((it['key'], it.get('s') or '', start, end, it.get('st') or ''))
+    if bad:
+        print(f'! {len(bad)} card(s) end before they start, so they appear nowhere '
+              f'(usually a sub-task paused before its requisition was reopened):')
+        for key, name, start, end, st in sorted(bad):
+            print(f'    {key}  {name[:38]}  opened {start}, ended {end}  {st}')
+    return bad
+
+
 def build_data():
     boards = [fetch_board('mobile'), fetch_board('web')]
 
@@ -607,6 +630,8 @@ def build_data():
               f'no sub-tasks, so {total} opening(s) are not counted:')
         for k, n in sorted(short, key=lambda kv: -kv[1]):
             print(f'    {k}  asks for {n}, counted as 1')
+
+    _report_impossible_spans(OP, RA, CV, CX)
 
     return {
         'OP': OP, 'RA': RA, 'CV': CV, 'CX': CX,

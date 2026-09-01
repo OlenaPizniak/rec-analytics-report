@@ -345,12 +345,34 @@ def drop_superseded_by_cancellations(*arrays):
     These end AFTER the cutoff, so drop_superseded() leaves them alone; without
     this they would be counted alongside the sheet rows describing the very same
     openings.
+
+    A superseded card that has COME BACK TO LIFE is not superseded any more.
+    REC-274 sat in On hold when the sheet recorded its two openings cancelled on
+    13 July; on 20 August the requisition was reopened with a fresh start date
+    and a new English title. The sheet is still right about July, and Jira is
+    right about August — they describe different work, so both belong. Dropping
+    it regardless lost a live role from the dashboard, and nothing said so,
+    because the card was simply absent rather than wrong.
+
+    A revived parent keeps its children too, or it would be left asking for
+    people with no openings to show for them.
     """
+    cards = [it for arr in arrays for it in arr]
+    def is_live(it):
+        return not (it.get('cxd') or it.get('fcd') or it.get('hd') or it.get('rd'))
+    revived = {it['key'] for it in cards
+               if it['key'] in CANCELED_SUPERSEDES_JIRA and is_live(it)}
+    revived |= {it['key'] for it in cards
+                if it['key'] in CANCELED_SUPERSEDES_JIRA and it.get('pk') in revived}
+    if revived:
+        print('  ! reopened since being superseded, so kept: '
+              + ', '.join(sorted(revived)))
     removed = []
     for arr in arrays:
         keep = []
         for it in arr:
-            if it.get('origin') != 'sheet' and it['key'] in CANCELED_SUPERSEDES_JIRA:
+            if (it.get('origin') != 'sheet' and it['key'] in CANCELED_SUPERSEDES_JIRA
+                    and it['key'] not in revived):
                 removed.append(it['key'])
             else:
                 keep.append(it)
@@ -375,13 +397,15 @@ def validate_reconciliation(linked, superseded, *arrays):
         if target not in keys:
             problems.append(f'CANCELED_ATTACH_TO {req} → {target}: no such card in the '
                             f'dataset, so its rows would stand as a separate role')
-    missing = CANCELED_SUPERSEDES_JIRA - set(superseded)
+    # A key that removed nothing is either gone from Jira or revived; the revived
+    # case is legitimate and already reported, so only complain when the card is
+    # absent entirely.
+    present = {it["key"] for arr in arrays for it in arr}
+    missing = CANCELED_SUPERSEDES_JIRA - set(superseded) - present
     for key in sorted(missing):
-        problems.append(f'CANCELED_SUPERSEDES_JIRA {key}: nothing was removed — either it '
-                        f'is gone from Jira (drop it from the set) or it never arrived')
-    still_here = CANCELED_SUPERSEDES_JIRA & keys
-    for key in sorted(still_here):
-        problems.append(f'CANCELED_SUPERSEDES_JIRA {key}: still present after the drop')
+        problems.append(f'CANCELED_SUPERSEDES_JIRA {key}: nothing was removed and the card '
+                        f'is not in the dataset — it is gone from Jira, drop it from the set')
+
     if problems:
         raise SystemExit('stale reconciliation:\n  ' + '\n  '.join(problems))
     # The identity matcher is a heuristic, so it warns rather than fails: titles
