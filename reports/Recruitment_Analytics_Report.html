@@ -650,6 +650,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
 .gc-lock { font-size:12px; font-weight:600; padding:5px 12px; border-radius:7px; cursor:pointer;
            border:1px solid var(--border); background:var(--white); color:var(--text2); }
 .gc-lock.on { background:#4a3829; border-color:#4a3829; color:#fff; }
+.gc-lock-note { font-size:11px; color:#7d6a4f; margin-left:8px; align-self:center; max-width:340px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .gc-sel:disabled, .seg button:disabled { opacity:.45; cursor:not-allowed; }
 
 /* Three panels instead of two. The stat rows and legend carry FIXED pixel
@@ -717,7 +718,8 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
         </div>
         <select class="gc-sel" id="f-overview-month"   onchange="setMonth('overview',this.value)"></select>
         <button class="gc-lock" id="f-lock" onclick="toggleLock()">🔓 Freeze period</button>
-        <span class="info-i" tabindex="0" data-tip="Freeze the period before sending the report, so the reader sees exactly the month you selected.">i</span>
+        <span id="f-lock-note" class="gc-lock-note" style="display:none"></span>
+        <span class="info-i" tabindex="0" data-tip="Freeze the period, then share the link: it copies to your clipboard with the period written into it, and whoever opens it lands on exactly this month with the controls locked.&#10;&#10;Unfreezing removes it from the link again. A plain link, without freezing, always opens on the current month.">i</span>
       </div>
     </div>
     <div class="section">
@@ -1828,9 +1830,68 @@ function rolesPriorityTable(items,scope){
     {key:'NA',    label:'—',      match:v=>prBucket(v)==='—'},
   ],{prioCol:1});
 }
-// Period can be frozen so a report sent to someone else opens on the month you chose.
+// ── Freezing the period, and making the freeze travel ───────────────────────
+// This used to be a bare `let PERIOD_LOCKED=false` that only greyed out the
+// controls in the tab you were looking at. Nothing persisted it — no storage,
+// no URL — so it survived neither a reload nor being sent to anyone, while the
+// button's own tooltip promised the reader would "see exactly the month you
+// selected". The state now lives in the URL fragment, which is the one place
+// that travels with a link across all three publication surfaces.
 let PERIOD_LOCKED=false;
-function toggleLock(){PERIOD_LOCKED=!PERIOD_LOCKED;_applyLock();}
+function _periodHash(){
+  const p=new URLSearchParams();
+  p.set('period', PERIOD.p);
+  if(PERIOD.p==='custom'){ p.set('from', PERIOD.f||''); p.set('to', PERIOD.t||''); }
+  p.set('lock','1');
+  return '#'+p.toString();
+}
+function frozenLink(){
+  return location.origin+location.pathname+location.search+_periodHash();
+}
+// Restore on load. A malformed fragment is ignored rather than fatal — someone
+// will edit one of these links by hand eventually.
+function _readPeriodHash(){
+  if(!location.hash || location.hash.length<2) return false;
+  let p; try{ p=new URLSearchParams(location.hash.slice(1)); }catch(e){ return false; }
+  const period=p.get('period');
+  if(!period) return false;
+  if(period==='custom'){
+    const f=p.get('from'), t=p.get('to');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(f||'')||!/^\d{4}-\d{2}-\d{2}$/.test(t||'')) return false;
+    PERIOD.p='custom'; PERIOD.f=f; PERIOD.t=t;
+    const mo=document.getElementById('f-overview-month');
+    if(mo) mo.value=f.slice(0,7);
+  } else {
+    if(!_presetRange(period)) return false;
+    PERIOD.p=period; PERIOD.f=null; PERIOD.t=null;
+    _segOn('f-overview-period','data-p',period);
+  }
+  PERIOD_LOCKED=p.get('lock')==='1';
+  return true;
+}
+function toggleLock(){
+  PERIOD_LOCKED=!PERIOD_LOCKED;
+  if(PERIOD_LOCKED){
+    history.replaceState(null,'',_periodHash());
+    const link=frozenLink();
+    // Clipboard needs a secure context; both live surfaces are https, but a
+    // file:// copy of the report is not, so fall back to showing the link.
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(link).then(()=>_lockNote('Link copied — the reader opens on this period'),
+                                               ()=>_lockNote(link));
+    } else _lockNote(link);
+  } else {
+    history.replaceState(null,'',location.pathname+location.search);
+    _lockNote('');
+  }
+  _applyLock();
+}
+function _lockNote(msg){
+  const el=document.getElementById('f-lock-note');
+  if(!el) return;
+  el.textContent=msg;
+  el.style.display=msg?'':'none';
+}
 function _applyLock(){
   const mo=document.getElementById('f-overview-month'); if(mo)mo.disabled=PERIOD_LOCKED;
   const seg=document.getElementById('f-overview-period');
@@ -2092,6 +2153,10 @@ function renderClosed(){
 function renderScope(scope){if(scope==='overview')renderOverview();else if(scope==='active')renderActive();else if(scope==='closed')renderClosed();}
 function renderAll(){renderOverview();renderActive();renderClosed();}
 _populatePeriodSelects();
+// The fragment has to be read AFTER the selects exist, so the month dropdown can
+// be set to match, and BEFORE the first render, so the page never flashes the
+// default period first.
+_readPeriodHash();
 renderAll();
 </script>
 </body>
