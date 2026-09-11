@@ -705,7 +705,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Data: September 11, 2026, updated 14:59 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: September 11, 2026, updated 15:26 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -1822,10 +1822,16 @@ function _deptHead(){
 // half that is NOT the named subteam keeps the department's own name, so
 // Marketing becomes Creative + Marketing and Product becomes Design + Product.
 // A department with no entry here is never splittable.
+// `re` is a PREFIX match on purpose: Marketing's dropdown carries both
+// 'Creative' and 'Creative Marketing', and both are the Creative team.
+// `looks` names the vacancy titles that ought to land in that half — nothing
+// uses it to classify, only to warn when a title says one thing and the subteam
+// another, which is otherwise silent.
+// Product splits on the mobile board only; the web board has no Design subteam,
+// and a rule that never fires is a rule nobody maintains.
 const DEPT_SPLITS={
-  'Marketing':        {re:/^Creative/i, label:'Creative'},
-  'Product (Mobile)': {re:/^Design/i,   label:'Design'},
-  'Product (Web)':    {re:/^Design/i,   label:'Design'},
+  'Marketing':        {re:/^Creative/i, label:'Creative', looks:/creative|designer|motion|graphic/i},
+  'Product (Mobile)': {re:/^Design/i,   label:'Design',   looks:/design|ui\/ux/i},
 };
 // The department's own name for the remainder half — without the board pill,
 // which would read oddly on an indented row.
