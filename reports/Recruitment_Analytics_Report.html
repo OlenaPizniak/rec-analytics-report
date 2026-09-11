@@ -1262,7 +1262,33 @@ function tthDays(from,to){
 function jl(k){return `<a class="jl" href="${J}${k}" target="_blank">${k}</a>`;}
 function fv(v){return v&&v!=='-'?v:`<span class="dash-val">—</span>`;}
 function srcTag(s){return `<span class="tag-src ${s}">${s==='mobile'?'📱 Mobile':'💻 Web'}</span>`;}
-const _attr=o=>`data-mf='${JSON.stringify(o)}'`;
+// Free text reaches the page from Jira, so it has to be escaped before it is
+// interpolated — into element bodies AND into attributes. The candidate-source
+// "Other" field is typed by hand; an apostrophe alone would have broken
+// _attr's single-quoted JSON.
+const _esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// The attribute is delimited by SINGLE quotes, so only & and ' need escaping
+// there — running the full _esc over it turned every JSON `"` into &quot;,
+// which browsers decode fine but which makes the markup unreadable and
+// unparseable by anything reading the raw HTML.
+const _attr=o=>`data-mf='${JSON.stringify(o).replace(/&/g,'&amp;').replace(/'/g,'&#39;')}'`;
+// Jira's "Candidate source" is a picklist whose last option is literally
+// `Other`, with the real answer typed into the companion free-text field
+// "Candidate source [Other]". Bucketing all of those as one "Other" threw that
+// answer away: two hires from a Telegram channel and from a lay-off platform
+// were indistinguishable on the chart.
+//
+// The substitution is deliberately narrow — ONLY when the picklist says Other.
+// A card with the picklist empty and the free-text filled (WRP-76 today) is
+// left as "(Not specified)": nobody chose Other there, and quietly promoting
+// stray text would invent a source category out of a note.
+function csRaw(v){
+  const pick=(v.cs||'').trim(), free=(v.cs_other||'').trim();
+  if(pick==='Other') return free||pick;
+  return pick||null;
+}
+function csLabel(v){return csRaw(v)||'(Not specified)';}   // grouping / filtering
+function csCell(v){const s=csRaw(v);return fv(s?_esc(s):null);}  // a table cell keeps its dash
 
 // ── domain helpers ──
 const SEN_ORDER=['Intern','Junior','Middle','Senior','Lead','Expert'];
@@ -1648,7 +1674,7 @@ function itemsFor(mf){
   // Design — and `sub` carries which half was pressed.
   if(mf.sub) arr=arr.filter(v=>subBucket(v)===mf.sub);
   if(mf.prio) arr=arr.filter(v=>prBucket(v)===mf.prio);
-  if(mf.cs) arr=arr.filter(v=>(v.cs||'(Not specified)')===mf.cs);
+  if(mf.cs) arr=arr.filter(v=>csLabel(v)===mf.cs);
   if(mf.sen) arr=arr.filter(v=>(v.sn||'—')===mf.sen);
   if(mf.kindGroup==='op') arr=arr.filter(v=>v.kind==='op'||v.kind==='op_sub');
   if(mf.kindGroup==='ra') arr=arr.filter(v=>v.kind==='ra'||v.kind==='ra_sub');
@@ -1658,7 +1684,7 @@ function itemsFor(mf){
   else if(mf.dim==='reason') arr=arr.filter(v=>reasonLabel(v.r)===mf.val);
   else if(mf.dim==='dept') arr=arr.filter(v=>deptOf(v)===mf.val);
   else if(mf.dim==='sen') arr=arr.filter(v=>(v.sn||'—')===mf.val);
-  else if(mf.dim==='src') arr=arr.filter(v=>(v.cs||'(Not specified)')===mf.val);
+  else if(mf.dim==='src') arr=arr.filter(v=>csLabel(v)===mf.val);
   return arr;
 }
 
@@ -1735,7 +1761,7 @@ function _renderModal(){
       else if(c==='r')h+=`<td>${_reasonBadge(v.r)}</td>`;
       else if(c==='rec')h+=`<td>${fv(v.rec)}</td>`;
       else if(c==='src')h+=`<td>${fv(v.src)}</td>`;
-      else if(c==='cs')h+=`<td>${fv(v.cs)}</td>`;
+      else if(c==='cs')h+=`<td>${csCell(v)}</td>`;
       else if(c==='sd')h+=`<td>${fv(v.sd)}</td>`;
       else if(c==='state'){const m={'Active':['#e7ddcb','#4a3829'],'Closed':['#e9dfcb','#5c4a2e'],'Canceled':['#f0ddce','#8a4a2e']}[v._state]||['#f1e9db','#8a7358'];
         h+=`<td><span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:${m[0]};color:${m[1]}">${v._state}</span></td>`;}
@@ -2298,7 +2324,7 @@ function closedDetailTable(items,scope){
       const cd=closeDate(v),ttf=ttfDays(startDate(v),cd);
       h+=(i===0&&gi>0)?'<tr class="dep-start">':'<tr>';
       if(i===0)h+=`<td rowspan="${entries.length}" class="dep">${deptLabel(dep)}</td>`;
-      h+=`<td>${fv(v.s)}</td><td>${_reasonBadge(v.r)}</td><td>${fv(v.sn)}</td><td>${_ua(v.sd)}</td><td>${_ua(cd)}</td><td>${_monthLabel(cd)}</td><td class="num">${ttf!=null?ttf+'d':'—'}</td><td class="num">${cd?cd.slice(0,4):'—'}</td><td>${fv(v.cs)}</td><td>${_esCell(v)}</td></tr>`;
+      h+=`<td>${fv(v.s)}</td><td>${_reasonBadge(v.r)}</td><td>${fv(v.sn)}</td><td>${_ua(v.sd)}</td><td>${_ua(cd)}</td><td>${_monthLabel(cd)}</td><td class="num">${ttf!=null?ttf+'d':'—'}</td><td class="num">${cd?cd.slice(0,4):'—'}</td><td>${csCell(v)}</td><td>${_esCell(v)}</td></tr>`;
     });
   });
   return h+'</tbody></table>';
@@ -2325,17 +2351,18 @@ function hsRender(){
   let arr=_hsBase();
   if(HS.dept!=='All') arr=arr.filter(v=>deptOf(v)===HS.dept);
   if(HS.sen!=='All') arr=arr.filter(v=>(v.sn||'—')===HS.sen);
-  const bySrc={}; arr.forEach(v=>{const s=v.cs||'(Not specified)';bySrc[s]=(bySrc[s]||0)+(v.h||1);});
+  const bySrc={}; arr.forEach(v=>{const s=csLabel(v);bySrc[s]=(bySrc[s]||0)+(v.h||1);});
   const rows=Object.entries(bySrc).sort((a,b)=>((a[0]==='(Not specified)')-(b[0]==='(Not specified)'))||b[1]-a[1]);
   const totalHires=rows.reduce((s,[,n])=>s+n,0), nSources=rows.length, top=rows.filter(([s])=>s!=='(Not specified)')[0]||rows[0];
   document.getElementById('hs-cards').innerHTML=
     `<div class="hs-card"><div class="lbl">Total hires</div><div class="val">${totalHires}</div><div class="sub">in period</div></div>`+
     `<div class="hs-card"><div class="lbl">Sources</div><div class="val">${nSources}</div><div class="sub">unique</div></div>`+
-    `<div class="hs-card"><div class="lbl">Top source</div><div class="val src">${top?top[0]:'—'}</div><div class="sub">${top?top[1]+' hires':''}</div></div>`;
+    `<div class="hs-card"><div class="lbl">Top source</div><div class="val src">${top?_esc(top[0]):'—'}</div><div class="sub">${top?top[1]+' hires':''}</div></div>`;
   const max=top?top[1]:1;
   let bars='';
   rows.forEach(([s,n],i)=>{const w=Math.max(2,n/max*100);
-    bars+=`<div class="hsbh-row"><div class="hsbh-name" title="${s}">${s}</div><div class="hsbh-track"><div class="hsbh-bar" style="width:${w}%;background:${HS_EARTH[i%HS_EARTH.length]}" data-tip="${s} — ${n}"></div><div class="hsbh-val">${n}</div></div></div>`;});
+    const e=_esc(s);
+    bars+=`<div class="hsbh-row"><div class="hsbh-name" title="${e}">${e}</div><div class="hsbh-track"><div class="hsbh-bar" style="width:${w}%;background:${HS_EARTH[i%HS_EARTH.length]}" data-tip="${e} — ${n}"></div><div class="hsbh-val">${n}</div></div></div>`;});
   document.getElementById('hs-chart').innerHTML=rows.length?`<div class="hsbh">${bars}</div>`:'<div class="empty-note">No data for sources matching this filter.</div>';
 }
 // Closed tab: filter by role kind (all / vacancies / recruitment assignments)
