@@ -132,6 +132,24 @@ def _team(raw):
     return {'E-com': 'E-commerce'}.get(t, t) or None
 
 
+def _subteam(raw):
+    """The sheet's Subteam column, or None when it says there is none.
+
+    'non-existent' is a literal the recruiters type to mean "no subteam" — 55
+    rows across the two files carry it. Left alone it becomes a subteam of that
+    name, and the Creative/Design splits would show it as a third group.
+
+    Values are otherwise passed through untouched. They do not always match
+    Jira's spelling ('HC Quiz' against 'Health Coaching Quiz'), which does not
+    matter while the only things read off this field are the Creative and Design
+    splits — but it will matter the day anything groups by subteam directly.
+    """
+    t = (raw or '').strip()
+    if not t or t.lower() in ('non-existent', 'none', '—', '-'):
+        return None
+    return t
+
+
 def _kind(employee_status, is_sub):
     """'Expert' is the spreadsheet's third employment type → Recruitment
     Assignment, matching how esBucket() treats it on the Jira side."""
@@ -194,7 +212,7 @@ def load(path=None):
                 'cs_other': None,
                 'h': 1,
                 't': team or None,
-                'sb': None,              # sub-teams are deliberately not used
+                'sb': _subteam(_get(r, 'Subteam')),
                 'cr': published,
                 'origin': 'sheet',       # provenance, for debugging
             }
@@ -323,7 +341,7 @@ def load_canceled(path=None, attach_to=None):
                 'cs': None, 'cs_other': None,
                 'h': 1,
                 't': team or None,
-                'sb': None,
+                'sb': _subteam(_get(r, 'Subteam')),
                 'cr': published,
                 'origin': 'sheet',
             }
