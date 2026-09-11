@@ -726,10 +726,14 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
         <div class="seg" id="f-overview-period">
           <button data-p="month" onclick="setPeriod('overview','month')" class="on">Current month</button>
         </div>
-        <select class="gc-sel" id="f-overview-month"   onchange="setMonth('overview',this.value)"></select>
+        <div class="seg sm" id="f-overview-grain">
+          <button data-g="month" onclick="setGrain('month')" class="on">Month</button>
+          <button data-g="episode" onclick="setGrain('episode')">Episode</button>
+        </div>
+        <select class="gc-sel" id="f-overview-month"   onchange="onPeriodPick(this.value)"></select>
         <button class="gc-lock" id="f-lock" onclick="toggleLock()">🔓 Freeze period</button>
         <span id="f-lock-note" class="gc-lock-note" style="display:none"></span>
-        <span class="info-i" tabindex="0" data-tip="Freeze the period, then share the link: it copies to your clipboard with the period written into it, and whoever opens it lands on exactly this month with the controls locked.&#10;&#10;Unfreezing removes it from the link again. A plain link, without freezing, always opens on the current month.">i</span>
+        <span class="info-i" tabindex="0" data-tip="Freeze the period, then share the link: it copies to your clipboard with the period written into it, and whoever opens it lands on exactly this period &mdash; month or episode &mdash; with the controls locked.&#10;&#10;Unfreezing removes it from the link again. A plain link, without freezing, always opens on the current month.&#10;&#10;Month or Episode chooses what the dropdown lists. An episode is the team&#39;s four-month planning block, and only FINISHED episodes are offered &mdash; a running one cannot be averaged.">i</span>
       </div>
     </div>
     <div class="section">
@@ -1303,7 +1307,7 @@ function _presetRange(p){
 }
 // Period is GLOBAL — picked once on Overview, obeyed by every tab.
 // ST is kept only so older per-scope call sites keep working; it is no longer read.
-const PERIOD={p:'month',f:null,t:null};
+const PERIOD={p:'month',f:null,t:null,ep:null};
 function _range(scope){
   if(PERIOD.p==='custom') return [PERIOD.f,PERIOD.t];
   return _presetRange(PERIOD.p)||[null,null];
@@ -1505,10 +1509,76 @@ function _periodReset(scope){
   _segOn('f-'+scope+'-period','data-p','__none__');
   ['month','quarter','year'].forEach(k=>{const el=document.getElementById('f-'+scope+'-'+k);if(el)el.selectedIndex=0;});
 }
-function setPeriod(scope,p){_periodReset('overview');PERIOD.p=p;PERIOD.f=null;PERIOD.t=null;_segOn('f-overview-period','data-p',p);renderAll();}
-function setMonth(scope,val){if(!val)return;_periodReset('overview');const el=document.getElementById('f-overview-month');if(el)el.value=val;const y=+val.slice(0,4),m=+val.slice(5,7);PERIOD.p='custom';PERIOD.f=_fmt(new Date(y,m-1,1));PERIOD.t=_fmt(new Date(y,m,0));renderAll();}
+function setPeriod(scope,p){_periodReset('overview');_setGrain('month');PERIOD.p=p;PERIOD.f=null;PERIOD.t=null;PERIOD.ep=null;_segOn('f-overview-period','data-p',p);renderAll();}
+function setMonth(scope,val){if(!val)return;_periodReset('overview');_setGrain('month');PERIOD.ep=null;const el=document.getElementById('f-overview-month');if(el)el.value=val;const y=+val.slice(0,4),m=+val.slice(5,7);PERIOD.p='custom';PERIOD.f=_fmt(new Date(y,m-1,1));PERIOD.t=_fmt(new Date(y,m,0));renderAll();}
 function setQuarter(scope,val){if(!val)return;_periodReset('overview');const el=document.getElementById('f-overview-quarter');if(el)el.value=val;const y=+val.slice(0,4),q=+val.slice(6);PERIOD.p='custom';PERIOD.f=_fmt(new Date(y,(q-1)*3,1));PERIOD.t=_fmt(new Date(y,q*3,0));renderAll();}
 function setYear(scope,val){if(!val)return;_periodReset('overview');const el=document.getElementById('f-overview-year');if(el)el.value=val;const y=+val;PERIOD.p='custom';PERIOD.f=_fmt(new Date(y,0,1));PERIOD.t=_fmt(new Date(y,11,31));renderAll();}
+// ── granularity: Month or Episode ──────────────────────────────────────
+// ONE dropdown with two vocabularies, not two dropdowns. A month and an
+// episode are mutually exclusive periods, so a second select would have to be
+// greyed out whenever the first was used; the toggle says that in less space.
+//
+// Only FINISHED episodes are offered, and only ones starting on or after the
+// data floor. Both exclusions are about not showing a number nobody can
+// qualify: a running episode reports a four-month planning block against a
+// partial window, and the TTF/TTH cards (which already refuse to average an
+// unfinished episode) would quietly fall back to the PREVIOUS one while the
+// tables below showed the current one — two different episodes on one screen.
+// An episode reaching back past January 2026 has no data for most of its
+// months. Excluding both keeps the whole page on a single, complete episode.
+let GRAIN='month', _MONTH_OPTS='';
+function _finishedEpisodes(){
+  const today=_fmt(TODAY), floor=_fmt(new Date(FLOOR_PERIOD[0],FLOOR_PERIOD[1],1));
+  const out=[];
+  for(let i=_episodeIndex(TODAY.getFullYear(),TODAY.getMonth());;i--){
+    const ep=_episodeAt(i);
+    if(ep.from<floor) break;      // past the data floor — nothing older qualifies
+    if(ep.to<today) out.push(ep); // newest first, matching the month list
+  }
+  return out;
+}
+function _episodeOptLabel(ep){
+  const f=new Date(ep.from), t=new Date(ep.to);
+  const span=f.getFullYear()===t.getFullYear()
+    ? `${_MONTHS_UA[f.getMonth()]} — ${_MONTHS_UA[t.getMonth()]} ${t.getFullYear()}`
+    : `${_MONTHS_UA[f.getMonth()]} ${f.getFullYear()} — ${_MONTHS_UA[t.getMonth()]} ${t.getFullYear()}`;
+  return `Episode ${ep.no} · ${span}`;
+}
+function _fillPeriodSelect(){
+  const el=document.getElementById('f-overview-month');
+  if(!el) return;
+  if(GRAIN!=='episode'){ el.innerHTML=_MONTH_OPTS; return; }
+  const eps=_finishedEpisodes();
+  // Nothing to offer until the first episode ends. Say so in the control
+  // rather than presenting an empty list that looks broken.
+  el.innerHTML=eps.length
+    ? '<option value="">Episode…</option>'+eps.map(e=>`<option value="ep:${e.i}">${_episodeOptLabel(e)}</option>`).join('')
+    : '<option value="">No finished episode yet</option>';
+}
+function _setGrain(g){GRAIN=g;_segOn('f-overview-grain','data-g',g);_fillPeriodSelect();}
+function setGrain(g){
+  if(PERIOD_LOCKED) return;
+  // Switching the vocabulary does not move the period — it changes what is on
+  // offer. The selection stands until something is actually picked.
+  _setGrain(g);
+}
+function setEpisode(val){
+  const i=parseInt(String(val).slice(3),10);
+  if(!Number.isFinite(i)) return;
+  const ep=_episodeAt(i);
+  _periodReset('overview');
+  _setGrain('episode');
+  const el=document.getElementById('f-overview-month'); if(el)el.value='ep:'+i;
+  PERIOD.p='custom'; PERIOD.f=ep.from; PERIOD.t=ep.to; PERIOD.ep=i;
+  renderAll();
+}
+// The select carries both vocabularies, so its change handler routes by value
+// rather than by the current grain — a restored link can set the value before
+// anything is clicked.
+function onPeriodPick(val){
+  if(!val) return;
+  if(String(val).indexOf('ep:')===0) setEpisode(val); else setMonth('overview',val);
+}
 function _allDates(){const ds=[];[OP,RA,CV,(typeof CX!=='undefined'?CX:[])].forEach(a=>a.forEach(v=>{if(v.sd)ds.push(v.sd);const c=closeDate(v);if(c)ds.push(c);}));return ds;}
 // January 2026 — see the note on the floor in _populatePeriodSelects.
 const FLOOR_PERIOD=[2026,0];
@@ -1531,14 +1601,16 @@ function _populatePeriodSelects(){
     const qFrom=(y===floorY?floorQ:0), qTo=(y===maxY?curQ:3);
     for(let q=qTo;q>=qFrom;q--)quarters.push([y,q]);}
   for(let y=maxY;y>=minY;y--)years.push(y);
+  _MONTH_OPTS='<option value="">Month…</option>'+months.map(a=>`<option value="${a[0]}-${String(a[1]+1).padStart(2,'0')}">${_MONTHS_UA[a[1]]} ${a[0]}</option>`).join('');
   ['overview','closed'].forEach(function(sc){
     const mo=document.getElementById('f-'+sc+'-month');
-    if(mo)mo.innerHTML='<option value="">Month…</option>'+months.map(a=>`<option value="${a[0]}-${String(a[1]+1).padStart(2,'0')}">${_MONTHS_UA[a[1]]} ${a[0]}</option>`).join('');
+    if(mo)mo.innerHTML=_MONTH_OPTS;
     const qo=document.getElementById('f-'+sc+'-quarter');
     if(qo)qo.innerHTML='<option value="">Quarter…</option>'+quarters.map(a=>`<option value="${a[0]}-Q${a[1]+1}">Q${a[1]+1} ${a[0]}</option>`).join('');
     const yo=document.getElementById('f-'+sc+'-year');
     if(yo)yo.innerHTML='<option value="">Year…</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
   });
+  _fillPeriodSelect();
 }
 
 // ── tabs ──
@@ -1931,7 +2003,12 @@ let PERIOD_LOCKED=false;
 function _periodHash(){
   const p=new URLSearchParams();
   p.set('period', PERIOD.p);
-  if(PERIOD.p==='custom'){ p.set('from', PERIOD.f||''); p.set('to', PERIOD.t||''); }
+  if(PERIOD.p==='custom'){
+    p.set('from', PERIOD.f||''); p.set('to', PERIOD.t||'');
+    // The window alone would restore the right DATA but the wrong LABEL: the
+    // reader would land on Feb 1 – May 31 with the control reading "Month…".
+    if(PERIOD.ep!=null) p.set('ep', String(PERIOD.ep));
+  }
   p.set('lock','1');
   return '#'+p.toString();
 }
@@ -1950,7 +2027,20 @@ function _readPeriodHash(){
     if(!/^\d{4}-\d{2}-\d{2}$/.test(f||'')||!/^\d{4}-\d{2}-\d{2}$/.test(t||'')) return false;
     PERIOD.p='custom'; PERIOD.f=f; PERIOD.t=t;
     const mo=document.getElementById('f-overview-month');
-    if(mo) mo.value=f.slice(0,7);
+    // `ep` is only believed when its window matches from/to. A hand-edited
+    // link must not be able to label an arbitrary range as an episode.
+    const epi=p.get('ep'), ep=/^-?\d+$/.test(epi||'')?_episodeAt(+epi):null;
+    if(ep&&ep.from===f&&ep.to===t){
+      PERIOD.ep=ep.i; _setGrain('episode');
+      if(mo) mo.value='ep:'+ep.i;
+    } else {
+      // Not an episode window — say so on BOTH the state and the control.
+      // Leaving PERIOD.ep alone let a rejected `ep` survive from whatever was
+      // selected before, and the next freeze would have written that stale
+      // index back into the link.
+      PERIOD.ep=null; _setGrain('month');
+      if(mo) mo.value=f.slice(0,7);
+    }
   } else {
     if(!_presetRange(period)) return false;
     PERIOD.p=period; PERIOD.f=null; PERIOD.t=null;
@@ -1984,8 +2074,10 @@ function _lockNote(msg){
 }
 function _applyLock(){
   const mo=document.getElementById('f-overview-month'); if(mo)mo.disabled=PERIOD_LOCKED;
-  const seg=document.getElementById('f-overview-period');
-  if(seg)seg.querySelectorAll('button').forEach(b=>{b.disabled=PERIOD_LOCKED;});
+  ['f-overview-period','f-overview-grain'].forEach(id=>{
+    const seg=document.getElementById(id);
+    if(seg)seg.querySelectorAll('button').forEach(b=>{b.disabled=PERIOD_LOCKED;});
+  });
   const b=document.getElementById('f-lock');
   if(b){b.textContent=PERIOD_LOCKED?'🔒 Period frozen':'🔓 Freeze period';b.classList.toggle('on',PERIOD_LOCKED);}
 }
