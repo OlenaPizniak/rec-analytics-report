@@ -2098,9 +2098,13 @@ function activeDetailTable(items,scope){
     // column that would sit empty for eighteen departments out of nineteen, the
     // halves are announced by a band row inside the department's own block —
     // which also gives the per-subteam subtotal that exists nowhere else.
+    // A band LABELS its group; it does not announce a split. So one is drawn
+    // whenever the named subteam has rows at all, even when it is the only
+    // group that month — August's Marketing closures were all Creative, and
+    // suppressing the band there read as "the split is broken" rather than
+    // "all of it is Creative".
     const sp=DEPT_SPLITS[dep];
-    const splittable = !!sp && rows.some(arr=>subBucket(arr[0])===sp.label)
-                            && rows.some(arr=>subBucket(arr[0])!==sp.label);
+    const splittable = !!sp && rows.some(arr=>subBucket(arr[0])===sp.label);
     let entries;
     if(!splittable){
       entries=rows.map(arr=>({arr}));
@@ -2172,9 +2176,36 @@ function closedDetailTable(items,scope){
   const order=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);
   let h='<table class="dtbl"><thead><tr><th>Department</th><th>Vacancy</th><th>Reason</th><th>Seniority</th><th>Published</th><th>Closed</th><th>Closed Month</th><th class="num">Time to fill</th><th class="num">Closing year</th><th>Job boards</th><th>Staff/Non-staff</th></tr></thead><tbody>';
   order.forEach((dep,gi)=>{const g=groups[dep];
-    g.forEach((v,i)=>{const cd=closeDate(v),ttf=ttfDays(startDate(v),cd);
+    // Same split as the Active table: Marketing announces Creative, Product
+    // announces Design, with a band row inside the department's own block. The
+    // subtotal counts CLOSURES rather than roles — on this tab a row is one
+    // opening that closed, which is what the Closed tab has always counted.
+    const sp=DEPT_SPLITS[dep];
+    const splittable = !!sp && g.some(v=>subBucket(v)===sp.label);
+    let entries;
+    if(!splittable){
+      entries=g.map(v=>({v}));
+    } else {
+      entries=[];
+      [sp.label,_splitRest(dep)].forEach(half=>{
+        const mine=g.filter(v=>subBucket(v)===half);
+        if(!mine.length) return;
+        entries.push({band:half, n:mine.length});
+        mine.forEach(v=>entries.push({v}));
+      });
+    }
+    entries.forEach((e,i)=>{
+      if(e.band){
+        h+=(i===0&&gi>0)?'<tr class="dep-start sub-band">':'<tr class="sub-band">';
+        if(i===0) h+=`<td rowspan="${entries.length}" class="dep">${deptLabel(dep)}</td>`;
+        h+=`<td colspan="10"><span class="sb-name">${e.band}</span>`+
+           `<span class="sb-meta">${e.n} ${e.n===1?'closure':'closures'}</span></td></tr>`;
+        return;
+      }
+      const v=e.v;
+      const cd=closeDate(v),ttf=ttfDays(startDate(v),cd);
       h+=(i===0&&gi>0)?'<tr class="dep-start">':'<tr>';
-      if(i===0)h+=`<td rowspan="${g.length}" class="dep">${deptLabel(dep)}</td>`;
+      if(i===0)h+=`<td rowspan="${entries.length}" class="dep">${deptLabel(dep)}</td>`;
       h+=`<td>${fv(v.s)}</td><td>${_reasonBadge(v.r)}</td><td>${fv(v.sn)}</td><td>${_ua(v.sd)}</td><td>${_ua(cd)}</td><td>${_monthLabel(cd)}</td><td class="num">${ttf!=null?ttf+'d':'—'}</td><td class="num">${cd?cd.slice(0,4):'—'}</td><td>${fv(v.cs)}</td><td>${_esCell(v)}</td></tr>`;
     });
   });
