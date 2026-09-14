@@ -705,7 +705,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Data: September 13, 2026, updated 22:11 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: September 14, 2026, updated 06:50 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -1309,7 +1309,37 @@ function esBucket(v){
 // Teams that exist on BOTH boards and must be split Mobile/Web (each gets a board pill).
 // Every other department is a single merged group — web + mobile roll up together, no pill.
 const DEPT_BADGE_DEPTS=['Engineering','Product','Product Design'];
-function deptOf(v){const d=v.t;if(!d)return '(Not specified)';return DEPT_BADGE_DEPTS.includes(d)?d+(v.source==='web'?' (Web)':' (Mobile)'):d;}
+// Which side a card belongs to. A team name that STATES its board wins over
+// the board the ticket happens to live on — WRP-76 sits on the web project but
+// its team reads "Product (Mobile)", which is how a web-board card is assigned
+// to the mobile side. Deriving the side from the project alone would move such
+// a card to the other department without a word.
+function _board(v){
+  const m=/\((Mobile|Web)\)$/.exec(v.t||'');
+  return m?m[1]:(v.source==='web'?'Web':'Mobile');
+}
+function _baseTeam(t){return String(t||'').replace(/ \((Mobile|Web)\)$/,'');}
+// Design is a team in its own right, not a subteam of Product.
+//
+// Two shapes reach the same place. Jira's web board spells the team `Design`;
+// the mobile side files designers under Product with Subteam=Design. Both are
+// "Product Design", told apart by their board pill rather than by their name.
+//
+// The promotion out of Product is MOBILE ONLY, by decision: the web side keeps
+// its own `Product Design (Web)` team name already, so a Product (Web) card
+// tagged Design would be a filing mistake rather than a designer.
+//
+// It keys off Subteam, so it is exactly as complete as that column. Three
+// cards named UX Writer / UX Researcher stay in Product because their subteam
+// is UX Research — deliberate, not an oversight.
+function deptOf(v){
+  const d=v.t;
+  if(!d)return '(Not specified)';
+  const base=_baseTeam(d), board=_board(v);
+  if(base==='Design') return 'Product Design ('+board+')';
+  if(base==='Product'&&board==='Mobile'&&/^Design/i.test(v.sb||'')) return 'Product Design (Mobile)';
+  return DEPT_BADGE_DEPTS.includes(d)?d+(v.source==='web'?' (Web)':' (Mobile)'):d;
+}
 // Render a department name with its board as a small pill instead of "(Mobile)/(Web)" text.
 function deptLabel(d){const m=/^(.*) \((Mobile|Web)\)$/.exec(d);if(!m)return d;return DEPT_BADGE_DEPTS.includes(m[1])?`${m[1]}<span class="dept-badge ${m[2].toLowerCase()}">${m[2]}</span>`:m[1];}
 
@@ -1927,9 +1957,14 @@ function _deptHead(){
 // another, which is otherwise silent.
 // Product splits on the mobile board only; the web board has no Design subteam,
 // and a rule that never fires is a rule nobody maintains.
+// Departments shown as two named groups inside one block.
+//
+// 'Product (Mobile)' used to be here, splitting off a Design band. Design is
+// now a department of its own, so no Product card carries sb=Design any more
+// and the band could never be drawn — a dead entry that would quietly start
+// mis-filing the day someone tagged a Product card Design again.
 const DEPT_SPLITS={
-  'Marketing':        {re:/^Creative/i, label:'Creative', looks:/creative|designer|motion|graphic/i},
-  'Product (Mobile)': {re:/^Design/i,   label:'Design',   looks:/design|ui\/ux/i},
+  'Marketing': {re:/^Creative/i, label:'Creative', looks:/creative|designer|motion|graphic/i},
 };
 // The department's own name for the remainder half — without the board pill,
 // which would read oddly on an indented row.
