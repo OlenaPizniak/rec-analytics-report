@@ -363,7 +363,14 @@ def resolve_seniority(source, fld):
 
 
 def resolve_reason(source, fld, kind):
-    raw = get_option(fld.get(F['rec_reason'] if source == 'mobile' else F['wrp_reason']))
+    if source == 'mobile':
+        return map_reason(get_option(fld.get(F['rec_reason'])), kind)
+    # WRP moved onto REC's "Reason for opening" (22877) in 2026-09, and the legacy
+    # "Hiring reason" (13936) came off the WRP create screen at the same time. New
+    # web vacancies therefore carry only 22877, older ones only 13936 until they are
+    # backfilled — read the new field first, fall back to the legacy one. map_reason
+    # normalises both vocabularies ("team increase" and "Extention" alike).
+    raw = get_option(fld.get(F['rec_reason'])) or get_option(fld.get(F['wrp_reason']))
     return map_reason(raw, kind)
 
 
