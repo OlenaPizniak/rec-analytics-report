@@ -108,6 +108,12 @@ BOARDS = {
         'project': 'WRP',
         'kinds': {
             'Vacancy': 'op',
+            # WRP gained the shared "Vacancy sub-task" type (16698, the same issue
+            # type REC uses) in 2026-09, driven by the same multi-hire automation.
+            # Without this entry the type falls through kinds.get(itype, 'op') and
+            # every sub-task is counted as a vacancy in its own right — the exact
+            # double-count fixed for mobile in PR #33.
+            'Vacancy sub-task': 'op_sub',
             'Consultant': 'ra',
         },
         # WRP terminal statuses (category Done): "Closed" (filled) + "Canceled".
