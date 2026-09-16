@@ -34,8 +34,35 @@ jobs:
         with:
           python-version: '3.11'
 
+      # Pinned rather than relying on whatever the runner image ships: the check
+      # step is continue-on-error, so a missing node would skip it in silence —
+      # exactly the failure mode these checks exist to prevent.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Run updater (REC + WRP → Recruitment Analytics Report)
         run: python3 scripts/update_recruitment_analytics.py
+
+      # Runs against the report the updater just wrote, so every refresh is
+      # checked rather than only the ones a human happens to look at. It does NOT
+      # gate the push: most of what it catches is data entered a certain way in
+      # Jira — a subteam spelled anew, a card that ends before it starts — and
+      # blocking the refresh over that would leave the dashboard stale instead of
+      # slightly off. The failure is visible in the run's summary either way.
+      - name: Check report invariants
+        continue-on-error: true
+        env:
+          REPORT_LOCAL_OUT: reports/Recruitment_Analytics_Report.html
+        run: |
+          node scripts/check_local_report.js | tee /tmp/checks.txt
+          {
+            echo '## Report invariants'
+            echo '```'
+            grep -E '✗|checks? passed|FAILED' /tmp/checks.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Commit & push if data changed (conflict-safe)
         run: |

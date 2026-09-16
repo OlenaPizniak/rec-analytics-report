@@ -330,12 +330,20 @@ def get_date(s):
 
 # ── Board-agnostic department resolver ──────────────────────
 def resolve_dept(source, fld):
-    """Return (dept, subteam) normalized. Mobile uses cascading Team&subteams;
-    web uses Team Web + Subteam. Source-suffix disambiguation (e.g. "Engineering
-    (Web)") is applied in the report layer, not here — we keep raw dept + source."""
+    """Return (dept, subteam) normalized. Both boards now use the unified cascading
+    Team & subteams (23547); web falls back to its legacy Team Web + Subteam pair.
+    Source-suffix disambiguation (e.g. "Engineering (Web)") is applied in the report
+    layer, not here — we keep raw dept + source."""
     if source == 'mobile':
         return get_cascading(fld.get(F['rec_team']))
-    # web
+    # WRP is migrating onto the same cascading field as REC (23547). Since 2026-09
+    # the legacy Team Web (13937) + Subteam (13938) pair is off the WRP create
+    # screen, so NEW web vacancies only carry the cascade — read it first. Older
+    # tickets stay on the legacy pair until they are backfilled; fall back to it.
+    # Same pattern as resolve_seniority (WRP moved onto REC's 22876 in 2026-08).
+    dept, subteam = get_cascading(fld.get(F['rec_team']))
+    if dept:
+        return (dept, subteam)
     return (get_option(fld.get(F['wrp_team'])),
             get_option(fld.get(F['wrp_subteam'])))
 
