@@ -705,7 +705,7 @@ tr[class^="st-"]:last-child td { border-bottom: none; }
   </div>
   <div class="header-meta">
     <span class="header-dot"></span>
-    <!--<<<AUTO_DATE_START>>>-->Data: September 16, 2026, updated 22:50 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
+    <!--<<<AUTO_DATE_START>>>-->Data: September 17, 2026, updated 06:49 (Kyiv)<!--<<<AUTO_DATE_END>>>-->
   </div>
 </div>
 
@@ -1980,14 +1980,14 @@ function toggleDept(key){_deptOpen[key]=!_deptOpen[key];renderAll();}
 
 function _deptPivotTable(items,scope,bucket,title,cols,extraMf){
   if(!items.length) return _emptyNote(bucket==='closed'?'closed':'active');
-  const map={};
+  const map={}, byDept={};
   items.forEach(v=>{
     const d=deptOf(v);
-    if(!map[d]){map[d]={roles:0};cols.forEach(c=>{map[d][c.key]=0;});}
-    map[d].roles++;
+    if(!map[d]){map[d]={roles:0};byDept[d]=[];cols.forEach(c=>{map[d][c.key]=0;});}
+    map[d].roles++; byDept[d].push(v);
     cols.forEach(c=>{if(c.match(v))map[d][c.key]++;});
   });
-  const order=Object.keys(map).sort(_deptCmp);
+  const order=_deptOrderFrom(byDept);
   const g={roles:0}; cols.forEach(c=>{g[c.key]=0;});
   order.forEach(d=>{g.roles+=map[d].roles;cols.forEach(c=>{g[c.key]+=map[d][c.key];});});
   const shown=cols.filter(c=>g[c.key]>0);        // empty columns just add noise
@@ -2145,27 +2145,48 @@ function _applyLock(){
 }
 
 const ES_ORDER=['Staff','Non-staff','Consulting','n/a'];
-// ── one canonical department order, shared by EVERY table ───────────────────
-// Ranking is derived from the whole period (Active + Closed + Canceled), never
-// from the individual table's own rows — otherwise each table would sort by its
-// own totals and the same department would sit at a different height on each.
-// Cached per period so switching months recomputes it exactly once.
-let _deptRankCache={key:null,map:null};
-function _deptRank(){
-  const [f,t]=_range('overview');
-  const key=(f||'')+'|'+(t||'');
-  if(_deptRankCache.key===key) return _deptRankCache.map;
-  const cnt={};
-  activeItems('overview').concat(closedItems('overview'),stoppedItems('overview'))
-    .forEach(v=>{const d=deptOf(v);cnt[d]=(cnt[d]||0)+1;});
-  const map={};
-  Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a.localeCompare(b)).forEach((d,i)=>{map[d]=i;});
-  _deptRankCache={key,map};
-  return map;
+// ── department order ────────────────────────────────────────────────────────
+// Most roles first, and "roles" means the number this table PRINTS.
+//
+// The rank used to be computed once from the whole period (active + closed +
+// canceled) and shared by every table, so that a department sat at the same
+// height everywhere. The cost was that a table could contradict its own Roles
+// column: in March the Active table put Brand Communications (1 active role)
+// above Finance (3), because Brand Communications had three roles across the
+// period. A reader comparing 1 against 3 has no way to know that.
+//
+// These six always come last, in this order, and only when the table has rows
+// for them. They are the board-split departments; keeping them together at the
+// foot stops Product and Engineering interleaving with the business teams by
+// accident of headcount.
+const PINNED_TAIL=['Product (Mobile)','Product (Web)',
+                   'Product Design (Mobile)','Product Design (Web)',
+                   'Engineering (Mobile)','Engineering (Web)'];
+// A department's roles laid out the way the detail table already shows them —
+// via _roleCmp itself, so the tie-break can never disagree with the row order
+// it claims to follow.
+function _deptProfile(items){
+  return items.slice().sort(_roleCmp)
+              .map(v=>[_ES_RANK[esBucket(v)],_senRank(v.sn)]);
 }
-function _deptCmp(a,b){
-  const m=_deptRank(), ra=m[a], rb=m[b];
-  return (ra===undefined?9e3:ra)-(rb===undefined?9e3:rb)||String(a).localeCompare(String(b));
+// Compared position by position, so ONE Senior beats TWO Juniors — the counts
+// are already equal by the time this runs, which is the only reason comparing
+// element-wise is well defined.
+function _profileCmp(pa,pb){
+  const n=Math.min(pa.length,pb.length);
+  for(let i=0;i<n;i++){
+    if(pa[i][0]!==pb[i][0]) return pa[i][0]-pb[i][0];
+    if(pa[i][1]!==pb[i][1]) return pb[i][1]-pa[i][1];
+  }
+  return 0;
+}
+function _deptOrderFrom(byDept){
+  const prof={}; Object.keys(byDept).forEach(d=>{prof[d]=_deptProfile(byDept[d]);});
+  const head=Object.keys(byDept).filter(d=>PINNED_TAIL.indexOf(d)<0)
+    .sort((a,b)=>byDept[b].length-byDept[a].length
+               ||_profileCmp(prof[a],prof[b])
+               ||String(a).localeCompare(String(b)));
+  return head.concat(PINNED_TAIL.filter(d=>byDept[d]&&byDept[d].length));
 }
 function renderOverview(){
   const scope='overview';
@@ -2227,7 +2248,7 @@ function activeDetailTable(items,scope){
   const groups={};
   list.forEach(v=>{(groups[deptOf(v)]=groups[deptOf(v)]||[]).push(v);});
   const _senIdx=s=>s?SEN_ORDER.indexOf(s):99;
-  const order=Object.keys(groups).sort(_deptCmp);
+  const order=_deptOrderFrom(groups);
   const cell=n=>n?`<span class="num">${n}</span>`:`<span class="num zero">·</span>`;
   let h='<table class="dtbl mtx"><thead>'+
     '<tr><th rowspan="2">Department</th><th rowspan="2">Vacancy</th><th rowspan="2">Seniority</th><th rowspan="2" class="mc">Hires</th>'+
